@@ -30,8 +30,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 import java.util.Map.Entry;
+import java.util.Vector;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -70,6 +70,11 @@ public class TripUploader extends AsyncTask <Long, Integer, Boolean> {
     public static final String USER_ZIP_WORK = "workZIP";
     public static final String USER_ZIP_SCHOOL = "schoolZIP";
     public static final String USER_CYCLING_FREQUENCY = "cyclingFreq";
+
+    public static final String USER_ETHNICITY = "ethnicity";
+    public static final String USER_INCOME = "homeIncome";
+    public static final String USER_RIDERTYPE = "riderType";
+    public static final String USER_RIDERHISTORY = "riderHistory";
 
     public TripUploader(Context ctx) {
         super();
@@ -131,18 +136,25 @@ public class TripUploader extends AsyncTask <Long, Integer, Boolean> {
     private JSONObject getUserJSON() throws JSONException {
         JSONObject user = new JSONObject();
         Map<String, Integer> fieldMap = new HashMap<String, Integer>();
-        fieldMap.put(USER_AGE, new Integer(UserInfoActivity.PREF_AGE));
-        fieldMap.put(USER_EMAIL, new Integer(UserInfoActivity.PREF_EMAIL));
-        fieldMap.put(USER_GENDER, new Integer(UserInfoActivity.PREF_GENDER));
-        fieldMap.put(USER_ZIP_HOME, new Integer(UserInfoActivity.PREF_ZIPHOME));
-        fieldMap.put(USER_ZIP_WORK, new Integer(UserInfoActivity.PREF_ZIPWORK));
-        fieldMap.put(USER_ZIP_SCHOOL, new Integer(UserInfoActivity.PREF_ZIPSCHOOL));
+
+        fieldMap.put(USER_EMAIL, Integer.valueOf(UserInfoActivity.PREF_EMAIL));
+
+        fieldMap.put(USER_ZIP_HOME, Integer.valueOf(UserInfoActivity.PREF_ZIPHOME));
+        fieldMap.put(USER_ZIP_WORK, Integer.valueOf(UserInfoActivity.PREF_ZIPWORK));
+        fieldMap.put(USER_ZIP_SCHOOL, Integer.valueOf(UserInfoActivity.PREF_ZIPSCHOOL));
 
         SharedPreferences settings = this.mCtx.getSharedPreferences("PREFS", 0);
         for (Entry<String, Integer> entry : fieldMap.entrySet()) {
                user.put(entry.getKey(), settings.getString(entry.getValue().toString(), null));
         }
+        user.put(USER_AGE, settings.getInt("" + UserInfoActivity.PREF_AGE, 0));
+        user.put(USER_GENDER, settings.getInt("" + UserInfoActivity.PREF_GENDER, 0));
         user.put(USER_CYCLING_FREQUENCY, Integer.parseInt(settings.getString(""+UserInfoActivity.PREF_CYCLEFREQ, "0"))/100);
+        user.put(USER_ETHNICITY, settings.getInt("" + UserInfoActivity.PREF_ETHNICITY, 0));
+        user.put(USER_INCOME, settings.getInt("" + UserInfoActivity.PREF_INCOME, 0));
+        user.put(USER_RIDERTYPE, settings.getInt("" + UserInfoActivity.PREF_RIDERTYPE, 0));
+        user.put(USER_RIDERHISTORY, settings.getInt("" + UserInfoActivity.PREF_RIDERHISTORY, 0));
+
         return user;
     }
 
@@ -247,7 +259,8 @@ public class TripUploader extends AsyncTask <Long, Integer, Boolean> {
         Log.v("PostData", nameValuePairs.toString());
 
         HttpClient client = new DefaultHttpClient();
-        final String postUrl = "http://bikedatabase.sfcta.org/post/";
+        //TODO: Server URL
+        final String postUrl = "http://cycleatlanta.org/post_dev/";
         HttpPost postRequest = new HttpPost(postUrl);
 
         try {
@@ -289,7 +302,7 @@ public class TripUploader extends AsyncTask <Long, Integer, Boolean> {
         if (cur != null && cur.getCount()>0) {
             //pd.setMessage("Sent. You have previously unsent trips; submitting those now.");
             while (!cur.isAfterLast()) {
-                unsentTrips.add(new Long(cur.getLong(0)));
+                unsentTrips.add(Long.valueOf(cur.getLong(0)));
                 cur.moveToNext();
             }
             cur.close();
@@ -304,7 +317,7 @@ public class TripUploader extends AsyncTask <Long, Integer, Boolean> {
 
     @Override
     protected void onPreExecute() {
-        Toast.makeText(mCtx.getApplicationContext(),"Submitting trip.  Thanks for using CycleTracks!", Toast.LENGTH_LONG).show();
+        Toast.makeText(mCtx.getApplicationContext(),"Submitting trip. Thanks for using Cycle Atlanta!", Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -313,7 +326,7 @@ public class TripUploader extends AsyncTask <Long, Integer, Boolean> {
             if (result) {
                 Toast.makeText(mCtx.getApplicationContext(),"Trip uploaded successfully.", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(mCtx.getApplicationContext(),"CycleTracks couldn't upload the trip, and will retry when your next trip is completed.", Toast.LENGTH_LONG).show();
+                Toast.makeText(mCtx.getApplicationContext(),"Cycle Atlanta couldn't upload the trip, and will retry when your next trip is completed.", Toast.LENGTH_LONG).show();
             }
         } catch (Exception e) {
             // Just don't toast if the view has gone out of context
