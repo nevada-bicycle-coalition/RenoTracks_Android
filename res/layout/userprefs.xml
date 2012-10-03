@@ -345,7 +345,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="15sp"
-            android:text="Save and Exit" />
+            android:text="Save" />
 
     </LinearLayout>
 

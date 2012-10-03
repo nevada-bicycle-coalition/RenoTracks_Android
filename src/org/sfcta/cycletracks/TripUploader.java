@@ -72,9 +72,9 @@ public class TripUploader extends AsyncTask <Long, Integer, Boolean> {
     public static final String USER_CYCLING_FREQUENCY = "cyclingFreq";
 
     public static final String USER_ETHNICITY = "ethnicity";
-    public static final String USER_INCOME = "homeIncome";
-    public static final String USER_RIDERTYPE = "riderType";
-    public static final String USER_RIDERHISTORY = "riderHistory";
+    public static final String USER_INCOME = "income";
+    public static final String USER_RIDERTYPE = "rider_type";
+    public static final String USER_RIDERHISTORY = "rider_history";
 
     public TripUploader(Context ctx) {
         super();
