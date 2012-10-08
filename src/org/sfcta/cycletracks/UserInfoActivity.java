@@ -84,7 +84,8 @@ public class UserInfoActivity extends Activity {
 		btn.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				Intent intent = new Intent(UserInfoActivity.this, MainInput.class);
+				Intent intent = new Intent(UserInfoActivity.this,
+						MainInput.class);
 				startActivity(intent);
 				finish();
 			}
@@ -95,36 +96,50 @@ public class UserInfoActivity extends Activity {
 		Map<String, ?> prefs = settings.getAll();
 		for (Entry<String, ?> p : prefs.entrySet()) {
 			int key = Integer.parseInt(p.getKey());
-			CharSequence value = (CharSequence) p.getValue();
+			// CharSequence value = (CharSequence) p.getValue();
 
 			switch (key) {
-			//case PREF_AGE:
-				// ((EditText)findViewById(R.id.TextAge)).setText(value);
-				//((Spinner) findViewById(R.id.ageSpinner)).getSelectedItemPosition();
-				//break;
+			case PREF_AGE:
+				((Spinner) findViewById(R.id.ageSpinner))
+						.setSelection(((Integer) p.getValue()).intValue());
+				break;
+			case PREF_ETHNICITY:
+				((Spinner) findViewById(R.id.ethnicitySpinner))
+						.setSelection(((Integer) p.getValue()).intValue());
+				break;
+			case PREF_INCOME:
+				((Spinner) findViewById(R.id.incomeSpinner))
+						.setSelection(((Integer) p.getValue()).intValue());
+				break;
+			case PREF_RIDERTYPE:
+				((Spinner) findViewById(R.id.ridertypeSpinner))
+						.setSelection(((Integer) p.getValue()).intValue());
+				break;
+			case PREF_RIDERHISTORY:
+				((Spinner) findViewById(R.id.riderhistorySpinner))
+						.setSelection(((Integer) p.getValue()).intValue());
+				break;
 			case PREF_ZIPHOME:
-				((EditText) findViewById(R.id.TextZipHome)).setText(value);
+				((EditText) findViewById(R.id.TextZipHome)).setText((CharSequence) p.getValue());
 				break;
 			case PREF_ZIPWORK:
-				((EditText) findViewById(R.id.TextZipWork)).setText(value);
+				((EditText) findViewById(R.id.TextZipWork)).setText((CharSequence) p.getValue());
 				break;
 			case PREF_ZIPSCHOOL:
-				((EditText) findViewById(R.id.TextZipSchool)).setText(value);
+				((EditText) findViewById(R.id.TextZipSchool)).setText((CharSequence) p.getValue());
 				break;
 			case PREF_EMAIL:
-				((EditText) findViewById(R.id.TextEmail)).setText(value);
+				((EditText) findViewById(R.id.TextEmail)).setText((CharSequence) p.getValue());
 				break;
 			case PREF_CYCLEFREQ:
-				((SeekBar) findViewById(R.id.SeekCycleFreq))
-						.setProgress(Integer.parseInt((String) value));
+				((SeekBar) findViewById(R.id.SeekCycleFreq)).setProgress(((Integer) p.getValue()).intValue());
 				break;
 			case PREF_GENDER:
-				if (value.equals("M")) {
-					((RadioButton) findViewById(R.id.ButtonMale))
-							.setChecked(true);
-				} else if (value.equals("F")) {
-					((RadioButton) findViewById(R.id.ButtonFemale))
-							.setChecked(true);
+				int x = ((Integer) p.getValue()).intValue();
+				if (x == 2) {
+					((RadioButton) findViewById(R.id.ButtonMale)).setChecked(true);
+				} else if (x == 1) {
+					((RadioButton) findViewById(R.id.ButtonFemale)).setChecked(true);
 				}
 				break;
 			}
@@ -143,11 +158,20 @@ public class UserInfoActivity extends Activity {
 		SharedPreferences settings = getSharedPreferences("PREFS", 0);
 		SharedPreferences.Editor editor = settings.edit();
 
-		editor.putInt("" + PREF_AGE, ((Spinner) findViewById(R.id.ageSpinner)).getSelectedItemPosition());
-		editor.putInt("" + PREF_ETHNICITY, ((Spinner) findViewById(R.id.ethnicitySpinner)).getSelectedItemPosition());
-		editor.putInt("" + PREF_INCOME, ((Spinner) findViewById(R.id.incomeSpinner)).getSelectedItemPosition());
-		editor.putInt("" + PREF_RIDERTYPE, ((Spinner) findViewById(R.id.ridertypeSpinner)).getSelectedItemPosition());
-		editor.putInt("" + PREF_RIDERHISTORY, ((Spinner) findViewById(R.id.riderhistorySpinner)).getSelectedItemPosition());
+		editor.putInt("" + PREF_AGE, ((Spinner) findViewById(R.id.ageSpinner))
+				.getSelectedItemPosition());
+		editor.putInt("" + PREF_ETHNICITY,
+				((Spinner) findViewById(R.id.ethnicitySpinner))
+						.getSelectedItemPosition());
+		editor.putInt("" + PREF_INCOME,
+				((Spinner) findViewById(R.id.incomeSpinner))
+						.getSelectedItemPosition());
+		editor.putInt("" + PREF_RIDERTYPE,
+				((Spinner) findViewById(R.id.ridertypeSpinner))
+						.getSelectedItemPosition());
+		editor.putInt("" + PREF_RIDERHISTORY,
+				((Spinner) findViewById(R.id.riderhistorySpinner))
+						.getSelectedItemPosition());
 
 		editor.putString("" + PREF_ZIPHOME,
 				((EditText) findViewById(R.id.TextZipHome)).getText()
@@ -160,36 +184,54 @@ public class UserInfoActivity extends Activity {
 						.toString());
 		editor.putString("" + PREF_EMAIL,
 				((EditText) findViewById(R.id.TextEmail)).getText().toString());
-		editor.putString("" + PREF_CYCLEFREQ, ""
-				+ ((SeekBar) findViewById(R.id.SeekCycleFreq)).getProgress());
+		editor.putInt("" + PREF_CYCLEFREQ, ((SeekBar) findViewById(R.id.SeekCycleFreq)).getProgress());
 
 		RadioGroup rbg = (RadioGroup) findViewById(R.id.RadioGroup01);
-		if (rbg.getCheckedRadioButtonId() == R.id.ButtonMale){
+		if (rbg.getCheckedRadioButtonId() == R.id.ButtonMale) {
 			editor.putInt("" + PREF_GENDER, 2);
 			Log.v(TAG, "gender=" + 2);
 		}
-		if (rbg.getCheckedRadioButtonId() == R.id.ButtonFemale){
+		if (rbg.getCheckedRadioButtonId() == R.id.ButtonFemale) {
 			editor.putInt("" + PREF_GENDER, 1);
 			Log.v(TAG, "gender=" + 1);
 		}
 
-
-		Log.v(TAG, "ageIndex=" + ((Spinner) findViewById(R.id.ageSpinner)).getSelectedItemPosition());
-		Log.v(TAG, "ethnicityIndex=" + ((Spinner) findViewById(R.id.ethnicitySpinner)).getSelectedItemPosition());
-		Log.v(TAG, "incomeIndex=" + ((Spinner) findViewById(R.id.incomeSpinner)).getSelectedItemPosition());
-		Log.v(TAG, "ridertypeIndex=" + ((Spinner) findViewById(R.id.ridertypeSpinner)).getSelectedItemPosition());
-		Log.v(TAG, "riderhistoryIndex=" + ((Spinner) findViewById(R.id.riderhistorySpinner)).getSelectedItemPosition());
-		Log.v(TAG, "ziphome=" + ((EditText) findViewById(R.id.TextZipHome)).getText()
-				.toString());
-		Log.v(TAG, "zipwork=" + ((EditText) findViewById(R.id.TextZipWork)).getText()
-				.toString());
-		Log.v(TAG, "zipschool=" + ((EditText) findViewById(R.id.TextZipSchool)).getText()
-				.toString());
-		Log.v(TAG, "email=" + ((EditText) findViewById(R.id.TextEmail)).getText()
-				.toString());
-		Log.v(TAG, "frequency=" + ((SeekBar) findViewById(R.id.SeekCycleFreq)).getProgress()/100);
-
-
+		Log.v(TAG,
+				"ageIndex="
+						+ ((Spinner) findViewById(R.id.ageSpinner))
+								.getSelectedItemPosition());
+		Log.v(TAG,
+				"ethnicityIndex="
+						+ ((Spinner) findViewById(R.id.ethnicitySpinner))
+								.getSelectedItemPosition());
+		Log.v(TAG,
+				"incomeIndex="
+						+ ((Spinner) findViewById(R.id.incomeSpinner))
+								.getSelectedItemPosition());
+		Log.v(TAG,
+				"ridertypeIndex="
+						+ ((Spinner) findViewById(R.id.ridertypeSpinner))
+								.getSelectedItemPosition());
+		Log.v(TAG,
+				"riderhistoryIndex="
+						+ ((Spinner) findViewById(R.id.riderhistorySpinner))
+								.getSelectedItemPosition());
+		Log.v(TAG, "ziphome="
+				+ ((EditText) findViewById(R.id.TextZipHome)).getText()
+						.toString());
+		Log.v(TAG, "zipwork="
+				+ ((EditText) findViewById(R.id.TextZipWork)).getText()
+						.toString());
+		Log.v(TAG, "zipschool="
+				+ ((EditText) findViewById(R.id.TextZipSchool)).getText()
+						.toString());
+		Log.v(TAG, "email="
+				+ ((EditText) findViewById(R.id.TextEmail)).getText()
+						.toString());
+		Log.v(TAG,
+				"frequency="
+						+ ((SeekBar) findViewById(R.id.SeekCycleFreq))
+								.getProgress() / 100);
 
 		// Don't forget to commit your edits!!!
 		editor.commit();

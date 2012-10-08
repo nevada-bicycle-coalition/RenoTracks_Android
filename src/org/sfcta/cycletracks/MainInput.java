@@ -122,7 +122,7 @@ public class MainInput extends Activity {
 
     private void buildAlertMessageNoGps() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Your phone's GPS is disabled. CycleTracks needs GPS to determine your location.\n\nGo to System Settings now to enable GPS?")
+        builder.setMessage("Your phone's GPS is disabled. Cycle Atlanta needs GPS to determine your location.\n\nGo to System Settings now to enable GPS?")
                .setCancelable(false)
                .setPositiveButton("GPS Settings...", new DialogInterface.OnClickListener() {
                    public void onClick(final DialogInterface dialog, final int id) {
@@ -263,6 +263,7 @@ public class MainInput extends Activity {
             return true;
         case MENU_HELP:
         	Intent myIntent = new Intent(Intent.ACTION_VIEW,
+        			//TODO: change website link
         			Uri.parse("http://www.sfcta.org/cycletracks-androidhelp.html"));
    			startActivity(myIntent);
             return true;

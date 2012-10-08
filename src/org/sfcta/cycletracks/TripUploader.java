@@ -149,7 +149,8 @@ public class TripUploader extends AsyncTask <Long, Integer, Boolean> {
         }
         user.put(USER_AGE, settings.getInt("" + UserInfoActivity.PREF_AGE, 0));
         user.put(USER_GENDER, settings.getInt("" + UserInfoActivity.PREF_GENDER, 0));
-        user.put(USER_CYCLING_FREQUENCY, Integer.parseInt(settings.getString(""+UserInfoActivity.PREF_CYCLEFREQ, "0"))/100);
+        user.put(USER_CYCLING_FREQUENCY, settings.getInt("" + UserInfoActivity.PREF_GENDER, 0)/100);
+        //Integer.parseInt(settings.getString(""+UserInfoActivity.PREF_CYCLEFREQ, "0"))
         user.put(USER_ETHNICITY, settings.getInt("" + UserInfoActivity.PREF_ETHNICITY, 0));
         user.put(USER_INCOME, settings.getInt("" + UserInfoActivity.PREF_INCOME, 0));
         user.put(USER_RIDERTYPE, settings.getInt("" + UserInfoActivity.PREF_RIDERTYPE, 0));
