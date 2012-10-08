@@ -19,10 +19,12 @@
  *   along with CycleTracks.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.sfcta.cycletracks;
+package edu.gatech.ppl.cycleatlanta;
 
 import java.util.List;
 import java.util.Map;
+
+import edu.gatech.ppl.cycleatlanta.R;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -264,7 +266,7 @@ public class MainInput extends Activity {
         case MENU_HELP:
         	Intent myIntent = new Intent(Intent.ACTION_VIEW,
         			//TODO: change website link
-        			Uri.parse("http://www.sfcta.org/cycletracks-androidhelp.html"));
+        			Uri.parse("http://cycleatlanta.org"));
    			startActivity(myIntent);
             return true;
         }

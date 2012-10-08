@@ -19,7 +19,7 @@
  *   along with CycleTracks.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.sfcta.cycletracks;
+package edu.gatech.ppl.cycleatlanta;
 
 import android.content.Context;
 import android.database.Cursor;

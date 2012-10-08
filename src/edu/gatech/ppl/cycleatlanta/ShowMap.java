@@ -18,8 +18,8 @@
  *   You should have received a copy of the GNU General Public License
  *   along with CycleTracks.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-package org.sfcta.cycletracks;
+//
+package edu.gatech.ppl.cycleatlanta;
 
 import java.util.List;
 
@@ -27,8 +27,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Point;
 import android.graphics.Paint.Style;
+import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;

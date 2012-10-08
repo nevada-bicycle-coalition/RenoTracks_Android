@@ -19,13 +19,13 @@
  *   along with CycleTracks.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.sfcta.cycletracks;
+package edu.gatech.ppl.cycleatlanta;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
-import java.util.TimeZone;
 import java.util.Map.Entry;
+import java.util.TimeZone;
 
 import android.app.Activity;
 import android.content.ComponentName;

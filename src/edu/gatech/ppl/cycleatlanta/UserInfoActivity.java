@@ -7,10 +7,12 @@
  * 	 @author Billy Charlton <billy.charlton@sfcta.org>
  *
  */
-package org.sfcta.cycletracks;
+package edu.gatech.ppl.cycleatlanta;
 
 import java.util.Map;
 import java.util.Map.Entry;
+
+import edu.gatech.ppl.cycleatlanta.R;
 
 import android.app.Activity;
 import android.content.Intent;

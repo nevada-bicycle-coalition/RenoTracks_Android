@@ -19,7 +19,7 @@
  *   along with CycleTracks.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.sfcta.cycletracks;
+package edu.gatech.ppl.cycleatlanta;
 
 public interface IRecordService {
 	public int  getState();
