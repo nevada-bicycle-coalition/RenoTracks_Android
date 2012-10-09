@@ -24,8 +24,6 @@ package edu.gatech.ppl.cycleatlanta;
 import java.util.List;
 import java.util.Map;
 
-import edu.gatech.ppl.cycleatlanta.R;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
@@ -266,7 +264,7 @@ public class MainInput extends Activity {
         case MENU_HELP:
         	Intent myIntent = new Intent(Intent.ACTION_VIEW,
         			//TODO: change website link
-        			Uri.parse("http://cycleatlanta.org"));
+        			Uri.parse("http://cycleatlanta.org/instructions/androidhelp.html"));
    			startActivity(myIntent);
             return true;
         }
