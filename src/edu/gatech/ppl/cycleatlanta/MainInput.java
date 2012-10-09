@@ -148,7 +148,7 @@ public class MainInput extends Activity {
     private void showWelcomeDialog() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Please enter your personal details so we can learn a bit about you.\n\nThen, try to use Cycle Atlanta every time you ride. Your trip routes will be sent to City of Atlanta so we can plan for better biking!\n\nThanks,\nThe Cycle Atlanta team")
-               .setCancelable(false).setTitle("Welcome to CycleTracks!")
+               .setCancelable(false).setTitle("Welcome to Cycle Atlanta!")
                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                    public void onClick(final DialogInterface dialog, final int id) {
                        startActivity(new Intent(MainInput.this, UserInfoActivity.class));
