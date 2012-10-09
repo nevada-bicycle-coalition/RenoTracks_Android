@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>CycleTracksTest</name>
+	<name>Cycle Atlanta Test</name>
 	<comment></comment>
 	<projects>
-		<project>CycleTracks</project>
+		<project>Cycle Atlanta</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
