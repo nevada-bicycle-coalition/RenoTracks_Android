@@ -1,4 +1,13 @@
-/**	 CycleTracks, Copyright 2009,2010 San Francisco County Transportation Authority
+/**	 Cycle Altanta, Copyright 2012 Georgia Institute of Technology
+ *                                    Atlanta, GA. USA
+ *
+ *   @author Christopher Le Dantec <ledantec@gatech.edu>
+ *   @author Anhong Guo <guoanhong15@gmail.com>
+ *
+ *   Updated/Modified for Atlanta's app deployment. Based on the
+ *   CycleTracks codebase for SFCTA.
+ *
+ *   CycleTracks, Copyright 2009,2010 San Francisco County Transportation Authority
  *                                    San Francisco, CA, USA
  *
  * 	 @author Billy Charlton <billy.charlton@sfcta.org>
@@ -25,8 +34,6 @@ import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import edu.gatech.ppl.cycleatlanta.R;
 
 import android.app.Activity;
 import android.content.ComponentName;

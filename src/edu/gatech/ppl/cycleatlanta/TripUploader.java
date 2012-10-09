@@ -1,4 +1,13 @@
-/**	 CycleTracks, Copyright 2009,2010 San Francisco County Transportation Authority
+/**	 Cycle Altanta, Copyright 2012 Georgia Institute of Technology
+ *                                    Atlanta, GA. USA
+ *
+ *   @author Christopher Le Dantec <ledantec@gatech.edu>
+ *   @author Anhong Guo <guoanhong15@gmail.com>
+ *
+ *   Updated/Modified for Atlanta's app deployment. Based on the
+ *   CycleTracks codebase for SFCTA.
+ *
+ *   CycleTracks, Copyright 2009,2010 San Francisco County Transportation Authority
  *                                    San Francisco, CA, USA
  *
  * 	 @author Billy Charlton <billy.charlton@sfcta.org>
@@ -48,7 +57,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.provider.Settings.System;
-import android.util.Log;
 import android.widget.Toast;
 
 public class TripUploader extends AsyncTask <Long, Integer, Boolean> {
@@ -257,7 +265,7 @@ public class TripUploader extends AsyncTask <Long, Integer, Boolean> {
             e.printStackTrace();
             return result;
         }
-        Log.v("PostData", nameValuePairs.toString());
+        //Log.v("PostData", nameValuePairs.toString());
 
         HttpClient client = new DefaultHttpClient();
         //TODO: Server URL
@@ -268,7 +276,7 @@ public class TripUploader extends AsyncTask <Long, Integer, Boolean> {
             postRequest.setEntity(new UrlEncodedFormEntity(nameValuePairs));
             HttpResponse response = client.execute(postRequest);
             String responseString = convertStreamToString(response.getEntity().getContent());
-            Log.v("httpResponse", responseString);
+            //Log.v("httpResponse", responseString);
             JSONObject responseData = new JSONObject(responseString);
             if (responseData.getString("status").equals("success")) {
                 mDb.open();

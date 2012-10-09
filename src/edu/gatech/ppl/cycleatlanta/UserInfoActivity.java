@@ -1,4 +1,13 @@
-/**	 CycleTracks, (c) 2009 San Francisco County Transportation Authority
+/**	 Cycle Altanta, Copyright 2012 Georgia Institute of Technology
+ *                                    Atlanta, GA. USA
+ *
+ *   @author Christopher Le Dantec <ledantec@gatech.edu>
+ *   @author Anhong Guo <guoanhong15@gmail.com>
+ *
+ *   Updated/Modified for Atlanta's app deployment. Based on the
+ *   CycleTracks codebase for SFCTA.
+ *
+ *   CycleTracks, (c) 2009 San Francisco County Transportation Authority
  * 					  San Francisco, CA, USA
  *
  *   Licensed under the GNU GPL version 3.0.
@@ -12,13 +21,10 @@ package edu.gatech.ppl.cycleatlanta;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import edu.gatech.ppl.cycleatlanta.R;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -191,49 +197,49 @@ public class UserInfoActivity extends Activity {
 		RadioGroup rbg = (RadioGroup) findViewById(R.id.RadioGroup01);
 		if (rbg.getCheckedRadioButtonId() == R.id.ButtonMale) {
 			editor.putInt("" + PREF_GENDER, 2);
-			Log.v(TAG, "gender=" + 2);
+			//Log.v(TAG, "gender=" + 2);
 		}
 		if (rbg.getCheckedRadioButtonId() == R.id.ButtonFemale) {
 			editor.putInt("" + PREF_GENDER, 1);
-			Log.v(TAG, "gender=" + 1);
+			//Log.v(TAG, "gender=" + 1);
 		}
 
-		Log.v(TAG,
-				"ageIndex="
-						+ ((Spinner) findViewById(R.id.ageSpinner))
-								.getSelectedItemPosition());
-		Log.v(TAG,
-				"ethnicityIndex="
-						+ ((Spinner) findViewById(R.id.ethnicitySpinner))
-								.getSelectedItemPosition());
-		Log.v(TAG,
-				"incomeIndex="
-						+ ((Spinner) findViewById(R.id.incomeSpinner))
-								.getSelectedItemPosition());
-		Log.v(TAG,
-				"ridertypeIndex="
-						+ ((Spinner) findViewById(R.id.ridertypeSpinner))
-								.getSelectedItemPosition());
-		Log.v(TAG,
-				"riderhistoryIndex="
-						+ ((Spinner) findViewById(R.id.riderhistorySpinner))
-								.getSelectedItemPosition());
-		Log.v(TAG, "ziphome="
-				+ ((EditText) findViewById(R.id.TextZipHome)).getText()
-						.toString());
-		Log.v(TAG, "zipwork="
-				+ ((EditText) findViewById(R.id.TextZipWork)).getText()
-						.toString());
-		Log.v(TAG, "zipschool="
-				+ ((EditText) findViewById(R.id.TextZipSchool)).getText()
-						.toString());
-		Log.v(TAG, "email="
-				+ ((EditText) findViewById(R.id.TextEmail)).getText()
-						.toString());
-		Log.v(TAG,
-				"frequency="
-						+ ((SeekBar) findViewById(R.id.SeekCycleFreq))
-								.getProgress() / 100);
+//		Log.v(TAG,
+//				"ageIndex="
+//						+ ((Spinner) findViewById(R.id.ageSpinner))
+//								.getSelectedItemPosition());
+//		Log.v(TAG,
+//				"ethnicityIndex="
+//						+ ((Spinner) findViewById(R.id.ethnicitySpinner))
+//								.getSelectedItemPosition());
+//		Log.v(TAG,
+//				"incomeIndex="
+//						+ ((Spinner) findViewById(R.id.incomeSpinner))
+//								.getSelectedItemPosition());
+//		Log.v(TAG,
+//				"ridertypeIndex="
+//						+ ((Spinner) findViewById(R.id.ridertypeSpinner))
+//								.getSelectedItemPosition());
+//		Log.v(TAG,
+//				"riderhistoryIndex="
+//						+ ((Spinner) findViewById(R.id.riderhistorySpinner))
+//								.getSelectedItemPosition());
+//		Log.v(TAG, "ziphome="
+//				+ ((EditText) findViewById(R.id.TextZipHome)).getText()
+//						.toString());
+//		Log.v(TAG, "zipwork="
+//				+ ((EditText) findViewById(R.id.TextZipWork)).getText()
+//						.toString());
+//		Log.v(TAG, "zipschool="
+//				+ ((EditText) findViewById(R.id.TextZipSchool)).getText()
+//						.toString());
+//		Log.v(TAG, "email="
+//				+ ((EditText) findViewById(R.id.TextEmail)).getText()
+//						.toString());
+//		Log.v(TAG,
+//				"frequency="
+//						+ ((SeekBar) findViewById(R.id.SeekCycleFreq))
+//								.getProgress() / 100);
 
 		// Don't forget to commit your edits!!!
 		editor.commit();

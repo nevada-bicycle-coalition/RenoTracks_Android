@@ -1,4 +1,13 @@
-/**	 CycleTracks, Copyright 2009,2010 San Francisco County Transportation Authority
+/**	 Cycle Altanta, Copyright 2012 Georgia Institute of Technology
+ *                                    Atlanta, GA. USA
+ *
+ *   @author Christopher Le Dantec <ledantec@gatech.edu>
+ *   @author Anhong Guo <guoanhong15@gmail.com>
+ *
+ *   Updated/Modified for Atlanta's app deployment. Based on the
+ *   CycleTracks codebase for SFCTA.
+ *
+ *   CycleTracks, Copyright 2009,2010 San Francisco County Transportation Authority
  *                                    San Francisco, CA, USA
  *
  * 	 @author Billy Charlton <billy.charlton@sfcta.org>
@@ -24,8 +33,6 @@ package edu.gatech.ppl.cycleatlanta;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import edu.gatech.ppl.cycleatlanta.R;
-
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -41,7 +48,6 @@ import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.util.Log;
 
 public class RecordingService extends Service implements LocationListener {
 	RecordingActivity recordActivity;
@@ -212,7 +218,7 @@ public class RecordingService extends Service implements LocationListener {
 				updateTripStats(loc);
 				boolean rtn = trip.addPointNow(loc, currentTime, distanceTraveled);
 				if (!rtn) {
-	                Log.e("FAIL", "Couldn't write to DB");
+	                //Log.e("FAIL", "Couldn't write to DB");
 				}
 
 				// Update the status page every time, if we can.
@@ -253,7 +259,7 @@ public class RecordingService extends Service implements LocationListener {
 
 		Context context = this;
 		CharSequence contentTitle = "Cycle Atlanta - Recording";
-		CharSequence contentText = "Tap to finish your trip";
+		CharSequence contentText = "Tap to see your ongoing trip";
 		Intent notificationIntent = new Intent(context, RecordingActivity.class);
 		PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
 		notification.setLatestEventInfo(context, contentTitle, contentText,	contentIntent);
@@ -280,7 +286,7 @@ public class RecordingService extends Service implements LocationListener {
 
 		Context context = this;
 		CharSequence contentTitle = "Cycle Atlanta - Recording";
-		CharSequence contentText = "Tap to finish your trip";
+		CharSequence contentText = "Tap to see your ongoing trip";
 		Intent notificationIntent = new Intent(context, RecordingActivity.class);
 		PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
 		notification.setLatestEventInfo(context, contentTitle, contentText,	contentIntent);

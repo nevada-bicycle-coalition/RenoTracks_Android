@@ -1,4 +1,13 @@
-/**	 CycleTracks, Copyright 2009,2010 San Francisco County Transportation Authority
+/**	 Cycle Altanta, Copyright 2012 Georgia Institute of Technology
+ *                                    Atlanta, GA. USA
+ *
+ *   @author Christopher Le Dantec <ledantec@gatech.edu>
+ *   @author Anhong Guo <guoanhong15@gmail.com>
+ *
+ *   Updated/Modified for Atlanta's app deployment. Based on the
+ *   CycleTracks codebase for SFCTA.
+ *
+ *   CycleTracks, Copyright 2009,2010 San Francisco County Transportation Authority
  *                                    San Francisco, CA, USA
  *
  * 	 @author Billy Charlton <billy.charlton@sfcta.org>
@@ -19,6 +28,7 @@
  *   along with CycleTracks.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 package edu.gatech.ppl.cycleatlanta;
 
 import android.content.ContentValues;
@@ -27,7 +37,6 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 /**
  * Simple database access helper class. Defines the basic CRUD operations, and
@@ -106,8 +115,8 @@ public class DbAdapter {
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
-                    + newVersion + ", which will destroy all old data");
+            //Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
+              //      + newVersion + ", which will destroy all old data");
             db.execSQL("DROP TABLE IF EXISTS " + DATA_TABLE_TRIPS);
             db.execSQL("DROP TABLE IF EXISTS " + DATA_TABLE_COORDS);
             onCreate(db);
@@ -194,7 +203,7 @@ public class DbAdapter {
             }
             return mCursor;
     	} catch (Exception e) {
-    		Log.v("GOT!",e.toString());
+    		//Log.v("GOT!",e.toString());
     		return null;
     	}
     }
