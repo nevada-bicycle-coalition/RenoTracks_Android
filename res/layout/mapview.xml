@@ -22,6 +22,6 @@
 		android:layout_marginRight="7sp"></TextView>
 	<com.google.android.maps.MapView
 		android:id="@+id/mapview" android:layout_width="fill_parent"
-		android:clickable="true" android:apiKey="0WpIKkVeTGCpIj880RRfwXqZTo3by4tEdyhEpAQ"
+		android:clickable="true" android:apiKey="0WpIKkVeTGCpsb5mShbqcH1WifdVsp6-R9SGOcw"
 		android:fitsSystemWindows="true" android:layout_height="fill_parent"/>
 </LinearLayout>
