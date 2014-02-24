@@ -17,7 +17,7 @@
             android:layout_marginLeft="12sp"
             android:layout_marginRight="5sp"
             android:layout_marginTop="5sp"
-            android:text="Thanks for using Cycle Atlanta! Please enter your user details here. It&apos;s optional, anonymous, and will really help us understand different people&apos;s biking preferences." >
+            android:text="@string/prefs_welcome" >
         </TextView>
 
         <LinearLayout
@@ -30,7 +30,7 @@
                 android:layout_width="120dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="15sp"
-                android:text="Age"
+                android:text="@string/age"
                 android:textStyle="bold" >
             </TextView>
 
@@ -54,7 +54,7 @@
                 android:layout_width="120dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="15sp"
-                android:text="Ethnicity"
+                android:text="@string/ethnicity"
                 android:textStyle="bold" />
 
             <Spinner
@@ -77,7 +77,7 @@
                 android:layout_width="120dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="15sp"
-                android:text="Home Income"
+                android:text="@string/income"
                 android:textStyle="bold" />
 
             <Spinner
@@ -110,7 +110,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10sp"
                     android:layout_weight="2.21"
-                    android:text="Male"
+                    android:text="@string/gender_male"
                     android:textSize="14sp"
                     android:textStyle="bold" >
                 </RadioButton>
@@ -121,7 +121,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10sp"
                     android:layout_marginRight="15sp"
-                    android:text="Female"
+                    android:text="@string/gender_female"
                     android:textSize="14sp"
                     android:textStyle="bold" >
                 </RadioButton>
@@ -134,7 +134,7 @@
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="15sp"
-                android:text="Gender"
+                android:text="@string/gender"
                 android:textStyle="bold" />
         </RelativeLayout>
 
@@ -150,7 +150,7 @@
                 android:layout_alignParentLeft="true"
                 android:layout_marginLeft="15sp"
                 android:layout_marginTop="20sp"
-                android:text="Cycling Frequency:"
+                android:text="@string/frequency"
                 android:textStyle="bold" >
             </TextView>
 
@@ -161,7 +161,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_marginRight="15sp"
                 android:layout_marginTop="20sp"
-                android:text="Less than once a month"
+                android:text="@string/frequency_default"
                 android:textStyle="bold" >
             </TextView>
         </RelativeLayout>
@@ -186,7 +186,7 @@
             android:layout_marginLeft="15sp"
             android:layout_marginRight="5sp"
             android:layout_marginTop="20sp"
-            android:text="What kind of rider are you?"
+            android:text="@string/rider_type"
             android:textStyle="bold" />
 
         <Spinner
@@ -204,7 +204,7 @@
             android:layout_marginLeft="15sp"
             android:layout_marginRight="5sp"
             android:layout_marginTop="20sp"
-            android:text="How long have you been a cyclist?"
+            android:text="@string/how_long"
             android:textStyle="bold" />
 
         <Spinner
@@ -237,7 +237,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5sp"
-                    android:text="Home ZIP"
+                    android:text="@string/home_zip"
                     android:textStyle="bold" >
                 </TextView>
 
@@ -245,7 +245,7 @@
                     android:id="@+id/TextZipHome"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Home"
+                    android:hint="@string/home"
                     android:inputType="number"
                     android:lines="1"
                     android:nextFocusDown="@+id/TextZipWork" >
@@ -264,7 +264,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="7sp"
-                    android:text="Work ZIP"
+                    android:text="@string/work_zip"
                     android:textStyle="bold" >
                 </TextView>
 
@@ -274,7 +274,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="2sp"
                     android:layout_marginRight="2sp"
-                    android:hint="Work"
+                    android:hint="@string/work"
                     android:inputType="number"
                     android:lines="1"
                     android:nextFocusDown="@+id/TextZipSchool" >
@@ -293,7 +293,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5sp"
-                    android:text="School ZIP"
+                    android:text="@string/school_zip"
                     android:textStyle="bold" >
                 </TextView>
 
@@ -302,7 +302,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="5sp"
-                    android:hint="School"
+                    android:hint="@string/school"
                     android:inputType="number"
                     android:lines="1"
                     android:nextFocusDown="@+id/TextEmail" >
@@ -317,7 +317,7 @@
             android:layout_marginLeft="15sp"
             android:layout_marginRight="5sp"
             android:layout_marginTop="20sp"
-            android:text="Email address: for news and updates!!"
+            android:text="@string/email_for_updates"
             android:textStyle="bold" >
         </TextView>
 
@@ -327,7 +327,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="10sp"
             android:layout_marginRight="15sp"
-            android:hint="email address"
+            android:hint="@string/email_address"
             android:inputType="textEmailAddress"
             android:lines="1" >
         </EditText>
@@ -336,7 +336,7 @@
             android:id="@+id/textView1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="   "
+            android:text=""
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <Button
@@ -345,7 +345,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="15sp"
-            android:text="Save" />
+            android:text="@string/save" />
 
     </LinearLayout>
 

@@ -1,65 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="recording_title">Cycle Atlanta</string>
-    
-    <string name="app_name">Cycle Atlanta</string>
-<string name="previous_trips">Saved Trips:</string>
-<string name="startNewTrip">Start Trip!</string>
-<string name="pauseButtonLabel">Pause</string>
-<string name="finishedButtonLabel">Finish</string>
-
-<string name="enterTripInfo">And add any comments about your trip here</string>
-<string name="promptPurpose">Select the main purpose of this trip</string>
-<string name="uploadProgressTitle">Sending…</string>
-<string name="uploadProgressMessage">Sending your trip.\n\nThanks for using Cycle Atlanta!</string>
-
-<string-array name="ageArray">
-    <item></item>
-    <item>Less than 18</item>
-    <item>18–24</item>
-    <item>25–34</item>
-    <item>35–44</item>
-    <item>45–54</item>
-    <item>55–64</item>
-    <item>65+</item>
-</string-array>
-
-<string-array name="ethnicityArray">
-    <item></item>
-    <item>White</item>
-    <item>African American</item>
-    <item>Asian</item>
-    <item>Native American</item>
-    <item>Pacific Islander</item>
-    <item>Multi-racial</item>
-    <item>Hispanic / Mexican / Latino</item>
-    <item>Other</item>
-</string-array>
-
-<string-array name="incomeArray">
-    <item></item>
-    <item>Less than $20,000</item>
-    <item>$20,000 to $39,999</item>
-    <item>$40,000 to $59,999</item>
-    <item>$60,000 to $74,999</item>
-    <item>$75,000 to $99,999</item>
-    <item>$100,000 or greater</item>
-</string-array>
-
-<string-array name="ridertypeArray">
-    <item></item>
-    <item><![CDATA[Strong & fearless]]></item>
-    <item><![CDATA[Enthused & confident]]></item>
-    <item>Comfortable, but cautious</item>
-    <item>Interested, but concerned</item>
-</string-array>
-
-<string-array name="riderhistoryArray">
-    <item></item>
-    <item>Since childhood</item>
-    <item>Several years</item>
-    <item>One year or less</item>
-    <item>Just trying it out / just started</item>
-</string-array>
-
+	<string name="recording_title">Reno Tracks</string>	
+	<string name="app_name">Reno Tracks</string>
+	<string name="previous_trips">Saved Trips:</string>
+	<string name="startNewTrip">Start Trip!</string>
+	<string name="pauseButtonLabel">Pause</string>
+	<string name="finishedButtonLabel">Finish</string>
+	
+	<string name="enterTripInfo">And add any comments about your trip here</string>
+	<string name="promptPurpose">Select the main purpose of this trip</string>
+	<string name="uploadProgressTitle">Sending…</string>
+	<string name="uploadProgressMessage">Sending your trip.\n\nThanks for using Reno Tracks!</string>
+	
+	<string-array name="ageArray">
+		<item></item>
+		<item>Less than 18</item>
+		<item>18–24</item>
+		<item>25–34</item>
+		<item>35–44</item>
+		<item>45–54</item>
+		<item>55–64</item>
+		<item>65+</item>
+	</string-array>
+	
+	<string-array name="ethnicityArray">
+		<item></item>
+		<item>White</item>
+		<item>African American</item>
+		<item>Asian</item>
+		<item>Native American</item>
+		<item>Pacific Islander</item>
+		<item>Multi-racial</item>
+		<item>Hispanic / Mexican / Latino</item>
+		<item>Other</item>
+	</string-array>
+	
+	<string-array name="incomeArray">
+		<item></item>
+		<item>Less than $20,000</item>
+		<item>$20,000 to $39,999</item>
+		<item>$40,000 to $59,999</item>
+		<item>$60,000 to $74,999</item>
+		<item>$75,000 to $99,999</item>
+		<item>$100,000 or greater</item>
+	</string-array>
+	
+	<string-array name="ridertypeArray">
+		<item></item>
+		<item><![CDATA[Strong & fearless]]></item>
+		<item><![CDATA[Enthused & confident]]></item>
+		<item>Comfortable, but cautious</item>
+		<item>Interested, but concerned</item>
+	</string-array>
+	
+	<string-array name="riderhistoryArray">
+		<item></item>
+		<item>Since childhood</item>
+		<item>Several years</item>
+		<item>One year or less</item>
+		<item>Just trying it out / just started</item>
+	</string-array>
+	
+	<string name="prefs_welcome">Thanks for using Cycle Atlanta! Please enter your user details here. It\'s optional, anonymous, and will really help us understand different people\'s biking preferences.</string>
+	<string name="age">Age</string>
+	
+	
+	<string name="ethnicity">Ethnicity</string>
+	<string name="income">Home Income</string>
+	<string name="gender_male">Male</string>
+	<string name="gender_female">Female</string>
+	<string name="gender">Gender</string>
+	<string name="frequency">Cycling Frequency:</string>
+	<string name="frequency_default">Less than once a month</string>
+	<string name="rider_type">What kind of rider are you?</string>
+	<string name="how_long">How long have you been a cyclist?</string>
+	<string name="home">Home</string>
+	<string name="home_zip">Home ZIP</string>
+	<string name="work">Work</string>
+	<string name="work_zip">Work ZIP</string>
+	<string name="school">School</string>
+	<string name="school_zip">School ZIP</string>
+	<string name="email_for_updates">Email Address: for news and updates!!</string>
+	<string name="email_address">Email Address</string>
+	<string name="save">Save</string>
+	<string name="placeholder">placeholder</string>
+	<string name="submit">Submit</string>
+	<string name="discard">Discard</string>
+	<string name="enter_info">Please enter your user info&#8230;</string>
+	<string name="enter_comments">Comments about your trip</string>
+	<string name="finished_recording">Finished recording.  Choose a trip purpose:</string>
+	<string name="points_collected">Points collected:</string>
+	<string name="zero_points_collected">Points collected: 0</string>
+	<string name="distance">Distance:</string>
+	<string name="time_elapsed">Time Elapsed:</string>
+	<string name="zero">0</string>
+	<string name="zero_time">0:00:00</string>
+	<string name="zero_mph">0 mph</string>
+	<string name="current_speed">Current Speed:</string>
+	<string name="max_speed">Max Speed:</string>
+	<string name="average_speed">Average Speed:</string>
 </resources>
