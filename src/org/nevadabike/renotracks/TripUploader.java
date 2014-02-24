@@ -121,7 +121,7 @@ public class TripUploader extends AsyncTask <Long, Integer, Boolean> {
         fieldMap.put(USER_ZIP_WORK, Integer.valueOf(UserInfoActivity.PREF_ZIPWORK));
         fieldMap.put(USER_ZIP_SCHOOL, Integer.valueOf(UserInfoActivity.PREF_ZIPSCHOOL));
 
-        SharedPreferences settings = this.mCtx.getSharedPreferences("PREFS", 0);
+        SharedPreferences settings = mCtx.getSharedPreferences("PREFS", 0);
         for (Entry<String, Integer> entry : fieldMap.entrySet()) {
                user.put(entry.getKey(), settings.getString(entry.getValue().toString(), null));
         }
@@ -239,7 +239,7 @@ public class TripUploader extends AsyncTask <Long, Integer, Boolean> {
 
         HttpClient client = new DefaultHttpClient();
         //TODO: Server URL
-        final String postUrl = "http://cycleatlanta.org/post/";
+        final String postUrl = mCtx.getResources().getString(R.string.post_url);
         HttpPost postRequest = new HttpPost(postUrl);
 
         try {
@@ -296,16 +296,16 @@ public class TripUploader extends AsyncTask <Long, Integer, Boolean> {
 
     @Override
     protected void onPreExecute() {
-        Toast.makeText(mCtx.getApplicationContext(),"Submitting trip. Thanks for using Cycle Atlanta!", Toast.LENGTH_LONG).show();
+        Toast.makeText(mCtx.getApplicationContext(),mCtx.getResources().getString(R.string.submitting), Toast.LENGTH_LONG).show();
     }
 
     @Override
     protected void onPostExecute(Boolean result) {
         try {
             if (result) {
-                Toast.makeText(mCtx.getApplicationContext(),"Trip uploaded successfully.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mCtx.getApplicationContext(),mCtx.getResources().getString(R.string.submit_success), Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(mCtx.getApplicationContext(),"Cycle Atlanta couldn't upload the trip, and will retry when your next trip is completed.", Toast.LENGTH_LONG).show();
+                Toast.makeText(mCtx.getApplicationContext(),mCtx.getResources().getString(R.string.submit_fail), Toast.LENGTH_LONG).show();
             }
         } catch (Exception e) {
             // Just don't toast if the view has gone out of context

@@ -161,7 +161,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_marginRight="15sp"
                 android:layout_marginTop="20sp"
-                android:text="@string/frequency_default"
+                android:text="@string/frequency_less_month"
                 android:textStyle="bold" >
             </TextView>
         </RelativeLayout>

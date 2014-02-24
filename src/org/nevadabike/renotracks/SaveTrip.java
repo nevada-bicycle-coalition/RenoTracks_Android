@@ -31,6 +31,8 @@ public class SaveTrip extends Activity {
 	String purpose = "";
 
 	HashMap <Integer, String> purpDescriptions = new HashMap<Integer, String>();
+	private String discarded;
+	private String select_purpose;
 
 	// Set up the purpose buttons to be one-click only
 	void preparePurposeButtons() {
@@ -43,22 +45,14 @@ public class SaveTrip extends Activity {
 		purpButtons.put(R.id.ToggleErrand,  (ToggleButton)findViewById(R.id.ToggleErrand));
 		purpButtons.put(R.id.ToggleOther,   (ToggleButton)findViewById(R.id.ToggleOther));
 
-        purpDescriptions.put(R.id.ToggleCommute,
-			"<b>Commute:</b> this bike trip was primarily to get between home and your main workplace.");
-		purpDescriptions.put(R.id.ToggleSchool,
-			"<b>School:</b> this bike trip was primarily to go to or from school or college.");
-		purpDescriptions.put(R.id.ToggleWorkRel,
-			"<b>Work-Related:</b> this bike trip was primarily to go to or from a business related meeting, function, or work-related errand for your job.");
-		purpDescriptions.put(R.id.ToggleExercise,
-			"<b>Exercise:</b> this bike trip was primarily for exercise, or biking for the sake of biking.");
-		purpDescriptions.put(R.id.ToggleSocial,
-			"<b>Social:</b> this bike trip was primarily for going to or from a social activity, e.g. at a friend's house, the park, a restaurant, the movies.");
-		purpDescriptions.put(R.id.ToggleShopping,
-			"<b>Shopping:</b> this bike trip was primarily to purchase or bring home goods or groceries.");
-		purpDescriptions.put(R.id.ToggleErrand,
-			"<b>Errand:</b> this bike trip was primarily to attend to personal business such as banking, a doctor  visit, going to the gym, etc.");
-		purpDescriptions.put(R.id.ToggleOther,
-			"<b>Other:</b> if none of the other reasons applied to this trip, you can enter comments below to tell us more.");
+        purpDescriptions.put(R.id.ToggleCommute, getResources().getString(R.string.ToggleCommute));
+		purpDescriptions.put(R.id.ToggleSchool, getResources().getString(R.string.ToggleSchool));
+		purpDescriptions.put(R.id.ToggleWorkRel, getResources().getString(R.string.ToggleWorkRel));
+		purpDescriptions.put(R.id.ToggleExercise, getResources().getString(R.string.ToggleExercise));
+		purpDescriptions.put(R.id.ToggleSocial, getResources().getString(R.string.ToggleSocial));
+		purpDescriptions.put(R.id.ToggleShopping, getResources().getString(R.string.ToggleShopping));
+		purpDescriptions.put(R.id.ToggleErrand, getResources().getString(R.string.ToggleErrand));
+		purpDescriptions.put(R.id.ToggleOther, getResources().getString(R.string.ToggleOther));
 
 		CheckListener cl = new CheckListener();
 		for (Entry<Integer, ToggleButton> e: purpButtons.entrySet()) {
@@ -108,11 +102,14 @@ public class SaveTrip extends Activity {
             prefsButton.setVisibility(View.GONE);
         }
 
+        discarded = getResources().getString(R.string.discarded);
+        select_purpose = getResources().getString(R.string.select_purpose);
+
 		// Discard btn
 		final Button btnDiscard = (Button) findViewById(R.id.ButtonDiscard);
 		btnDiscard.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				Toast.makeText(getBaseContext(), "Trip discarded.",	Toast.LENGTH_SHORT).show();
+				Toast.makeText(getBaseContext(), discarded, Toast.LENGTH_SHORT).show();
 
 				cancelRecording();
 
@@ -146,7 +143,7 @@ public class SaveTrip extends Activity {
 				// Make sure trip purpose has been selected
 				if (purpose.equals("")) {
 					// Oh no!  No trip purpose!
-					Toast.makeText(getBaseContext(), "You must select a trip purpose before submitting! Choose from the purposes above.", Toast.LENGTH_SHORT).show();
+					Toast.makeText(getBaseContext(), select_purpose, Toast.LENGTH_SHORT).show();
 					return;
 				}
 

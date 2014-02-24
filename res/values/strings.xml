@@ -61,7 +61,7 @@
 		<item>Just trying it out / just started</item>
 	</string-array>
 	
-	<string name="prefs_welcome">Thanks for using Cycle Atlanta! Please enter your user details here. It\'s optional, anonymous, and will really help us understand different people\'s biking preferences.</string>
+	<string name="prefs_welcome">Thanks for using Reno Track! Please enter your user details here. It\'s optional, anonymous, and will really help us understand different people\'s biking preferences.</string>
 	<string name="age">Age</string>
 	
 	
@@ -71,7 +71,10 @@
 	<string name="gender_female">Female</string>
 	<string name="gender">Gender</string>
 	<string name="frequency">Cycling Frequency:</string>
-	<string name="frequency_default">Less than once a month</string>
+	<string name="frequency_less_month">Less than once a month</string>
+	<string name="frequency_several_month">Several times a month</string>
+	<string name="frequency_several_weekly">Several times per week</string>
+	<string name="frequency_daily">Daily</string>
 	<string name="rider_type">What kind of rider are you?</string>
 	<string name="how_long">How long have you been a cyclist?</string>
 	<string name="home">Home</string>
@@ -99,4 +102,29 @@
 	<string name="current_speed">Current Speed:</string>
 	<string name="max_speed">Max Speed:</string>
 	<string name="average_speed">Average Speed:</string>
+	
+	<string name="notification_title">Reno Tracks - Recording</string>
+	<string name="notification_subtitle">Tap to see your ongoing trip</string>
+	<string name="recording">Recording&#8230;</string>
+	<string name="still_recording">Still recording (%d min)</string>
+	
+	<string name="post_url">http://renotracks.nevadabike.org/androidpost/</string>
+	
+	<string name="submitting">Submitting trip. Thanks for using Reno Tracks!</string>
+	<string name="submit_success">Trip uploaded successfully.</string>
+	<string name="submit_fail">Reno Tracks couldn\'t upload the trip, and will retry when your next trip is completed.</string>
+	
+	<string name="ToggleCommute"><b>Commute:</b> this bike trip was primarily to get between home and your main workplace.</string>
+	<string name="ToggleSchool"><b>School:</b> this bike trip was primarily to go to or from school or college.</string>
+	<string name="ToggleWorkRel"><b>Work-Related:</b> this bike trip was primarily to go to or from a business related meeting, function, or work-related errand for your job.</string>
+	<string name="ToggleExercise"><b>Exercise:</b> this bike trip was primarily for exercise, or biking for the sake of biking.</string>
+	<string name="ToggleSocial"><b>Social:</b> this bike trip was primarily for going to or from a social activity, e.g. at a friend\'s house, the park, a restaurant, the movies.</string>
+	<string name="ToggleShopping"><b>Shopping:</b> this bike trip was primarily to purchase or bring home goods or groceries.</string>
+	<string name="ToggleErrand"><b>Errand:</b> this bike trip was primarily to attend to personal business such as banking, a doctor  visit, going to the gym, etc.</string>
+	<string name="ToggleOther"><b>Other:</b> if none of the other reasons applied to this trip, you can enter comments below to tell us more.</string>
+	
+	<string name="discarded">Trip discarded.</string>
+	<string name="select_purpose">You must select a trip purpose before submitting! Choose from the purposes above.</string>
+	
+	<string name="preferences_saved">User preferences saved.</string>
 </resources>

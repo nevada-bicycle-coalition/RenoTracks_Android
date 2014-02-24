@@ -217,7 +217,7 @@ public class RecordingService extends Service implements LocationListener {
 		int icon = R.drawable.icon25;
         long when = System.currentTimeMillis();
         int minutes = (int) (when - trip.startTime) / 60000;
-		CharSequence tickerText = String.format("Still recording (%d min)", minutes);
+		CharSequence tickerText = getResources().getString(R.string.still_recording, minutes);
 
 		Notification notification = new Notification(icon, tickerText, when);
 		notification.flags |=
@@ -228,8 +228,8 @@ public class RecordingService extends Service implements LocationListener {
 		notification.ledOffMS = 3000;
 
 		Context context = this;
-		CharSequence contentTitle = "Cycle Atlanta - Recording";
-		CharSequence contentText = "Tap to see your ongoing trip";
+		CharSequence contentTitle = getResources().getString(R.string.notification_title);
+		CharSequence contentText = getResources().getString(R.string.notification_subtitle);
 		Intent notificationIntent = new Intent(context, RecordingActivity.class);
 		PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
 		notification.setLatestEventInfo(context, contentTitle, contentText,	contentIntent);
@@ -240,7 +240,7 @@ public class RecordingService extends Service implements LocationListener {
 	private void setNotification() {
 		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		int icon = R.drawable.icon25;
-		CharSequence tickerText = "Recording...";
+		CharSequence tickerText = getResources().getString(R.string.recording);
 		long when = System.currentTimeMillis();
 
 		Notification notification = new Notification(icon, tickerText, when);
@@ -255,8 +255,8 @@ public class RecordingService extends Service implements LocationListener {
 				Notification.FLAG_NO_CLEAR;
 
 		Context context = this;
-		CharSequence contentTitle = "Cycle Atlanta - Recording";
-		CharSequence contentText = "Tap to see your ongoing trip";
+		CharSequence contentTitle = getResources().getString(R.string.notification_title);
+		CharSequence contentText = getResources().getString(R.string.notification_subtitle);
 		Intent notificationIntent = new Intent(context, RecordingActivity.class);
 		PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
 		notification.setLatestEventInfo(context, contentTitle, contentText,	contentIntent);

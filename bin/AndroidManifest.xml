@@ -48,7 +48,7 @@
             android:launchMode="singleTop" >
         </activity>
         <activity
-            android:name="org.nevadabike.renotracks.UserInfoActivity"
+            android:name="UserInfoActivity"
             android:finishOnTaskLaunch="true"
             android:launchMode="singleInstance" >
         </activity>

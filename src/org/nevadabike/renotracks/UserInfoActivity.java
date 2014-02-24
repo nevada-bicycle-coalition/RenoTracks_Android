@@ -38,14 +38,17 @@ public class UserInfoActivity extends Activity {
 
 	private final static int MENU_SAVE = 0;
 
-	final String[] freqDesc = { "Less than once a month",
-			"Several times a month", "Several times per week", "Daily" };
+	final int[] freqDesc = {
+		R.string.frequency_less_month,
+		R.string.frequency_several_month,
+		R.string.frequency_several_weekly,
+		R.string.frequency_daily
+	};
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.userprefs);
-
 		// Don't pop up the soft keyboard until user clicks!
 		this.getWindow().setSoftInputMode(
 				WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
@@ -66,7 +69,7 @@ public class UserInfoActivity extends Activity {
 			@Override
 			public void onProgressChanged(SeekBar arg0, int arg1, boolean arg2) {
 				TextView tv = (TextView) findViewById(R.id.TextFreq);
-				tv.setText(freqDesc[arg1 / 100]);
+				tv.setText(getResources().getString(freqDesc[arg1 / 100]));
 			}
 		});
 
@@ -225,14 +228,14 @@ public class UserInfoActivity extends Activity {
 
 		// Don't forget to commit your edits!!!
 		editor.commit();
-		Toast.makeText(getBaseContext(), "User preferences saved.",
+		Toast.makeText(getBaseContext(), getResources().getString(R.string.preferences_saved),
 				Toast.LENGTH_SHORT).show();
 	}
 
 	/* Creates the menu items */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		menu.add(0, MENU_SAVE, 0, "Save").setIcon(
+		menu.add(0, MENU_SAVE, 0, getResources().getString(R.string.save)).setIcon(
 				android.R.drawable.ic_menu_save);
 		return true;
 	}
