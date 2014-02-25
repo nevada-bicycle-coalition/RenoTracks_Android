@@ -71,10 +71,20 @@
 	<string name="gender_female">Female</string>
 	<string name="gender">Gender</string>
 	<string name="frequency">Cycling Frequency:</string>
+
 	<string name="frequency_less_month">Less than once a month</string>
 	<string name="frequency_several_month">Several times a month</string>
 	<string name="frequency_several_weekly">Several times per week</string>
 	<string name="frequency_daily">Daily</string>
+	
+	<string-array name="frequency_array">
+	    <item></item>
+	    <item>@string/frequency_less_month</item>
+	    <item>@string/frequency_several_month</item>
+	    <item>@string/frequency_several_weekly</item>
+	    <item>@string/frequency_daily</item>
+	</string-array>
+	
 	<string name="rider_type">What kind of rider are you?</string>
 	<string name="how_long">How long have you been a cyclist?</string>
 	<string name="home">Home</string>
@@ -127,4 +137,8 @@
 	<string name="select_purpose">You must select a trip purpose before submitting! Choose from the purposes above.</string>
 	
 	<string name="preferences_saved">User preferences saved.</string>
+	
+	<string name="help_faq">Help and FAQ</string>
+	<string name="help_url">http://renotracks.nevadabike.org/RenoTrackshelp.html</string>
+	<string name="edit_user_info">Edit User Info</string>
 </resources>

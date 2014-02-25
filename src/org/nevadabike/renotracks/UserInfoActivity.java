@@ -4,21 +4,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.SeekBar;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 public class UserInfoActivity extends Activity {
@@ -34,107 +28,58 @@ public class UserInfoActivity extends Activity {
 	public final static int PREF_RIDERTYPE = 10;
 	public final static int PREF_RIDERHISTORY = 11;
 
-	private static final String TAG = "UserPrefActivity";
-
-	private final static int MENU_SAVE = 0;
-
-	final int[] freqDesc = {
-		R.string.frequency_less_month,
-		R.string.frequency_several_month,
-		R.string.frequency_several_weekly,
-		R.string.frequency_daily
-	};
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.userprefs);
-		// Don't pop up the soft keyboard until user clicks!
-		this.getWindow().setSoftInputMode(
-				WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-		SeekBar sb = (SeekBar) findViewById(R.id.SeekCycleFreq);
-		sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-
-			@Override
-			public void onStopTrackingTouch(SeekBar arg0) {
-				// TODO Auto-generated method stub
-			}
-
-			@Override
-			public void onStartTrackingTouch(SeekBar arg0) {
-				// TODO Auto-generated method stub
-			}
-
-			@Override
-			public void onProgressChanged(SeekBar arg0, int arg1, boolean arg2) {
-				TextView tv = (TextView) findViewById(R.id.TextFreq);
-				tv.setText(getResources().getString(freqDesc[arg1 / 100]));
-			}
-		});
-
-		Button btn = (Button) findViewById(R.id.saveButton);
-		btn.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				Intent intent = new Intent(UserInfoActivity.this,
-						MainInput.class);
-				startActivity(intent);
-				finish();
-			}
-
-		});
+		// Don't pop up the soft keyboard until taps on something
+		this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
 		SharedPreferences settings = getSharedPreferences("PREFS", 0);
 		Map<String, ?> prefs = settings.getAll();
 		for (Entry<String, ?> p : prefs.entrySet()) {
 			int key = Integer.parseInt(p.getKey());
-			// CharSequence value = (CharSequence) p.getValue();
 
 			switch (key) {
-			case PREF_AGE:
-				((Spinner) findViewById(R.id.ageSpinner))
-						.setSelection(((Integer) p.getValue()).intValue());
-				break;
-			case PREF_ETHNICITY:
-				((Spinner) findViewById(R.id.ethnicitySpinner))
-						.setSelection(((Integer) p.getValue()).intValue());
-				break;
-			case PREF_INCOME:
-				((Spinner) findViewById(R.id.incomeSpinner))
-						.setSelection(((Integer) p.getValue()).intValue());
-				break;
-			case PREF_RIDERTYPE:
-				((Spinner) findViewById(R.id.ridertypeSpinner))
-						.setSelection(((Integer) p.getValue()).intValue());
-				break;
-			case PREF_RIDERHISTORY:
-				((Spinner) findViewById(R.id.riderhistorySpinner))
-						.setSelection(((Integer) p.getValue()).intValue());
-				break;
-			case PREF_ZIPHOME:
-				((EditText) findViewById(R.id.TextZipHome)).setText((CharSequence) p.getValue());
-				break;
-			case PREF_ZIPWORK:
-				((EditText) findViewById(R.id.TextZipWork)).setText((CharSequence) p.getValue());
-				break;
-			case PREF_ZIPSCHOOL:
-				((EditText) findViewById(R.id.TextZipSchool)).setText((CharSequence) p.getValue());
-				break;
-			case PREF_EMAIL:
-				((EditText) findViewById(R.id.TextEmail)).setText((CharSequence) p.getValue());
-				break;
-			case PREF_CYCLEFREQ:
-				((SeekBar) findViewById(R.id.SeekCycleFreq)).setProgress(((Integer) p.getValue()).intValue());
-				break;
-			case PREF_GENDER:
-				int x = ((Integer) p.getValue()).intValue();
-				if (x == 2) {
-					((RadioButton) findViewById(R.id.ButtonMale)).setChecked(true);
-				} else if (x == 1) {
-					((RadioButton) findViewById(R.id.ButtonFemale)).setChecked(true);
-				}
-				break;
+				case PREF_AGE:
+					((Spinner) findViewById(R.id.ageSpinner)).setSelection(((Integer) p.getValue()).intValue());
+					break;
+				case PREF_ETHNICITY:
+					((Spinner) findViewById(R.id.ethnicitySpinner)).setSelection(((Integer) p.getValue()).intValue());
+					break;
+				case PREF_INCOME:
+					((Spinner) findViewById(R.id.incomeSpinner)).setSelection(((Integer) p.getValue()).intValue());
+					break;
+				case PREF_RIDERTYPE:
+					((Spinner) findViewById(R.id.ridertypeSpinner)).setSelection(((Integer) p.getValue()).intValue());
+					break;
+				case PREF_RIDERHISTORY:
+					((Spinner) findViewById(R.id.riderhistorySpinner)).setSelection(((Integer) p.getValue()).intValue());
+					break;
+				case PREF_CYCLEFREQ:
+					((Spinner) findViewById(R.id.frequencySpinner)).setSelection(((Integer) p.getValue()).intValue());
+					break;
+				case PREF_ZIPHOME:
+					((EditText) findViewById(R.id.TextZipHome)).setText((CharSequence) p.getValue());
+					break;
+				case PREF_ZIPWORK:
+					((EditText) findViewById(R.id.TextZipWork)).setText((CharSequence) p.getValue());
+					break;
+				case PREF_ZIPSCHOOL:
+					((EditText) findViewById(R.id.TextZipSchool)).setText((CharSequence) p.getValue());
+					break;
+				case PREF_EMAIL:
+					((EditText) findViewById(R.id.TextEmail)).setText((CharSequence) p.getValue());
+					break;
+				case PREF_GENDER:
+					int x = ((Integer) p.getValue()).intValue();
+					if (x == 2) {
+						((RadioButton) findViewById(R.id.ButtonMale)).setChecked(true);
+					} else if (x == 1) {
+						((RadioButton) findViewById(R.id.ButtonFemale)).setChecked(true);
+					}
+					break;
 			}
 		}
 	}
@@ -146,108 +91,49 @@ public class UserInfoActivity extends Activity {
 	}
 
 	private void savePreferences() {
-		// Save user preferences. We need an Editor object to
-		// make changes. All objects are from android.context.Context
 		SharedPreferences settings = getSharedPreferences("PREFS", 0);
 		SharedPreferences.Editor editor = settings.edit();
 
-		editor.putInt("" + PREF_AGE, ((Spinner) findViewById(R.id.ageSpinner))
-				.getSelectedItemPosition());
-		editor.putInt("" + PREF_ETHNICITY,
-				((Spinner) findViewById(R.id.ethnicitySpinner))
-						.getSelectedItemPosition());
-		editor.putInt("" + PREF_INCOME,
-				((Spinner) findViewById(R.id.incomeSpinner))
-						.getSelectedItemPosition());
-		editor.putInt("" + PREF_RIDERTYPE,
-				((Spinner) findViewById(R.id.ridertypeSpinner))
-						.getSelectedItemPosition());
-		editor.putInt("" + PREF_RIDERHISTORY,
-				((Spinner) findViewById(R.id.riderhistorySpinner))
-						.getSelectedItemPosition());
-
-		editor.putString("" + PREF_ZIPHOME,
-				((EditText) findViewById(R.id.TextZipHome)).getText()
-						.toString());
-		editor.putString("" + PREF_ZIPWORK,
-				((EditText) findViewById(R.id.TextZipWork)).getText()
-						.toString());
-		editor.putString("" + PREF_ZIPSCHOOL,
-				((EditText) findViewById(R.id.TextZipSchool)).getText()
-						.toString());
-		editor.putString("" + PREF_EMAIL,
+		editor.putInt(String.valueOf(PREF_AGE),
+				((Spinner) findViewById(R.id.ageSpinner)).getSelectedItemPosition());
+		editor.putInt(String.valueOf(PREF_ETHNICITY),
+				((Spinner) findViewById(R.id.ethnicitySpinner)).getSelectedItemPosition());
+		editor.putInt(String.valueOf(PREF_INCOME),
+				((Spinner) findViewById(R.id.incomeSpinner)).getSelectedItemPosition());
+		editor.putInt(String.valueOf(PREF_RIDERTYPE),
+				((Spinner) findViewById(R.id.ridertypeSpinner)).getSelectedItemPosition());
+		editor.putInt(String.valueOf(PREF_RIDERHISTORY),
+				((Spinner) findViewById(R.id.riderhistorySpinner)).getSelectedItemPosition());
+		editor.putInt(String.valueOf(PREF_CYCLEFREQ),
+				((Spinner) findViewById(R.id.frequencySpinner)).getSelectedItemPosition());
+		editor.putString(String.valueOf(PREF_ZIPHOME),
+				((EditText) findViewById(R.id.TextZipHome)).getText().toString());
+		editor.putString(String.valueOf(PREF_ZIPWORK),
+				((EditText) findViewById(R.id.TextZipWork)).getText().toString());
+		editor.putString(String.valueOf(PREF_ZIPSCHOOL),
+				((EditText) findViewById(R.id.TextZipSchool)).getText().toString());
+		editor.putString(String.valueOf(PREF_EMAIL),
 				((EditText) findViewById(R.id.TextEmail)).getText().toString());
-		editor.putInt("" + PREF_CYCLEFREQ, ((SeekBar) findViewById(R.id.SeekCycleFreq)).getProgress());
-
-		RadioGroup rbg = (RadioGroup) findViewById(R.id.RadioGroup01);
-		if (rbg.getCheckedRadioButtonId() == R.id.ButtonMale) {
-			editor.putInt("" + PREF_GENDER, 2);
-			//Log.v(TAG, "gender=" + 2);
-		}
-		if (rbg.getCheckedRadioButtonId() == R.id.ButtonFemale) {
-			editor.putInt("" + PREF_GENDER, 1);
-			//Log.v(TAG, "gender=" + 1);
-		}
-
-//		Log.v(TAG,
-//				"ageIndex="
-//						+ ((Spinner) findViewById(R.id.ageSpinner))
-//								.getSelectedItemPosition());
-//		Log.v(TAG,
-//				"ethnicityIndex="
-//						+ ((Spinner) findViewById(R.id.ethnicitySpinner))
-//								.getSelectedItemPosition());
-//		Log.v(TAG,
-//				"incomeIndex="
-//						+ ((Spinner) findViewById(R.id.incomeSpinner))
-//								.getSelectedItemPosition());
-//		Log.v(TAG,
-//				"ridertypeIndex="
-//						+ ((Spinner) findViewById(R.id.ridertypeSpinner))
-//								.getSelectedItemPosition());
-//		Log.v(TAG,
-//				"riderhistoryIndex="
-//						+ ((Spinner) findViewById(R.id.riderhistorySpinner))
-//								.getSelectedItemPosition());
-//		Log.v(TAG, "ziphome="
-//				+ ((EditText) findViewById(R.id.TextZipHome)).getText()
-//						.toString());
-//		Log.v(TAG, "zipwork="
-//				+ ((EditText) findViewById(R.id.TextZipWork)).getText()
-//						.toString());
-//		Log.v(TAG, "zipschool="
-//				+ ((EditText) findViewById(R.id.TextZipSchool)).getText()
-//						.toString());
-//		Log.v(TAG, "email="
-//				+ ((EditText) findViewById(R.id.TextEmail)).getText()
-//						.toString());
-//		Log.v(TAG,
-//				"frequency="
-//						+ ((SeekBar) findViewById(R.id.SeekCycleFreq))
-//								.getProgress() / 100);
-
-		// Don't forget to commit your edits!!!
+		editor.putInt(String.valueOf(PREF_GENDER),
+				((RadioGroup) findViewById(R.id.genderGroup)).getCheckedRadioButtonId() == R.id.ButtonMale ? 1 : 2);
 		editor.commit();
-		Toast.makeText(getBaseContext(), getResources().getString(R.string.preferences_saved),
-				Toast.LENGTH_SHORT).show();
+
+		Toast.makeText(getBaseContext(), getResources().getString(R.string.preferences_saved), Toast.LENGTH_SHORT).show();
 	}
 
-	/* Creates the menu items */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		menu.add(0, MENU_SAVE, 0, getResources().getString(R.string.save)).setIcon(
-				android.R.drawable.ic_menu_save);
+		getMenuInflater().inflate(R.menu.user_info, menu);
 		return true;
 	}
 
-	/* Handles item selections */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case MENU_SAVE:
-			savePreferences();
-			this.finish();
-			return true;
+			case R.id.menu_save:
+				savePreferences();
+				this.finish();
+				return true;
 		}
 		return false;
 	}

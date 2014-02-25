@@ -18,6 +18,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -28,29 +29,25 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainInput extends Activity {
-    private final static int MENU_USER_INFO = 0;
-    private final static int MENU_HELP = 1;
-
     private final static int CONTEXT_RETRY = 0;
     private final static int CONTEXT_DELETE = 1;
 
-    DbAdapter mDb;
+    //DbAdapter mDb;
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.main);
 
 		// Let's handle some launcher lifecycle issues:
 
 		// If we're recording or saving right now, jump to the existing activity.
 		// (This handles user who hit BACK button while recording)
-		setContentView(R.layout.main);
 
 		Intent rService = new Intent(this, RecordingService.class);
 		ServiceConnection sc = new ServiceConnection() {
@@ -225,11 +222,10 @@ public class MainInput extends Activity {
         populateList(listSavedTrips);
     }
 
-	 /* Creates the menu items */
+	/* Creates the menu items */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(0, MENU_HELP, 0, "Help and FAQ").setIcon(android.R.drawable.ic_menu_help);
-        menu.add(0, MENU_USER_INFO, 0, "Edit User Info").setIcon(android.R.drawable.ic_menu_edit);
+    	getMenuInflater().inflate(R.menu.main_menu, menu);
         return true;
     }
 
@@ -237,17 +233,25 @@ public class MainInput extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-        case MENU_USER_INFO:
-            startActivity(new Intent(this, UserInfoActivity.class));
+        case R.id.menu_help:
+        	openHelp();
             return true;
-        case MENU_HELP:
-        	Intent myIntent = new Intent(Intent.ACTION_VIEW,
-        			//TODO: change website link
-        			Uri.parse("http://cycleatlanta.org/instructions/androidhelp.html"));
-   			startActivity(myIntent);
+        case R.id.menu_user_info:
+        	openUserInfo();
             return true;
         }
-        return false;
+    	return false;
+    }
+
+    private void openHelp() {
+    	startActivity(new Intent(
+   			Intent.ACTION_VIEW,
+   			Uri.parse(getResources().getString(R.string.help_url))
+   		));
+    }
+
+    private void openUserInfo() {
+    	startActivity(new Intent(this, UserInfoActivity.class));
     }
 }
 
@@ -256,5 +260,4 @@ class FakeAdapter extends SimpleAdapter {
 			int resource, String[] from, int[] to) {
 		super(context, data, resource, from, to);
 	}
-
 }
