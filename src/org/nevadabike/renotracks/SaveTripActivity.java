@@ -25,7 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-public class SaveTrip extends Activity {
+public class SaveTripActivity extends Activity {
 	long tripid;
 	HashMap <Integer, ToggleButton> purpButtons = new HashMap<Integer,ToggleButton>();
 	String purpose = "";
@@ -113,10 +113,10 @@ public class SaveTrip extends Activity {
 
 				cancelRecording();
 
-				Intent i = new Intent(SaveTrip.this, MainInput.class);
+				Intent i = new Intent(SaveTripActivity.this, MainActivity.class);
 				i.putExtra("keepme", true);
 				startActivity(i);
-				SaveTrip.this.finish();
+				SaveTripActivity.this.finish();
 			}
 		});
 
@@ -137,7 +137,7 @@ public class SaveTrip extends Activity {
 		btnSubmit.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 
-				TripData trip = TripData.fetchTrip(SaveTrip.this, tripid);
+				TripData trip = TripData.fetchTrip(SaveTripActivity.this, tripid);
 				trip.populateDetails();
 
 				// Make sure trip purpose has been selected
@@ -173,14 +173,14 @@ public class SaveTrip extends Activity {
 				imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
 
 				// Now create the MainInput Activity so BACK btn works properly
-				Intent i = new Intent(getApplicationContext(), MainInput.class);
+				Intent i = new Intent(getApplicationContext(), MainActivity.class);
 				startActivity(i);
 
 				// And, show the map!
                 xi.putExtra("showtrip", trip.tripid);
                 xi.putExtra("uploadTrip", true);
 				startActivity(xi);
-				SaveTrip.this.finish();
+				SaveTripActivity.this.finish();
 			}
 		});
 
@@ -221,7 +221,7 @@ public class SaveTrip extends Activity {
 			public void onServiceConnected(ComponentName name, IBinder service) {
 				IRecordService rs = (IRecordService) service;
 				tripid = rs.finishRecording();
-				SaveTrip.this.activateSubmitButton();
+				SaveTripActivity.this.activateSubmitButton();
 				unbindService(this);
 			}
 		};
