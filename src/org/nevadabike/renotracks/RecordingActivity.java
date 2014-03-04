@@ -179,7 +179,7 @@ public class RecordingActivity extends Activity {
 					cancelRecording();
 
 			    	// Go back to main screen
-					fi = new Intent(RecordingActivity.this, MainInput.class);
+					fi = new Intent(RecordingActivity.this, MainActivity.class);
 					fi.putExtra("keep", true);
 				}
 

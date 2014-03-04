@@ -22,7 +22,7 @@
 		android:label="@string/app_name">
 		
 		<activity
-			android:name="org.nevadabike.renotracks.MainInput"
+			android:name="org.nevadabike.renotracks.MainActivity"
 			android:label="@string/app_name">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />

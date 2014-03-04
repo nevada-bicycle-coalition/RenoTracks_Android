@@ -32,7 +32,7 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainInput extends Activity {
+public class MainActivity extends Activity {
     private final static int CONTEXT_RETRY = 0;
     private final static int CONTEXT_DELETE = 1;
 
@@ -57,11 +57,11 @@ public class MainInput extends Activity {
 				int state = rs.getState();
 				if (state > RecordingService.STATE_IDLE) {
 					if (state == RecordingService.STATE_FULL) {
-						startActivity(new Intent(MainInput.this, SaveTripActivity.class));
+						startActivity(new Intent(MainActivity.this, SaveTripActivity.class));
 					} else {  // RECORDING OR PAUSED:
-						startActivity(new Intent(MainInput.this, RecordingActivity.class));
+						startActivity(new Intent(MainActivity.this, RecordingActivity.class));
 					}
-					MainInput.this.finish();
+					MainActivity.this.finish();
 				} else {
 					// Idle. First run? Switch to user prefs screen if there are no prefs stored yet
 			        SharedPreferences settings = getSharedPreferences("PREFS", 0);
@@ -72,7 +72,7 @@ public class MainInput extends Activity {
 					ListView listSavedTrips = (ListView) findViewById(R.id.ListSavedTrips);
 					populateList(listSavedTrips);
 				}
-				MainInput.this.unbindService(this); // race?  this says we no longer care
+				MainActivity.this.unbindService(this); // race?  this says we no longer care
 			}
 		};
 		// This needs to block until the onServiceConnected (above) completes.
@@ -90,7 +90,7 @@ public class MainInput extends Activity {
 			        buildAlertMessageNoGps();
 			    } else {
 	                startActivity(i);
-	                MainInput.this.finish();
+	                MainActivity.this.finish();
 			    }
 			}
 		});
@@ -125,7 +125,7 @@ public class MainInput extends Activity {
                .setCancelable(false).setTitle("Welcome to Cycle Atlanta!")
                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                    public void onClick(final DialogInterface dialog, final int id) {
-                       startActivity(new Intent(MainInput.this, UserInfoActivity.class));
+                       startActivity(new Intent(MainActivity.this, UserInfoActivity.class));
                    }
                });
 
@@ -135,7 +135,7 @@ public class MainInput extends Activity {
 
 	void populateList(ListView lv) {
 		// Get list from the real phone database. W00t!
-		DbAdapter mDb = new DbAdapter(MainInput.this);
+		DbAdapter mDb = new DbAdapter(MainActivity.this);
 		mDb.open();
 
 		// Clean up any bad trips & coords from crashes
@@ -175,7 +175,7 @@ public class MainInput extends Activity {
 
 		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 		    public void onItemClick(AdapterView<?> parent, View v, int pos, long id) {
-		        Intent i = new Intent(MainInput.this, ShowMap.class);
+		        Intent i = new Intent(MainActivity.this, ShowMap.class);
 		        i.putExtra("showtrip", id);
 		        startActivity(i);
 		    }
@@ -207,12 +207,12 @@ public class MainInput extends Activity {
 	}
 
 	private void retryTripUpload(long tripId) {
-	    TripUploader uploader = new TripUploader(MainInput.this);
+	    TripUploader uploader = new TripUploader(MainActivity.this);
         uploader.execute(tripId);
 	}
 
 	private void deleteTrip(long tripId) {
-	    DbAdapter mDbHelper = new DbAdapter(MainInput.this);
+	    DbAdapter mDbHelper = new DbAdapter(MainActivity.this);
         mDbHelper.open();
         mDbHelper.deleteAllCoordsForTrip(tripId);
         mDbHelper.deleteTrip(tripId);
