@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent"
-	android:padding="@dimen/standard_padding"
-	android:orientation="vertical">
-	<Button
-	    android:id="@+id/ButtonStart"
-	    android:text="@string/startNewTrip"
-	    android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:drawableLeft="@drawable/bike"
-		android:textStyle="bold"
-		android:textSize="24sp"/>
-	<TextView
-	    android:id="@+id/TextViewPreviousTrips"
-	    android:text="@string/previous_trips"
-	    android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:gravity="center"/>
-	<ListView
-	    android:id="@+id/ListSavedTrips"
-		android:layout_height="match_parent"
-		android:layout_width="fill_parent"/>
-</LinearLayout>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/baseContainer">
+    
+    <LinearLayout
+        style="@style/contentContainer"
+        android:layout_above="@+id/RecordBar">
+        
+		<TextView
+		    android:id="@+id/TextViewPreviousTrips"
+		    android:text="@string/previous_trips"
+		    android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:gravity="center"/>
+		
+		<ListView
+		    android:id="@+id/ListSavedTrips"
+			android:layout_height="match_parent"
+			android:layout_width="fill_parent"/>
+		
+	</LinearLayout>
+	
+	<include layout="@layout/record_bar" />
+	
+</RelativeLayout>

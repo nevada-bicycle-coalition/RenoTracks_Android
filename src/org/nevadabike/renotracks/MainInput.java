@@ -57,7 +57,7 @@ public class MainInput extends Activity {
 				int state = rs.getState();
 				if (state > RecordingService.STATE_IDLE) {
 					if (state == RecordingService.STATE_FULL) {
-						startActivity(new Intent(MainInput.this, SaveTrip.class));
+						startActivity(new Intent(MainInput.this, SaveTripActivity.class));
 					} else {  // RECORDING OR PAUSED:
 						startActivity(new Intent(MainInput.this, RecordingActivity.class));
 					}
@@ -80,7 +80,7 @@ public class MainInput extends Activity {
 		bindService(rService, sc, Context.BIND_AUTO_CREATE);
 
 		// And set up the record button
-		final Button startButton = (Button) findViewById(R.id.ButtonStart);
+		final Button startButton = (Button) findViewById(R.id.ButtonRecordPause);
 		final Intent i = new Intent(this, RecordingActivity.class);
 		startButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {

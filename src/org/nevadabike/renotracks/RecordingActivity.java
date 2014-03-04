@@ -10,11 +10,13 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,6 +46,14 @@ public class RecordingActivity extends Activity {
         }
     };
 
+	Drawable pauseDrawable;
+	Drawable recordDrawable;
+	String pausedTitle;
+	String recordingTitle;
+
+	String pause;
+	String resume;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -57,8 +67,20 @@ public class RecordingActivity extends Activity {
         txtMaxSpeed = (TextView) findViewById(R.id.TextMaxSpeed);
         txtAvgSpeed = (TextView) findViewById(R.id.TextAvgSpeed);
 
-		pauseButton = (Button) findViewById(R.id.ButtonPause);
+        pauseDrawable = getResources().getDrawable(R.drawable.pause);
+        recordDrawable = getResources().getDrawable(R.drawable.record);
+
+        pausedTitle = getResources().getString(R.string.paused_title);
+        recordingTitle = getResources().getString(R.string.recording_title);
+
+		pauseButton = (Button) findViewById(R.id.ButtonRecordPause);
 		finishButton = (Button) findViewById(R.id.ButtonFinished);
+
+		pause = getResources().getString(R.string.pause);
+		resume = getResources().getString(R.string.resume);
+
+		//MAKE THE STOP BUTTON VISIBLE IN THE RECORDING BAR
+		((LinearLayout) findViewById(R.id.ButtonFinishedContainer)).setVisibility(View.VISIBLE);
 
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 
@@ -75,23 +97,28 @@ public class RecordingActivity extends Activity {
 						trip = TripData.createTrip(RecordingActivity.this);
 						rs.startRecording(trip);
 						isRecording = true;
-						RecordingActivity.this.pauseButton.setEnabled(true);
-						RecordingActivity.this.setTitle("Cycle Atlanta - Recording...");
+						pauseButton.setEnabled(true);
+						pauseButton.setCompoundDrawablesWithIntrinsicBounds(pauseDrawable, null, null, null);
+						pauseButton.setText(pause);
+						setTitle(recordingTitle);
 						break;
 					case RecordingService.STATE_RECORDING:
 						long id = rs.getCurrentTrip();
 						trip = TripData.fetchTrip(RecordingActivity.this, id);
 						isRecording = true;
-						RecordingActivity.this.pauseButton.setEnabled(true);
-						RecordingActivity.this.setTitle("Cycle Atlanta - Recording...");
+						pauseButton.setEnabled(true);
+						pauseButton.setCompoundDrawablesWithIntrinsicBounds(pauseDrawable, null, null, null);
+						pauseButton.setText(pause);
+						setTitle(recordingTitle);
 						break;
 					case RecordingService.STATE_PAUSED:
 						long tid = rs.getCurrentTrip();
 						isRecording = false;
 						trip = TripData.fetchTrip(RecordingActivity.this, tid);
-						RecordingActivity.this.pauseButton.setEnabled(true);
-						RecordingActivity.this.pauseButton.setText("Resume");
-						RecordingActivity.this.setTitle("Cycle Atlanta - Paused...");
+						pauseButton.setEnabled(true);
+						pauseButton.setCompoundDrawablesWithIntrinsicBounds(recordDrawable, null, null, null);
+						pauseButton.setText(resume);
+						setTitle(pausedTitle);
 						break;
 					case RecordingService.STATE_FULL:
 						// Should never get here, right?
@@ -109,8 +136,9 @@ public class RecordingActivity extends Activity {
 			public void onClick(View v) {
 				isRecording = !isRecording;
 				if (isRecording) {
-					pauseButton.setText("Pause");
-					RecordingActivity.this.setTitle("Cycle Atlanta - Recording...");
+					pauseButton.setText(pause);
+					pauseButton.setCompoundDrawablesWithIntrinsicBounds(pauseDrawable, null, null, null);
+					setTitle(recordingTitle);
 					// Don't include pause time in trip duration
 					if (trip.pauseStartedAt > 0) {
 	                    trip.totalPauseTime += (System.currentTimeMillis() - trip.pauseStartedAt);
@@ -118,12 +146,13 @@ public class RecordingActivity extends Activity {
 					}
 					Toast.makeText(getBaseContext(),"GPS restarted. It may take a moment to resync.", Toast.LENGTH_LONG).show();
 				} else {
-					pauseButton.setText("Resume");
-					RecordingActivity.this.setTitle("Cycle Atlanta - Paused...");
+					pauseButton.setText(resume);
+					pauseButton.setCompoundDrawablesWithIntrinsicBounds(recordDrawable, null, null, null);
+					setTitle(pausedTitle);
 					trip.pauseStartedAt = System.currentTimeMillis();
 					Toast.makeText(getBaseContext(),"Recording paused; GPS now offline", Toast.LENGTH_LONG).show();
 				}
-				RecordingActivity.this.setListener();
+				setListener();
 			}
 		});
 
@@ -140,7 +169,7 @@ public class RecordingActivity extends Activity {
                         trip.endTime = System.currentTimeMillis() - trip.totalPauseTime;
                     }
 					// Save trip so far (points and extent, but no purpose or notes)
-					fi = new Intent(RecordingActivity.this, SaveTrip.class);
+					fi = new Intent(RecordingActivity.this, SaveTripActivity.class);
 					trip.updateTrip("","","","");
 				}
 				// Otherwise, cancel and go back to main screen
@@ -156,7 +185,7 @@ public class RecordingActivity extends Activity {
 
 				// Either way, activate next task, and then kill this task
 				startActivity(fi);
-				RecordingActivity.this.finish();
+				finish();
 			}
 		});
 	}
@@ -183,7 +212,7 @@ public class RecordingActivity extends Activity {
 			public void onServiceDisconnected(ComponentName name) {}
 			public void onServiceConnected(ComponentName name, IBinder service) {
 				IRecordService rs = (IRecordService) service;
-				if (RecordingActivity.this.isRecording) {
+				if (isRecording) {
 					rs.resumeRecording();
 				} else {
 					rs.pauseRecording();
