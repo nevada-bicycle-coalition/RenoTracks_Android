@@ -10,8 +10,6 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Binder;
@@ -19,9 +17,21 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 
-public class RecordingService extends Service implements LocationListener {
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient;
+import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+
+public class RecordingService extends Service implements
+	GooglePlayServicesClient.ConnectionCallbacks,
+	GooglePlayServicesClient.OnConnectionFailedListener,
+	LocationListener {
+
+	private LocationClient locationClient;
+	private LocationRequest locationRequest;
+
 	RecordingActivity recordActivity;
-	LocationManager lm = null;
 	DbAdapter mDb;
 
 	// Bike bell variables
@@ -50,7 +60,7 @@ public class RecordingService extends Service implements LocationListener {
 	int state = STATE_IDLE;
 	private final MyServiceBinder myServiceBinder = new MyServiceBinder();
 
-	// ---SERVICE methods - required! -----------------
+	// BEGIN SERVICE METHODS
 	@Override
 	public IBinder onBind(Intent arg0) {
 		return myServiceBinder;
@@ -66,10 +76,7 @@ public class RecordingService extends Service implements LocationListener {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-            if (timer!=null) {
-                timer.cancel();
-                timer.purge();
-            }
+        cancelTimer();
 	}
 
 	public class MyServiceBinder extends Binder implements IRecordService {
@@ -105,8 +112,9 @@ public class RecordingService extends Service implements LocationListener {
 			notifyListeners();
 		}
 	}
+	// END SERVICE METHODS
 
-	// ---end SERVICE methods -------------------------
+	// BEGIN RECORDING METHODS
 
 	public void startRecording(TripData trip) {
 		this.state = STATE_RECORDING;
@@ -119,37 +127,25 @@ public class RecordingService extends Service implements LocationListener {
 		setNotification();
 
 		// Start listening for GPS updates!
-		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+		locationClientInit();
 
 		// Set up timer for bike bell
-		if (timer != null) {
-		    timer.cancel(); timer.purge();
-		}
-        timer = new Timer();
-        timer.schedule (new TimerTask() {
-            @Override public void run() {
-                mHandler.post(mRemindUser);
-            }
-        }, BELL_FIRST_INTERVAL*60000, BELL_NEXT_INTERVAL*60000);
+		setupTimer();
 	}
 
 	public void pauseRecording() {
 		this.state = STATE_PAUSED;
-		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		lm.removeUpdates(this);
+		locationClientStopRecording();
 	}
 
 	public void resumeRecording() {
 		this.state = STATE_RECORDING;
-		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+		locationClientStartRecording();
 	}
 
 	public long finishRecording() {
 		this.state = STATE_FULL;
-		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		lm.removeUpdates(this);
+		locationClientStopRecording();
 
 		clearNotifications();
 
@@ -161,8 +157,7 @@ public class RecordingService extends Service implements LocationListener {
 			trip.dropTrip();
 		}
 
-		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		lm.removeUpdates(this);
+		locationClientStopRecording();
 
 		clearNotifications();
 		this.state = STATE_IDLE;
@@ -176,13 +171,33 @@ public class RecordingService extends Service implements LocationListener {
 		return trip;
 	}
 
-	// LocationListener implementation:
+	// END RECORDING METHODS
+
+	// BEGIN LOCATION METHODS
+
+	private void locationClientInit() {
+		locationClient = new LocationClient(this, this, this);
+		locationClient.connect();
+	}
+
+	private void locationClientStartRecording() {
+		if (locationClient != null) {
+			locationClient.requestLocationUpdates(locationRequest, this);
+		}
+	}
+
+	private void locationClientStopRecording() {
+		if (locationClient != null) {
+			locationClient.removeLocationUpdates(this);
+		}
+	}
+
 	@Override
 	public void onLocationChanged(Location loc) {
 		if (loc != null) {
-			// Only save one beep per second.
+			// Only save one point per second.
 			double currentTime = System.currentTimeMillis();
-			if (currentTime - latestUpdate > 999) {
+			if (currentTime - latestUpdate >= 1000) {
 
 				latestUpdate = currentTime;
 				updateTripStats(loc);
@@ -190,31 +205,60 @@ public class RecordingService extends Service implements LocationListener {
 				if (!rtn) {
 	                //Log.e("FAIL", "Couldn't write to DB");
 				}
-
 				// Update the status page every time, if we can.
 				notifyListeners();
 			}
 		}
 	}
 
+    private void updateTripStats(Location newLocation) {
+        final float spdConvert = 2.2369f;
+
+    	// Stats should only be updated if accuracy is decent
+    	if (newLocation.getAccuracy()< 20) {
+            // Speed data is sometimes awful, too:
+            curSpeed = newLocation.getSpeed() * spdConvert;
+            if (curSpeed < 60.0f) {
+            	maxSpeed = Math.max(maxSpeed, curSpeed);
+            }
+            if (lastLocation != null) {
+                float segmentDistance = lastLocation.distanceTo(newLocation);
+                distanceTraveled = distanceTraveled + segmentDistance;
+            }
+
+            lastLocation = newLocation;
+    	}
+    }
+
+    void notifyListeners() {
+    	if (recordActivity != null) {
+    		recordActivity.updateStatus(trip.numpoints, distanceTraveled, curSpeed, maxSpeed);
+    	}
+    }
+
 	@Override
-	public void onProviderDisabled(String arg0) {
+	public void onConnected(Bundle bundle) {
+		locationRequest = LocationRequest.create();
+		locationRequest.setInterval(100);
+		locationClientStartRecording();
 	}
 
 	@Override
-	public void onProviderEnabled(String arg0) {
+	public void onConnectionFailed(ConnectionResult arg0) {
 	}
 
 	@Override
-	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
+	public void onDisconnected() {
 	}
-	// END LocationListener implementation:
 
+	// BEGIN LOCATION METHODS
+
+	// BEGIN BELL FUNCTIONS
 	public void remindUser() {
 	    soundpool.play(bikebell, 1.0f, 1.0f, 1, 0, 1.0f);
 
 		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		int icon = R.drawable.icon25;
+		int icon = R.drawable.ic_notification;
         long when = System.currentTimeMillis();
         int minutes = (int) (when - trip.startTime) / 60000;
 		CharSequence tickerText = getResources().getString(R.string.still_recording, minutes);
@@ -239,7 +283,7 @@ public class RecordingService extends Service implements LocationListener {
 
 	private void setNotification() {
 		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		int icon = R.drawable.icon25;
+		int icon = R.drawable.ic_notification;
 		CharSequence tickerText = getResources().getString(R.string.recording);
 		long when = System.currentTimeMillis();
 
@@ -268,34 +312,24 @@ public class RecordingService extends Service implements LocationListener {
 		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		mNotificationManager.cancelAll();
 
+		cancelTimer();
+	}
+
+	private void setupTimer() {
+		cancelTimer();
+        timer = new Timer();
+        timer.schedule (new TimerTask() {
+            @Override public void run() {
+                mHandler.post(mRemindUser);
+            }
+        }, BELL_FIRST_INTERVAL*60000, BELL_NEXT_INTERVAL*60000);
+	}
+
+	private void cancelTimer() {
 		if (timer!=null) {
             timer.cancel();
             timer.purge();
 		}
 	}
-
-    private void updateTripStats(Location newLocation) {
-        final float spdConvert = 2.2369f;
-
-    	// Stats should only be updated if accuracy is decent
-    	if (newLocation.getAccuracy()< 20) {
-            // Speed data is sometimes awful, too:
-            curSpeed = newLocation.getSpeed() * spdConvert;
-            if (curSpeed < 60.0f) {
-            	maxSpeed = Math.max(maxSpeed, curSpeed);
-            }
-            if (lastLocation != null) {
-                float segmentDistance = lastLocation.distanceTo(newLocation);
-                distanceTraveled = distanceTraveled + segmentDistance;
-            }
-
-            lastLocation = newLocation;
-    	}
-    }
-
-    void notifyListeners() {
-    	if (recordActivity != null) {
-    		recordActivity.updateStatus(trip.numpoints, distanceTraveled, curSpeed, maxSpeed);
-    	}
-    }
+	// END BELL FUNCTIONS
 }
