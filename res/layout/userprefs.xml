@@ -1,20 +1,27 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>   
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/ScrollView01"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="@dimen/standard_padding">
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+	style="@style/baseContainer">
+	<LinearLayout
+	    style="@style/contentContainer"
+		android:orientation="vertical">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/standard_padding"
             android:text="@string/prefs_welcome"/>
+        
+        <LinearLayout
+            style="@style/user_pref_group">
+            
+            <TextView
+                style="@style/user_prefs_label"
+                android:text="@string/trip_purpose"/>
+            <Spinner
+                android:id="@+id/tripPurposeSpinner"
+                style="@style/user_prefs_spinner"/>
+
+        </LinearLayout>
 
         <LinearLayout
             style="@style/user_pref_group">
@@ -197,5 +204,4 @@
                 android:inputType="textEmailAddress"/>
         </LinearLayout>
     </LinearLayout>
-
 </ScrollView>

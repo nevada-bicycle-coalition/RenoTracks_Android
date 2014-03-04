@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="rt_green">#2e8837</color>
+    <color name="accent_color">#2e8837</color>
 </resources>
