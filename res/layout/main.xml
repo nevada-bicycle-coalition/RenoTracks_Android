@@ -20,6 +20,26 @@
 		
 	</LinearLayout>
 	
-	<include layout="@layout/record_bar" />
-	
+	<LinearLayout
+        android:id="@+id/ButtonStart"
+        style="?android:attr/buttonBarButtonStyle"
+	    android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true"
+		android:gravity="center"
+		android:background="@color/accent_color"
+		android:padding="@dimen/standard_padding">
+		<ImageView
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_marginRight="@dimen/standard_padding"
+		    android:src="@drawable/bike" />
+		<TextView
+		    style="?android:attr/textAppearanceLarge"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/startNewTrip"
+			android:textColor="@android:color/white"
+			android:textStyle="bold"/>
+	</LinearLayout>	
 </RelativeLayout>

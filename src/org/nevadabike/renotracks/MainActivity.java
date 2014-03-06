@@ -26,7 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
-import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -35,6 +35,10 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
     private final static int CONTEXT_RETRY = 0;
     private final static int CONTEXT_DELETE = 1;
+	private TextView counter;
+	private ListView listSavedTrips;
+	private Activity activity;
+	private LinearLayout startButton;
 
     //DbAdapter mDb;
 
@@ -43,6 +47,11 @@ public class MainActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+
+		activity = this;
+
+		counter = (TextView) findViewById(R.id.TextViewPreviousTrips);
+		listSavedTrips = (ListView) findViewById(R.id.ListSavedTrips);
 
 		// Let's handle some launcher lifecycle issues:
 
@@ -57,11 +66,11 @@ public class MainActivity extends Activity {
 				int state = rs.getState();
 				if (state > RecordingService.STATE_IDLE) {
 					if (state == RecordingService.STATE_FULL) {
-						startActivity(new Intent(MainActivity.this, SaveTripActivity.class));
+						startActivity(new Intent(activity, SaveTripActivity.class));
 					} else {  // RECORDING OR PAUSED:
-						startActivity(new Intent(MainActivity.this, RecordingActivity.class));
+						startActivity(new Intent(activity, RecordingActivity.class));
 					}
-					MainActivity.this.finish();
+					finish();
 				} else {
 					// Idle. First run? Switch to user prefs screen if there are no prefs stored yet
 			        SharedPreferences settings = getSharedPreferences("PREFS", 0);
@@ -69,28 +78,28 @@ public class MainActivity extends Activity {
                         showWelcomeDialog();
 			        }
 					// Not first run - set up the list view of saved trips
-					ListView listSavedTrips = (ListView) findViewById(R.id.ListSavedTrips);
 					populateList(listSavedTrips);
 				}
-				MainActivity.this.unbindService(this); // race?  this says we no longer care
+				unbindService(this); // race?  this says we no longer care
 			}
 		};
+
 		// This needs to block until the onServiceConnected (above) completes.
 		// Thus, we can check the recording status before continuing on.
 		bindService(rService, sc, Context.BIND_AUTO_CREATE);
 
 		// And set up the record button
-		final Button startButton = (Button) findViewById(R.id.ButtonRecordPause);
-		final Intent i = new Intent(this, RecordingActivity.class);
+		startButton = (LinearLayout) findViewById(R.id.ButtonStart);
 		startButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
+				// TODO update to google play services location api
 			    // Before we go to record, check GPS status
 			    final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
 			    if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
 			        buildAlertMessageNoGps();
 			    } else {
-	                startActivity(i);
-	                MainActivity.this.finish();
+	                startActivity(new Intent(activity, RecordingActivity.class));
+	                finish();
 			    }
 			}
 		});
@@ -125,7 +134,7 @@ public class MainActivity extends Activity {
                .setCancelable(false).setTitle("Welcome to Cycle Atlanta!")
                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                    public void onClick(final DialogInterface dialog, final int id) {
-                       startActivity(new Intent(MainActivity.this, UserInfoActivity.class));
+                       startActivity(new Intent(activity, UserInfoActivity.class));
                    }
                });
 
@@ -135,7 +144,7 @@ public class MainActivity extends Activity {
 
 	void populateList(ListView lv) {
 		// Get list from the real phone database. W00t!
-		DbAdapter mDb = new DbAdapter(MainActivity.this);
+		DbAdapter mDb = new DbAdapter(activity);
 		mDb.open();
 
 		// Clean up any bad trips & coords from crashes
@@ -154,7 +163,6 @@ public class MainActivity extends Activity {
 			);
 
 			lv.setAdapter(sca);
-			TextView counter = (TextView) findViewById(R.id.TextViewPreviousTrips);
 
 			int numtrips = allTrips.getCount();
 			switch (numtrips) {
@@ -175,7 +183,7 @@ public class MainActivity extends Activity {
 
 		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 		    public void onItemClick(AdapterView<?> parent, View v, int pos, long id) {
-		        Intent i = new Intent(MainActivity.this, ShowMap.class);
+		        Intent i = new Intent(activity, ShowMap.class);
 		        i.putExtra("showtrip", id);
 		        startActivity(i);
 		    }
@@ -207,17 +215,16 @@ public class MainActivity extends Activity {
 	}
 
 	private void retryTripUpload(long tripId) {
-	    TripUploader uploader = new TripUploader(MainActivity.this);
+	    TripUploader uploader = new TripUploader(activity);
         uploader.execute(tripId);
 	}
 
 	private void deleteTrip(long tripId) {
-	    DbAdapter mDbHelper = new DbAdapter(MainActivity.this);
+	    DbAdapter mDbHelper = new DbAdapter(activity);
         mDbHelper.open();
         mDbHelper.deleteAllCoordsForTrip(tripId);
         mDbHelper.deleteTrip(tripId);
         mDbHelper.close();
-        ListView listSavedTrips = (ListView) findViewById(R.id.ListSavedTrips);
         listSavedTrips.invalidate();
         populateList(listSavedTrips);
     }
