@@ -10,18 +10,6 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/standard_padding"
             android:text="@string/prefs_welcome"/>
-        
-        <LinearLayout
-            style="@style/user_pref_group">
-            
-            <TextView
-                style="@style/user_prefs_label"
-                android:text="@string/trip_purpose"/>
-            <Spinner
-                android:id="@+id/tripPurposeSpinner"
-                style="@style/user_prefs_spinner"/>
-
-        </LinearLayout>
 
         <LinearLayout
             style="@style/user_pref_group">
