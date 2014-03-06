@@ -141,30 +141,7 @@
 	<string name="stop">Stop</string>
 	
 	<string name="trip_purpose">Trip Purpose</string>
-	
-	<string-array name="trip_purpose_array">
-	    <item></item>
-	    <item>@string/trip_purpose_commute</item>
-	    <item>@string/trip_purpose_school</item>
-	    <item>@string/trip_purpose_work_rel</item>
-	    <item>@string/trip_purpose_exercise</item>
-	    <item>@string/trip_purpose_social</item>
-	    <item>@string/trip_purpose_shopping</item>
-	    <item>@string/trip_purpose_errand</item>
-	    <item>@string/trip_purpose_other</item>
-	</string-array>
-	
-	<string-array name="trip_purpose_array_icons">
-	    <item></item>
-	    <item>commute</item>
-	    <item>school</item>
-	    <item>workrel</item>
-	    <item>exercise</item>
-	    <item>social</item>
-	    <item>shopping</item>
-	    <item>errands</item>
-	    <item>other</item>
-	</string-array>
+	<string name="select_trip_purpose">Please select a trip purpose</string>
 	
 	<string name="trip_purpose_commute">Commute</string>
 	<string name="trip_purpose_school">School</string>
@@ -175,12 +152,12 @@
 	<string name="trip_purpose_errand">Errand</string>
 	<string name="trip_purpose_other">Other</string>
 	
-	<string name="ToggleCommute"><b>Commute:</b> this bike trip was primarily to get between home and your main workplace.</string>
-	<string name="ToggleSchool"><b>School:</b> this bike trip was primarily to go to or from school or college.</string>
-	<string name="ToggleWorkRel"><b>Work-Related:</b> this bike trip was primarily to go to or from a business related meeting, function, or work-related errand for your job.</string>
-	<string name="ToggleExercise"><b>Exercise:</b> this bike trip was primarily for exercise, or biking for the sake of biking.</string>
-	<string name="ToggleSocial"><b>Social:</b> this bike trip was primarily for going to or from a social activity, e.g. at a friend\'s house, the park, a restaurant, the movies.</string>
-	<string name="ToggleShopping"><b>Shopping:</b> this bike trip was primarily to purchase or bring home goods or groceries.</string>
-	<string name="ToggleErrand"><b>Errand:</b> this bike trip was primarily to attend to personal business such as banking, a doctor  visit, going to the gym, etc.</string>
-	<string name="ToggleOther"><b>Other:</b> if none of the other reasons applied to this trip, you can enter comments below to tell us more.</string>
+	<string name="trip_purpose_commute_details"><b>Commute:</b> this bike trip was primarily to get between home and your main workplace.</string>
+	<string name="trip_purpose_school_details"><b>School:</b> this bike trip was primarily to go to or from school or college.</string>
+	<string name="trip_purpose_work_rel_details"><b>Work-Related:</b> this bike trip was primarily to go to or from a business related meeting, function, or work-related errand for your job.</string>
+	<string name="trip_purpose_exercise_details"><b>Exercise:</b> this bike trip was primarily for exercise, or biking for the sake of biking.</string>
+	<string name="trip_purpose_social_details"><b>Social:</b> this bike trip was primarily for going to or from a social activity, e.g. at a friend\'s house, the park, a restaurant, the movies.</string>
+	<string name="trip_purpose_shopping_details"><b>Shopping:</b> this bike trip was primarily to purchase or bring home goods or groceries.</string>
+	<string name="trip_purpose_errand_details"><b>Errand:</b> this bike trip was primarily to attend to personal business such as banking, a doctor  visit, going to the gym, etc.</string>
+	<string name="trip_purpose_other_details"><b>Other:</b> if none of the other reasons applied to this trip, you can enter comments below to tell us more.</string>
 </resources>

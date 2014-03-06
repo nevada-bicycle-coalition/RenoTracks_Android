@@ -2,9 +2,11 @@ package org.nevadabike.renotracks;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map.Entry;
 import java.util.TimeZone;
+
+import org.nevadabike.renotracks.IconSpinnerAdapter.IconItem;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -18,63 +20,71 @@ import android.text.Html;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 public class SaveTripActivity extends Activity {
+	Activity activity;
 	long tripid;
-	HashMap <Integer, ToggleButton> purpButtons = new HashMap<Integer,ToggleButton>();
-	String purpose = "";
 
-	HashMap <Integer, String> purpDescriptions = new HashMap<Integer, String>();
+	private int selected_purpose_id = 0;
+	private TextView purpose_description;
+	private final ArrayList<IconItem> tripPurposes = new ArrayList<IconSpinnerAdapter.IconItem>();
+	private final HashMap <Integer, String> purpDescriptions = new HashMap<Integer, String>();
+
 	private String discarded;
 	private String select_purpose;
+	private Button prefsButton;
+	private Button btnSubmit;
+	private Button btnDiscard;
+	private LinearLayout tripButtons;
 
 	// Set up the purpose buttons to be one-click only
 	void preparePurposeButtons() {
-		purpButtons.put(R.id.ToggleCommute, (ToggleButton)findViewById(R.id.ToggleCommute));
-		purpButtons.put(R.id.ToggleSchool,  (ToggleButton)findViewById(R.id.ToggleSchool));
-		purpButtons.put(R.id.ToggleWorkRel, (ToggleButton)findViewById(R.id.ToggleWorkRel));
-		purpButtons.put(R.id.ToggleExercise,(ToggleButton)findViewById(R.id.ToggleExercise));
-		purpButtons.put(R.id.ToggleSocial,  (ToggleButton)findViewById(R.id.ToggleSocial));
-		purpButtons.put(R.id.ToggleShopping,(ToggleButton)findViewById(R.id.ToggleShopping));
-		purpButtons.put(R.id.ToggleErrand,  (ToggleButton)findViewById(R.id.ToggleErrand));
-		purpButtons.put(R.id.ToggleOther,   (ToggleButton)findViewById(R.id.ToggleOther));
 
-        purpDescriptions.put(R.id.ToggleCommute, getResources().getString(R.string.ToggleCommute));
-		purpDescriptions.put(R.id.ToggleSchool, getResources().getString(R.string.ToggleSchool));
-		purpDescriptions.put(R.id.ToggleWorkRel, getResources().getString(R.string.ToggleWorkRel));
-		purpDescriptions.put(R.id.ToggleExercise, getResources().getString(R.string.ToggleExercise));
-		purpDescriptions.put(R.id.ToggleSocial, getResources().getString(R.string.ToggleSocial));
-		purpDescriptions.put(R.id.ToggleShopping, getResources().getString(R.string.ToggleShopping));
-		purpDescriptions.put(R.id.ToggleErrand, getResources().getString(R.string.ToggleErrand));
-		purpDescriptions.put(R.id.ToggleOther, getResources().getString(R.string.ToggleOther));
+		purpose_description = (TextView) findViewById(R.id.TextPurpDescription);
 
-		CheckListener cl = new CheckListener();
-		for (Entry<Integer, ToggleButton> e: purpButtons.entrySet()) {
-			e.getValue().setOnCheckedChangeListener(cl);
-		}
-	}
+		tripPurposes.add(new IconSpinnerAdapter.IconItem(null, "", 0));
+		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.commute), getResources().getString(R.string.trip_purpose_commute), R.string.trip_purpose_commute));
+		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.school), getResources().getString(R.string.trip_purpose_school), R.string.trip_purpose_school));
+		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.workrel), getResources().getString(R.string.trip_purpose_work_rel), R.string.trip_purpose_work_rel));
+		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.exercise), getResources().getString(R.string.trip_purpose_exercise), R.string.trip_purpose_exercise));
+		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.social), getResources().getString(R.string.trip_purpose_social), R.string.trip_purpose_social));
+		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.shopping), getResources().getString(R.string.trip_purpose_shopping), R.string.trip_purpose_shopping));
+		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.errands), getResources().getString(R.string.trip_purpose_errand), R.string.trip_purpose_errand));
+		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.other), getResources().getString(R.string.trip_purpose_other), R.string.trip_purpose_other));
 
-	// Called every time a purp togglebutton is changed:
-	class CheckListener implements CompoundButton.OnCheckedChangeListener {
-		@Override
-		public void onCheckedChanged(CompoundButton v, boolean isChecked) {
-			// First, uncheck all purp buttons
-			if (isChecked) {
-				for (Entry<Integer, ToggleButton> e: purpButtons.entrySet()) {
-					e.getValue().setChecked(false);
-				}
-				v.setChecked(true);
-				purpose = v.getText().toString();
-				((TextView) findViewById(R.id.TextPurpDescription)).setText(
-				        Html.fromHtml(purpDescriptions.get(v.getId())));
+		purpDescriptions.put(0, getResources().getString(R.string.select_trip_purpose));
+		purpDescriptions.put(R.string.trip_purpose_commute, getResources().getString(R.string.trip_purpose_commute_details));
+		purpDescriptions.put(R.string.trip_purpose_school, getResources().getString(R.string.trip_purpose_school_details));
+		purpDescriptions.put(R.string.trip_purpose_work_rel, getResources().getString(R.string.trip_purpose_work_rel_details));
+		purpDescriptions.put(R.string.trip_purpose_exercise, getResources().getString(R.string.trip_purpose_exercise_details));
+		purpDescriptions.put(R.string.trip_purpose_social, getResources().getString(R.string.trip_purpose_social_details));
+		purpDescriptions.put(R.string.trip_purpose_shopping, getResources().getString(R.string.trip_purpose_shopping_details));
+		purpDescriptions.put(R.string.trip_purpose_errand, getResources().getString(R.string.trip_purpose_errand_details));
+		purpDescriptions.put(R.string.trip_purpose_other, getResources().getString(R.string.trip_purpose_other_details));
+
+		Spinner tripPurposeSpinner = (Spinner) findViewById(R.id.tripPurposeSpinner);
+		tripPurposeSpinner.setAdapter(new IconSpinnerAdapter(this, tripPurposes));
+		tripPurposeSpinner.setOnItemSelectedListener(new OnItemSelectedListener(){
+
+			@Override
+			public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+				IconSpinnerAdapter.IconItem selected_purpose = tripPurposes.get(position);
+				selected_purpose_id = selected_purpose.id;
+				purpose_description.setText(Html.fromHtml(purpDescriptions.get(selected_purpose_id)));
 			}
-		}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parentView) {
+			}
+		});
 	}
 
 	@Override
@@ -82,50 +92,52 @@ public class SaveTripActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.save);
 
+		this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+		activity = this;
 		finishRecording();
 
 		// Set up trip purpose buttons
-		purpose = "";
 		preparePurposeButtons();
 
-        // User prefs btn
-        final Button prefsButton = (Button) findViewById(R.id.ButtonPrefs);
-        final Intent pi = new Intent(this, UserInfoActivity.class);
-        prefsButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                startActivity(pi);
-            }
-        });
+		prefsButton = (Button) findViewById(R.id.ButtonPrefs);
+		tripButtons = (LinearLayout) findViewById(R.id.trip_buttons);
+		btnSubmit = (Button) findViewById(R.id.ButtonSubmit);
+		btnDiscard = (Button) findViewById(R.id.ButtonDiscard);
 
-        SharedPreferences settings = getSharedPreferences("PREFS", 0);
-        if (settings.getAll().size() >= 1) {
-            prefsButton.setVisibility(View.GONE);
-        }
+		//if the users has not yet entered their profile information, require them to do so now
+		SharedPreferences settings = getSharedPreferences("PREFS", 0);
+		if (settings.getAll().size() >= 1) {
+			prefsButton.setVisibility(View.GONE);
 
-        discarded = getResources().getString(R.string.discarded);
-        select_purpose = getResources().getString(R.string.select_purpose);
+			discarded = getResources().getString(R.string.discarded);
+			select_purpose = getResources().getString(R.string.select_purpose);
 
-		// Discard btn
-		final Button btnDiscard = (Button) findViewById(R.id.ButtonDiscard);
-		btnDiscard.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				Toast.makeText(getBaseContext(), discarded, Toast.LENGTH_SHORT).show();
+			// Discard btn
+			btnDiscard.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					Toast.makeText(getBaseContext(), discarded, Toast.LENGTH_SHORT).show();
 
-				cancelRecording();
+					cancelRecording();
 
-				Intent i = new Intent(SaveTripActivity.this, MainActivity.class);
-				i.putExtra("keepme", true);
-				startActivity(i);
-				SaveTripActivity.this.finish();
-			}
-		});
+					Intent i = new Intent(activity, MainActivity.class);
+					i.putExtra("keepme", true);
+					startActivity(i);
+					finish();
+				}
+			});
 
-		// Submit btn
-		final Button btnSubmit = (Button) findViewById(R.id.ButtonSubmit);
-		btnSubmit.setEnabled(false);
+			// Submit btn
+			btnSubmit.setEnabled(false);
+		} else {
+			tripButtons.setVisibility(View.GONE);
 
-		// Don't pop up the soft keyboard until user clicks!
-		this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+			prefsButton.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					startActivity(new Intent(activity, UserInfoActivity.class));
+				}
+			});
+		}
 	}
 
 	// submit btn is only activated after the service.finishedRecording() is completed.
@@ -137,11 +149,11 @@ public class SaveTripActivity extends Activity {
 		btnSubmit.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 
-				TripData trip = TripData.fetchTrip(SaveTripActivity.this, tripid);
+				TripData trip = TripData.fetchTrip(activity, tripid);
 				trip.populateDetails();
 
 				// Make sure trip purpose has been selected
-				if (purpose.equals("")) {
+				if (selected_purpose_id == 0) {
 					// Oh no!  No trip purpose!
 					Toast.makeText(getBaseContext(), select_purpose, Toast.LENGTH_SHORT).show();
 					return;
@@ -162,7 +174,7 @@ public class SaveTripActivity extends Activity {
 
 				// Save the trip details to the phone database. W00t!
 				trip.updateTrip(
-						purpose,
+						getResources().getString(selected_purpose_id),
 						fancyStartTime, fancyEndInfo,
 						notes.getEditableText().toString());
 				trip.updateTripStatus(TripData.STATUS_COMPLETE);
@@ -177,10 +189,10 @@ public class SaveTripActivity extends Activity {
 				startActivity(i);
 
 				// And, show the map!
-                xi.putExtra("showtrip", trip.tripid);
-                xi.putExtra("uploadTrip", true);
+				xi.putExtra("showtrip", trip.tripid);
+				xi.putExtra("uploadTrip", true);
 				startActivity(xi);
-				SaveTripActivity.this.finish();
+				finish();
 			}
 		});
 
@@ -221,7 +233,7 @@ public class SaveTripActivity extends Activity {
 			public void onServiceConnected(ComponentName name, IBinder service) {
 				IRecordService rs = (IRecordService) service;
 				tripid = rs.finishRecording();
-				SaveTripActivity.this.activateSubmitButton();
+				activateSubmitButton();
 				unbindService(this);
 			}
 		};
