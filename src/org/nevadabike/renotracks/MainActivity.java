@@ -107,9 +107,9 @@ public class MainActivity extends Activity {
 
     private void buildAlertMessageNoGps() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Your phone's GPS is disabled. Cycle Atlanta needs GPS to determine your location.\n\nGo to System Settings now to enable GPS?")
+        builder.setMessage(getResources().getString(R.string.gps_disabled))
                .setCancelable(false)
-               .setPositiveButton("GPS Settings...", new DialogInterface.OnClickListener() {
+               .setPositiveButton(getResources().getString(R.string.gps_settings), new DialogInterface.OnClickListener() {
                    public void onClick(final DialogInterface dialog, final int id) {
                        final ComponentName toLaunch = new ComponentName("com.android.settings","com.android.settings.SecuritySettings");
                        final Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
@@ -119,7 +119,7 @@ public class MainActivity extends Activity {
                        startActivityForResult(intent, 0);
                    }
                })
-               .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+               .setNegativeButton(getResources().getString(R.string.cancel), new DialogInterface.OnClickListener() {
                    public void onClick(final DialogInterface dialog, final int id) {
                         dialog.cancel();
                    }
@@ -130,9 +130,9 @@ public class MainActivity extends Activity {
 
     private void showWelcomeDialog() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Please enter your personal details so we can learn a bit about you.\n\nThen, try to use Cycle Atlanta every time you ride. Your trip routes will be sent to City of Atlanta so we can plan for better biking!\n\nThanks,\nThe Cycle Atlanta team")
-               .setCancelable(false).setTitle("Welcome to Cycle Atlanta!")
-               .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        builder.setMessage(getResources().getString(R.string.welcome_message))
+               .setCancelable(false).setTitle(getResources().getString(R.string.welcome_title))
+               .setPositiveButton(getResources().getString(R.string.okay), new DialogInterface.OnClickListener() {
                    public void onClick(final DialogInterface dialog, final int id) {
                        startActivity(new Intent(activity, UserInfoActivity.class));
                    }
@@ -150,7 +150,7 @@ public class MainActivity extends Activity {
 		// Clean up any bad trips & coords from crashes
 		int cleanedTrips = mDb.cleanTables();
 		if (cleanedTrips > 0) {
-		    Toast.makeText(getBaseContext(),""+cleanedTrips+" bad trip(s) removed.", Toast.LENGTH_SHORT).show();
+		    Toast.makeText(getBaseContext(),cleanedTrips + getResources().getString(R.string.trips_removed), Toast.LENGTH_SHORT).show();
 		}
 
 		try {
@@ -167,13 +167,13 @@ public class MainActivity extends Activity {
 			int numtrips = allTrips.getCount();
 			switch (numtrips) {
 			case 0:
-				counter.setText("No saved trips.");
+				counter.setText(getResources().getString(R.string.saved_trips_0));
 				break;
 			case 1:
-				counter.setText("1 saved trip:");
+				counter.setText(getResources().getString(R.string.saved_trips_1));
 				break;
 			default:
-				counter.setText("" + numtrips + " saved trips:");
+				counter.setText(numtrips + getResources().getString(R.string.saved_trips_X));
 			}
 			// allTrips.close();
 		} catch (SQLException sqle) {
@@ -192,11 +192,10 @@ public class MainActivity extends Activity {
 	}
 
 	@Override
-    public void onCreateContextMenu(ContextMenu menu, View v,
-	        ContextMenuInfo menuInfo) {
-	    super.onCreateContextMenu(menu, v, menuInfo);
-	    menu.add(0, CONTEXT_RETRY, 0, "Retry Upload");
-	    menu.add(0, CONTEXT_DELETE, 0,  "Delete");
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+		super.onCreateContextMenu(menu, v, menuInfo);
+	    menu.add(0, CONTEXT_RETRY, 0, getResources().getString(R.string.retry_upload));
+	    menu.add(0, CONTEXT_DELETE, 0,  getResources().getString(R.string.delete));
 	}
 
 	@Override

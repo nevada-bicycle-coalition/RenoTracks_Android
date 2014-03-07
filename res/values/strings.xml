@@ -160,4 +160,17 @@
 	<string name="trip_purpose_shopping_details"><b>Shopping:</b> this bike trip was primarily to purchase or bring home goods or groceries.</string>
 	<string name="trip_purpose_errand_details"><b>Errand:</b> this bike trip was primarily to attend to personal business such as banking, a doctor  visit, going to the gym, etc.</string>
 	<string name="trip_purpose_other_details"><b>Other:</b> if none of the other reasons applied to this trip, you can enter comments below to tell us more.</string>
+	
+	<string name="gps_disabled">Your phone\'s GPS is disabled. Reno Tracks needs GPS to determine your location.\n\nGo to System Settings now to enable GPS?</string>
+	<string name="welcome_message">Please enter your personal details so we can learn a bit about you.\n\nThen, try to use Reno Tracks every time you ride. Your trip routes will be sent to the City of Reno so we can plan for better biking!\n\nThanks,\nThe Reno Tracks team</string>
+	<string name="welcome_title">Welcome to Reno Tracks!</string>
+	<string name="gps_settings">GPS Settings&#8230;</string>
+	<string name="okay">OK</string>
+	<string name="cancel">Cancel</string>
+	<string name="trips_removed"> bad trip(s) removed.</string>
+	<string name="saved_trips_0">No saved trips.</string>
+	<string name="saved_trips_1">1 saved trip:</string>
+	<string name="saved_trips_X"> saved trips:</string>
+	<string name="retry_upload">Retry Upload</string>
+	<string name="delete">Delete</string>
 </resources>
