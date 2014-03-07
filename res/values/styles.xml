@@ -1,19 +1,17 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
     
-    <style name="AppBaseTheme" parent="android:Theme.Light"></style>
-    
-    <style name="AppTheme" parent="AppBaseTheme">
+    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
         <item name="android:actionBarStyle">@style/AppActionBar</item>
     </style>
     
 	<style name="AppActionBar" parent="android:Widget.Holo.Light.ActionBar.Solid.Inverse">
 		<item name="android:background">@color/accent_color</item>
+		<item name="android:icon">@drawable/logo</item>  
 	</style>
 	
 	<style name="baseContainer">
 		<item name="android:layout_width">match_parent</item>
 		<item name="android:layout_height">match_parent</item>
-		<item name="android:fitsSystemWindows">true</item>
 	</style>
 	
 	<style name="contentContainer">
