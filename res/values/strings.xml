@@ -173,4 +173,10 @@
 	<string name="saved_trips_X"> saved trips:</string>
 	<string name="retry_upload">Retry Upload</string>
 	<string name="delete">Delete</string>
+	
+	<string name="gps_restarted">GPS restarted. It may take a moment to resync.</string>
+	<string name="recording_paused">Recording paused; GPS now offline</string>
+	<string name="no_gps_data">No GPS data acquired; nothing to submit.</string>
+	<string name="data_points_received"> data points received&#8230;</string>
+	<string name="waiting_gps_fix">Waiting for GPS fix&#8230;</string>
 </resources>

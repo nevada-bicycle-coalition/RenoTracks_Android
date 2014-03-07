@@ -144,13 +144,13 @@ public class RecordingActivity extends Activity {
 	                    trip.totalPauseTime += (System.currentTimeMillis() - trip.pauseStartedAt);
 	                    trip.pauseStartedAt = 0;
 					}
-					Toast.makeText(getBaseContext(),"GPS restarted. It may take a moment to resync.", Toast.LENGTH_LONG).show();
+					Toast.makeText(getBaseContext(),getResources().getString(R.string.gps_restarted), Toast.LENGTH_LONG).show();
 				} else {
 					pauseButton.setText(resume);
 					pauseButton.setCompoundDrawablesWithIntrinsicBounds(recordDrawable, null, null, null);
 					setTitle(pausedTitle);
 					trip.pauseStartedAt = System.currentTimeMillis();
-					Toast.makeText(getBaseContext(),"Recording paused; GPS now offline", Toast.LENGTH_LONG).show();
+					Toast.makeText(getBaseContext(),getResources().getString(R.string.recording_paused), Toast.LENGTH_LONG).show();
 				}
 				setListener();
 			}
@@ -174,7 +174,7 @@ public class RecordingActivity extends Activity {
 				}
 				// Otherwise, cancel and go back to main screen
 				else {
-					Toast.makeText(getBaseContext(),"No GPS data acquired; nothing to submit.", Toast.LENGTH_SHORT).show();
+					Toast.makeText(getBaseContext(),getResources().getString(R.string.no_gps_data), Toast.LENGTH_SHORT).show();
 
 					cancelRecording();
 
@@ -195,9 +195,9 @@ public class RecordingActivity extends Activity {
 
 	    //TODO: check task status before doing this?
         if (points>0) {
-            txtStat.setText(""+points+" data points received...");
+            txtStat.setText(points + getResources().getString(R.string.data_points_received));
         } else {
-            txtStat.setText("Waiting for GPS fix...");
+            txtStat.setText(getResources().getString(R.string.waiting_gps_fix));
         }
         txtCurSpeed.setText(String.format("%1.1f mph", spdCurrent));
         txtMaxSpeed.setText(String.format("%1.1f mph", spdMax));
