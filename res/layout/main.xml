@@ -2,24 +2,22 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     style="@style/baseContainer">
     
-    <LinearLayout
+	<LinearLayout
         style="@style/contentContainer"
-        android:layout_above="@+id/RecordBar">
-        
+        android:orientation="vertical"
+        android:layout_above="@+id/ButtonStart"
+        android:layout_height="fill_parent">
 		<TextView
 		    android:id="@+id/TextViewPreviousTrips"
 		    android:text="@string/previous_trips"
 		    android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:gravity="center"/>
-		
 		<ListView
-		    android:id="@+id/ListSavedTrips"
-			android:layout_height="match_parent"
-			android:layout_width="fill_parent"/>
-		
+			android:id="@+id/ListSavedTrips"
+			android:layout_width="match_parent"
+			android:layout_height="fill_parent"/>
 	</LinearLayout>
-	
 	<LinearLayout
         android:id="@+id/ButtonStart"
         style="?android:attr/buttonBarButtonStyle"

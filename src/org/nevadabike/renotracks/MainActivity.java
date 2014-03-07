@@ -78,7 +78,7 @@ public class MainActivity extends Activity {
                         showWelcomeDialog();
 			        }
 					// Not first run - set up the list view of saved trips
-					populateList(listSavedTrips);
+					populateList();
 				}
 				unbindService(this); // race?  this says we no longer care
 			}
@@ -142,7 +142,7 @@ public class MainActivity extends Activity {
         alert.show();
     }
 
-	void populateList(ListView lv) {
+	void populateList() {
 		// Get list from the real phone database. W00t!
 		DbAdapter mDb = new DbAdapter(activity);
 		mDb.open();
@@ -157,12 +157,12 @@ public class MainActivity extends Activity {
 			Cursor allTrips = mDb.fetchAllTrips();
 
 			SimpleCursorAdapter sca = new SimpleCursorAdapter(this,
-					R.layout.twolinelist, allTrips,
-						new String[] { "purp", "fancystart", "fancyinfo"},
-						new int[] {R.id.TextView01, R.id.TextView03, R.id.TextInfo}
+				R.layout.twolinelist, allTrips,
+				new String[] { "purp", "fancystart", "fancyinfo"},
+				new int[] {R.id.text1, R.id.text2, R.id.text3}
 			);
 
-			lv.setAdapter(sca);
+			listSavedTrips.setAdapter(sca);
 
 			int numtrips = allTrips.getCount();
 			switch (numtrips) {
@@ -181,14 +181,14 @@ public class MainActivity extends Activity {
 		}
 		mDb.close();
 
-		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+		listSavedTrips.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 		    public void onItemClick(AdapterView<?> parent, View v, int pos, long id) {
 		        Intent i = new Intent(activity, ShowMap.class);
 		        i.putExtra("showtrip", id);
 		        startActivity(i);
 		    }
 		});
-		registerForContextMenu(lv);
+		registerForContextMenu(listSavedTrips);
 	}
 
 	@Override
@@ -226,7 +226,7 @@ public class MainActivity extends Activity {
         mDbHelper.deleteTrip(tripId);
         mDbHelper.close();
         listSavedTrips.invalidate();
-        populateList(listSavedTrips);
+        populateList();
     }
 
 	/* Creates the menu items */
