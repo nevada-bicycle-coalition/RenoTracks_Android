@@ -57,6 +57,8 @@ public class RecordingService extends Service implements
 	public final static int STATE_PAUSED = 2;
 	public final static int STATE_FULL = 3;
 
+	public final static int RECORDING_SPEED = 10 * 1000; //10 second intervals
+
 	int state = STATE_IDLE;
 	private final MyServiceBinder myServiceBinder = new MyServiceBinder();
 
@@ -211,23 +213,25 @@ public class RecordingService extends Service implements
 		}
 	}
 
+	final float spdConvert = 2.2369f; //Meters per second to miles per hour
     private void updateTripStats(Location newLocation) {
-        final float spdConvert = 2.2369f;
+    	//Update if accuracy is within 50 meters
+    	if (newLocation.getAccuracy() > 50) return;
 
-    	// Stats should only be updated if accuracy is decent
-    	if (newLocation.getAccuracy()< 20) {
-            // Speed data is sometimes awful, too:
-            curSpeed = newLocation.getSpeed() * spdConvert;
-            if (curSpeed < 60.0f) {
-            	maxSpeed = Math.max(maxSpeed, curSpeed);
-            }
-            if (lastLocation != null) {
-                float segmentDistance = lastLocation.distanceTo(newLocation);
-                distanceTraveled = distanceTraveled + segmentDistance;
-            }
+		//Convert speed TODO consider keeping at meters per second and only convert when displayed
+		curSpeed = newLocation.getSpeed() * spdConvert;
 
-            lastLocation = newLocation;
-    	}
+		//Get out of the car and back on the bike
+        if (curSpeed < 60) {
+        	maxSpeed = Math.max(maxSpeed, curSpeed);
+        }
+
+        if (lastLocation != null) {
+            float segmentDistance = lastLocation.distanceTo(newLocation);
+            distanceTraveled = distanceTraveled + segmentDistance;
+        }
+
+        lastLocation = newLocation;
     }
 
     void notifyListeners() {
@@ -238,8 +242,9 @@ public class RecordingService extends Service implements
 
 	@Override
 	public void onConnected(Bundle bundle) {
-		locationRequest = LocationRequest.create();
-		locationRequest.setInterval(100);
+		locationRequest = new LocationRequest();
+		locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+		locationRequest.setInterval(RECORDING_SPEED).setFastestInterval(RECORDING_SPEED); //Request that results be sent every ten seconds and no faster (helps to save the battery)
 		locationClientStartRecording();
 	}
 
