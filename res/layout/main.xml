@@ -3,16 +3,18 @@
     style="@style/baseContainer">
     
 	<LinearLayout
-        style="@style/contentContainer"
+	    android:layout_width="match_parent"
+		android:layout_height="fill_parent"
         android:orientation="vertical"
-        android:layout_above="@+id/ButtonStart"
-        android:layout_height="fill_parent">
+        android:layout_above="@+id/ButtonStart">
 		<TextView
 		    android:id="@+id/TextViewPreviousTrips"
 		    android:text="@string/previous_trips"
 		    android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:gravity="center"/>
+			android:gravity="center"
+			android:paddingTop="@dimen/standard_padding"
+        	android:paddingBottom="@dimen/standard_padding"/>
 		<ListView
 			android:id="@+id/ListSavedTrips"
 			android:layout_width="match_parent"
