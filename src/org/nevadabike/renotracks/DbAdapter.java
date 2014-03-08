@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 /**
  * Simple database access helper class. Defines the basic CRUD operations, and
@@ -21,7 +22,7 @@ import android.database.sqlite.SQLiteOpenHelper;
  * SDK**
  */
 public class DbAdapter {
-    private static final int DATABASE_VERSION = 20;
+    private static final int DATABASE_VERSION = 22;
 
     public static final String K_TRIP_ROWID = "_id";
     public static final String K_TRIP_PURP = "purp";
@@ -31,17 +32,13 @@ public class DbAdapter {
     public static final String K_TRIP_FANCYINFO = "fancyinfo";
     public static final String K_TRIP_NOTE = "note";
     public static final String K_TRIP_DISTANCE = "distance";
-    public static final String K_TRIP_LATHI = "lathi";
-    public static final String K_TRIP_LATLO = "latlo";
-    public static final String K_TRIP_LGTHI = "lgthi";
-    public static final String K_TRIP_LGTLO = "lgtlo";
     public static final String K_TRIP_STATUS = "status";
 
     public static final String K_POINT_ROWID = "_id";
     public static final String K_POINT_TRIP  = "trip";
     public static final String K_POINT_TIME  = "time";
-    public static final String K_POINT_LAT   = "lat";
-    public static final String K_POINT_LGT   = "lgt";
+    public static final String K_POINT_LAT   = "latitude";
+    public static final String K_POINT_LGT   = "longitude";
     public static final String K_POINT_ACC   = "acc";
     public static final String K_POINT_ALT   = "alt";
     public static final String K_POINT_SPEED = "speed";
@@ -55,12 +52,11 @@ public class DbAdapter {
      */
     private static final String TABLE_CREATE_TRIPS = "create table trips "
     	+ "(_id integer primary key autoincrement, purp text, start double, endtime double, "
-    	+ "fancystart text, fancyinfo text, distance float, note text,"
-        + "lathi integer, latlo integer, lgthi integer, lgtlo integer, status integer);";
+    	+ "fancystart text, fancyinfo text, distance float, note text, status integer);";
 
     private static final String TABLE_CREATE_COORDS = "create table coords "
     	+ "(_id integer primary key autoincrement, "
-        + "trip integer, lat int, lgt int, "
+        + "trip integer, latitude double, longitude double, "
         + "time double, acc float, alt double, speed float);";
 
     private static final String DATABASE_NAME = "data";
@@ -137,12 +133,15 @@ public class DbAdapter {
     	// Add the latest point
         ContentValues rowValues = new ContentValues();
         rowValues.put(K_POINT_TRIP, tripid);
-        rowValues.put(K_POINT_LAT, pt.getLatitudeE6());
-        rowValues.put(K_POINT_LGT, pt.getLongitudeE6());
+        rowValues.put(K_POINT_LAT, pt.latitude);
+        rowValues.put(K_POINT_LGT, pt.longitude);
         rowValues.put(K_POINT_TIME, pt.time);
         rowValues.put(K_POINT_ACC, pt.accuracy);
         rowValues.put(K_POINT_ALT, pt.altitude);
         rowValues.put(K_POINT_SPEED, pt.speed);
+
+        Log.i(getClass().getName(), pt.toString());
+        Log.i(getClass().getName(), rowValues.toString());
 
         success = success && (mDb.insert(DATA_TABLE_COORDS, null, rowValues) > 0);
 
@@ -271,8 +270,8 @@ public class DbAdapter {
     public Cursor fetchTrip(long rowId) throws SQLException {
         Cursor mCursor = mDb.query(true, DATA_TABLE_TRIPS, new String[] {
                 K_TRIP_ROWID, K_TRIP_PURP, K_TRIP_START, K_TRIP_FANCYSTART,
-                K_TRIP_NOTE, K_TRIP_LATHI, K_TRIP_LATLO, K_TRIP_LGTHI,
-                K_TRIP_LGTLO, K_TRIP_STATUS, K_TRIP_END, K_TRIP_FANCYINFO, K_TRIP_DISTANCE },
+                K_TRIP_NOTE, K_TRIP_STATUS, K_TRIP_END, K_TRIP_FANCYINFO,
+                K_TRIP_DISTANCE },
 
                 K_TRIP_ROWID + "=" + rowId,
 
@@ -284,17 +283,12 @@ public class DbAdapter {
     }
 
     public boolean updateTrip(long tripid, String purp, double starttime,
-            String fancystart, String fancyinfo, String note, int lathigh, int latlow,
-            int lgthigh, int lgtlow, float distance) {
+            String fancystart, String fancyinfo, String note, float distance) {
         ContentValues initialValues = new ContentValues();
         initialValues.put(K_TRIP_PURP, purp);
         initialValues.put(K_TRIP_START, starttime);
         initialValues.put(K_TRIP_FANCYSTART, fancystart);
         initialValues.put(K_TRIP_NOTE, note);
-        initialValues.put(K_TRIP_LATHI, lathigh);
-        initialValues.put(K_TRIP_LATLO, latlow);
-        initialValues.put(K_TRIP_LGTHI, lgthigh);
-        initialValues.put(K_TRIP_LGTLO, lgtlow);
         initialValues.put(K_TRIP_FANCYINFO, fancyinfo);
         initialValues.put(K_TRIP_DISTANCE, distance);
 

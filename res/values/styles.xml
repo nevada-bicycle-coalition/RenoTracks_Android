@@ -14,9 +14,7 @@
 		<item name="android:layout_height">match_parent</item>
 	</style>
 	
-	<style name="contentContainer">
-		<item name="android:layout_width">match_parent</item>
-		<item name="android:layout_height">match_parent</item>
+	<style name="contentContainer" parent="baseContainer">
 		<item name="android:padding">@dimen/standard_padding</item>
 	</style>
 	

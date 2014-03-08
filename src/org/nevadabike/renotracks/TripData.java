@@ -1,24 +1,23 @@
 package org.nevadabike.renotracks;
 
+import java.util.ArrayList;
+
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
-
-import com.google.android.maps.GeoPoint;
-import com.google.android.maps.OverlayItem;
+import android.util.Log;
 
 public class TripData {
 	long tripid;
 	double startTime = 0;
 	double endTime = 0;
 	int numpoints = 0;
-	int lathigh, lgthigh, latlow, lgtlow, latestlat, latestlgt;
+	double latestLatitude, latestLongitude;
 	int status;
 	float distance;
 	String purp, fancystart, info;
-	private ItemizedOverlayTrack gpspoints;
-	GeoPoint startpoint, endpoint;
+	//private ItemizedOverlayTrack gpspoints;
+	CyclePoint startpoint, endpoint;
 	double totalPauseTime = 0;
 	double pauseStartedAt = 0;
 
@@ -51,13 +50,10 @@ public class TripData {
 		startTime = System.currentTimeMillis();
 		endTime = System.currentTimeMillis();
         numpoints = 0;
-        latestlat = 800; latestlgt = 800;
+        latestLatitude = 200;
+        latestLongitude = 200;
         distance = 0;
 
-        lathigh = (int) (-100 * 1E6);
-		latlow = (int) (100 * 1E6);
-		lgtlow = (int) (180 * 1E6);
-		lgthigh = (int) (-180 * 1E6);
 		purp = fancystart = info = "";
 
 		updateTrip();
@@ -70,10 +66,6 @@ public class TripData {
 
 	    Cursor tripdetails = mDb.fetchTrip(tripid);
 	    startTime = tripdetails.getDouble(tripdetails.getColumnIndex("start"));
-	    lathigh = tripdetails.getInt(tripdetails.getColumnIndex("lathi"));
-	    latlow =  tripdetails.getInt(tripdetails.getColumnIndex("latlo"));
-	    lgthigh = tripdetails.getInt(tripdetails.getColumnIndex("lgthi"));
-	    lgtlow =  tripdetails.getInt(tripdetails.getColumnIndex("lgtlo"));
 	    status =  tripdetails.getInt(tripdetails.getColumnIndex("status"));
 	    endTime = tripdetails.getDouble(tripdetails.getColumnIndex("endtime"));
         distance = tripdetails.getFloat(tripdetails.getColumnIndex("distance"));
@@ -106,6 +98,40 @@ public class TripData {
 		mDb.close();
 	}
 
+	ArrayList<CyclePoint> getPoints() {
+
+		ArrayList<CyclePoint> cyclepoints = new ArrayList<CyclePoint>();
+
+		try {
+			mDb.openReadOnly();
+
+			Cursor points = mDb.fetchAllCoordsForTrip(tripid);
+            int COL_LAT = points.getColumnIndex("latitude");
+            int COL_LGT = points.getColumnIndex("longitude");
+            int COL_TIME = points.getColumnIndex("time");
+            int COL_ACC  = points.getColumnIndex(DbAdapter.K_POINT_ACC);
+
+			while (!points.isAfterLast()) {
+
+                double latitude = points.getDouble(COL_LAT);
+                double longitude = points.getDouble(COL_LGT);
+                double time = points.getDouble(COL_TIME);
+                float acc = (float) points.getDouble(COL_ACC);
+                Log.i(getClass().getName(), time + ": " + latitude + ", " + longitude + " (" + acc + ")");
+
+                cyclepoints.add(new CyclePoint(latitude, longitude, time, acc));
+				points.moveToNext();
+			}
+			points.close();
+			mDb.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return cyclepoints;
+	}
+
+	/*
 	public ItemizedOverlayTrack getPoints(Drawable d) {
 		// If already built, don't build again!
 		if (gpspoints != null && gpspoints.size()>0) {
@@ -119,26 +145,27 @@ public class TripData {
 			mDb.openReadOnly();
 
 			Cursor points = mDb.fetchAllCoordsForTrip(tripid);
-            int COL_LAT = points.getColumnIndex("lat");
-            int COL_LGT = points.getColumnIndex("lgt");
+            int COL_LAT = points.getColumnIndex("latitude");
+            int COL_LGT = points.getColumnIndex("longitude");
             int COL_TIME = points.getColumnIndex("time");
             int COL_ACC  = points.getColumnIndex(DbAdapter.K_POINT_ACC);
 
             numpoints = points.getCount();
 
             points.moveToLast();
-            this.endpoint   = new CyclePoint(points.getInt(COL_LAT), points.getInt(COL_LGT), points.getDouble(COL_TIME));
+            this.endpoint   = new CyclePoint(points.getDouble(COL_LAT), points.getDouble(COL_LGT), points.getDouble(COL_TIME));
 
             points.moveToFirst();
-            this.startpoint = new CyclePoint(points.getInt(COL_LAT), points.getInt(COL_LGT), points.getDouble(COL_TIME));
+            this.startpoint = new CyclePoint(points.getDouble(COL_LAT), points.getDouble(COL_LGT), points.getDouble(COL_TIME));
 
 			while (!points.isAfterLast()) {
-                int lat = points.getInt(COL_LAT);
-                int lgt = points.getInt(COL_LGT);
+                double latitude = points.getDouble(COL_LAT);
+                double longitude = points.getDouble(COL_LGT);
+                Log.i(getClass().getName(), latitude+", "+longitude);
                 double time = points.getDouble(COL_TIME);
                 float acc = (float) points.getDouble(COL_ACC);
 
-                addPointToSavedMap(lat, lgt, time, acc);
+                addPointToSavedMap(latitude, longitude, time, acc);
 				points.moveToNext();
 			}
 			points.close();
@@ -151,45 +178,41 @@ public class TripData {
 
 		return gpspoints;
 	}
-
-	private void addPointToSavedMap(int lat, int lgt, double currentTime, float acc) {
-		CyclePoint pt = new CyclePoint(lat, lgt, currentTime, acc);
+	*/
+	/*
+	private void addPointToSavedMap(double latitude, double longitude, double currentTime, float acc) {
+		CyclePoint pt = new CyclePoint(latitude, longitude, currentTime, acc);
 
 		OverlayItem opoint = new OverlayItem(pt, null, null);
 		gpspoints.addOverlay(opoint);
 	}
-
+	//*/
 	boolean addPointNow(Location loc, double currentTime, float dst) {
-		int lat = (int) (loc.getLatitude() * 1E6);
-		int lgt = (int) (loc.getLongitude() * 1E6);
+		double latitude = loc.getLatitude();
+		double longitude = loc.getLongitude();
 
 		// Skip duplicates
-		if (latestlat == lat && latestlgt == lgt)
+		if (latestLatitude == latitude && latestLongitude == longitude)
 			return true;
 
 		float accuracy = loc.getAccuracy();
 		double altitude = loc.getAltitude();
 		float speed = loc.getSpeed();
 
-		CyclePoint pt = new CyclePoint(lat, lgt, currentTime, accuracy,
-				altitude, speed);
+		Log.i(getClass().getName(), currentTime + ": " + latitude + ", " + longitude + " (" + accuracy + ")");
+
+		CyclePoint pt = new CyclePoint(latitude, longitude, currentTime, accuracy, altitude, speed);
 
         numpoints++;
         endTime = currentTime - this.totalPauseTime;
         distance = dst;
 
-		latlow = Math.min(latlow, lat);
-		lathigh = Math.max(lathigh, lat);
-		lgtlow = Math.min(lgtlow, lgt);
-		lgthigh = Math.max(lgthigh, lgt);
-
-		latestlat = lat;
-		latestlgt = lgt;
+        latestLatitude = latitude;
+		latestLongitude = longitude;
 
         mDb.open();
         boolean rtn = mDb.addCoordToTrip(tripid, pt);
-        rtn = rtn && mDb.updateTrip(tripid, "", startTime, "", "", "",
-                lathigh, latlow, lgthigh, lgtlow, distance);
+        rtn = rtn && mDb.updateTrip(tripid, "", startTime, "", "", "", distance);
         mDb.close();
 
         return rtn;
@@ -215,8 +238,7 @@ public class TripData {
 	public void updateTrip(String purpose, String fancyStart, String fancyInfo, String notes) {
 		// Save the trip details to the phone database. W00t!
 		mDb.open();
-		mDb.updateTrip(tripid, purpose,	startTime, fancyStart, fancyInfo, notes,
-				lathigh, latlow, lgthigh, lgtlow, distance);
+		mDb.updateTrip(tripid, purpose,	startTime, fancyStart, fancyInfo, notes, distance);
 		mDb.close();
 	}
 }
