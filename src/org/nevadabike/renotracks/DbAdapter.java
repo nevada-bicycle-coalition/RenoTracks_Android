@@ -22,7 +22,7 @@ import android.util.Log;
  * SDK**
  */
 public class DbAdapter {
-    private static final int DATABASE_VERSION = 22;
+    private static final int DATABASE_VERSION = 23;
 
     public static final String K_TRIP_ROWID = "_id";
     public static final String K_TRIP_PURP = "purp";
@@ -39,11 +39,10 @@ public class DbAdapter {
     public static final String K_POINT_TIME  = "time";
     public static final String K_POINT_LAT   = "latitude";
     public static final String K_POINT_LGT   = "longitude";
-    public static final String K_POINT_ACC   = "acc";
-    public static final String K_POINT_ALT   = "alt";
+    public static final String K_POINT_ACC   = "accuracy";
+    public static final String K_POINT_ALT   = "altitude";
     public static final String K_POINT_SPEED = "speed";
 
-    private static final String TAG = "DbAdapter";
     private DatabaseHelper mDbHelper;
     private SQLiteDatabase mDb;
 
@@ -57,7 +56,7 @@ public class DbAdapter {
     private static final String TABLE_CREATE_COORDS = "create table coords "
     	+ "(_id integer primary key autoincrement, "
         + "trip integer, latitude double, longitude double, "
-        + "time double, acc float, alt double, speed float);";
+        + "time double, accuracy float, altitude double, speed float);";
 
     private static final String DATABASE_NAME = "data";
     private static final String DATA_TABLE_TRIPS = "trips";

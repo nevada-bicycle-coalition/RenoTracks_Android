@@ -106,20 +106,22 @@ public class TripData {
 			mDb.openReadOnly();
 
 			Cursor points = mDb.fetchAllCoordsForTrip(tripid);
-            int COL_LAT = points.getColumnIndex("latitude");
-            int COL_LGT = points.getColumnIndex("longitude");
-            int COL_TIME = points.getColumnIndex("time");
+            int COL_LAT = points.getColumnIndex(DbAdapter.K_POINT_LAT);
+            int COL_LGT = points.getColumnIndex(DbAdapter.K_POINT_LGT);
+            int COL_TIME = points.getColumnIndex(DbAdapter.K_POINT_TIME);
             int COL_ACC  = points.getColumnIndex(DbAdapter.K_POINT_ACC);
+            int COL_SPEED  = points.getColumnIndex(DbAdapter.K_POINT_SPEED);
 
 			while (!points.isAfterLast()) {
 
                 double latitude = points.getDouble(COL_LAT);
                 double longitude = points.getDouble(COL_LGT);
                 double time = points.getDouble(COL_TIME);
-                float acc = (float) points.getDouble(COL_ACC);
-                Log.i(getClass().getName(), time + ": " + latitude + ", " + longitude + " (" + acc + ")");
+                float accuracy = points.getFloat(COL_ACC);
+                double altitude = points.getDouble(COL_ACC);
+                float speed = points.getFloat(COL_SPEED);
 
-                cyclepoints.add(new CyclePoint(latitude, longitude, time, acc));
+                cyclepoints.add(new CyclePoint(latitude, longitude, time, accuracy, altitude, speed));
 				points.moveToNext();
 			}
 			points.close();
