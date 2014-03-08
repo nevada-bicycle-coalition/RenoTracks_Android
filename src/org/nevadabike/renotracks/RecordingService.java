@@ -35,8 +35,8 @@ public class RecordingService extends Service implements
 	DbAdapter mDb;
 
 	// Bike bell variables
-	static int BELL_FIRST_INTERVAL = 20;
-	static int BELL_NEXT_INTERVAL = 5;
+	static int BELL_FIRST_INTERVAL = 20 * 60 * 1000; //20 minutes
+	static int BELL_NEXT_INTERVAL = 5 * 60 * 1000; //5 minutes
     Timer timer;
 	SoundPool soundpool;
 	int bikebell;
@@ -117,7 +117,6 @@ public class RecordingService extends Service implements
 	// END SERVICE METHODS
 
 	// BEGIN RECORDING METHODS
-
 	public void startRecording(TripData trip) {
 		this.state = STATE_RECORDING;
 		this.trip = trip;
@@ -172,11 +171,9 @@ public class RecordingService extends Service implements
 	public TripData getCurrentTrip() {
 		return trip;
 	}
-
 	// END RECORDING METHODS
 
 	// BEGIN LOCATION METHODS
-
 	private void locationClientInit() {
 		locationClient = new LocationClient(this, this, this);
 		locationClient.connect();
@@ -255,8 +252,7 @@ public class RecordingService extends Service implements
 	@Override
 	public void onDisconnected() {
 	}
-
-	// BEGIN LOCATION METHODS
+	// END LOCATION METHODS
 
 	// BEGIN BELL FUNCTIONS
 	public void remindUser() {
@@ -327,7 +323,7 @@ public class RecordingService extends Service implements
             @Override public void run() {
                 mHandler.post(mRemindUser);
             }
-        }, BELL_FIRST_INTERVAL*60000, BELL_NEXT_INTERVAL*60000);
+        }, BELL_FIRST_INTERVAL, BELL_NEXT_INTERVAL);
 	}
 
 	private void cancelTimer() {
