@@ -16,7 +16,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.view.View;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -78,9 +77,6 @@ public class RecordingActivity extends Activity {
 
 		pause = getResources().getString(R.string.pause);
 		resume = getResources().getString(R.string.resume);
-
-		//MAKE THE STOP BUTTON VISIBLE IN THE RECORDING BAR
-		((LinearLayout) findViewById(R.id.ButtonFinishedContainer)).setVisibility(View.VISIBLE);
 
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 
