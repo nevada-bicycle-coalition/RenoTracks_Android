@@ -26,7 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
-import android.widget.LinearLayout;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -38,7 +38,7 @@ public class MainActivity extends Activity {
 	private TextView counter;
 	private ListView listSavedTrips;
 	private Activity activity;
-	private LinearLayout startButton;
+	private Button startButton;
 
     //DbAdapter mDb;
 
@@ -89,7 +89,7 @@ public class MainActivity extends Activity {
 		bindService(rService, sc, Context.BIND_AUTO_CREATE);
 
 		// And set up the record button
-		startButton = (LinearLayout) findViewById(R.id.ButtonStart);
+		startButton = (Button) findViewById(R.id.ButtonStart);
 		startButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// TODO update to google play services location api
