@@ -57,7 +57,7 @@ public class RecordingService extends Service implements
 	public final static int STATE_PAUSED = 2;
 	public final static int STATE_FULL = 3;
 
-	public final static int RECORDING_SPEED = 2 * 1000; //2 second intervals
+	public final static int RECORDING_SPEED = 10 * 1000; //10 second intervals
 
 	int state = STATE_IDLE;
 	private final MyServiceBinder myServiceBinder = new MyServiceBinder();
@@ -240,7 +240,8 @@ public class RecordingService extends Service implements
 	@Override
 	public void onConnected(Bundle bundle) {
 		locationRequest = new LocationRequest();
-		locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY).setInterval(RECORDING_SPEED);
+		locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+		locationRequest.setInterval(RECORDING_SPEED).setFastestInterval(RECORDING_SPEED); //Request that results be sent every ten seconds and no faster (helps to save the battery)
 		locationClientStartRecording();
 	}
 

@@ -3,10 +3,7 @@ package org.nevadabike.renotracks;
 import java.util.ArrayList;
 
 import android.app.Activity;
-import android.graphics.Point;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Display;
 import android.view.Window;
 import android.widget.TextView;
 
@@ -68,15 +65,7 @@ public class ShowMap extends Activity {
         	endPoint = cyclepoint;
         }
 
-        LatLngBounds tripBounds = tripBoundsBuilder.build();
-        Display display = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-
-        int minSize = Math.min(size.x, size.y);
-        Log.i(getClass().getName(), String.valueOf(minSize));
-
-        map.moveCamera(CameraUpdateFactory.newLatLngBounds(tripBounds, minSize, minSize, 0));
+        map.moveCamera(CameraUpdateFactory.newLatLngBounds(tripBoundsBuilder.build(), 25, 25, 10));
         map.addPolyline(tripLine);
 
         //Show the first and last markers

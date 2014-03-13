@@ -138,10 +138,11 @@
 		style="?android:attr/buttonBarStyle"
 		android:background="@color/accent_color">
 		<LinearLayout
-	    	android:layout_width="0dp"
+	    	android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_weight="1"
-			android:gravity="center">
+			android:gravity="center"
+			android:padding="@dimen/standard_padding">
 			<Button
 			    android:id="@+id/ButtonRecordPause"
 			    style="?android:attr/buttonBarButtonStyle"
@@ -151,14 +152,15 @@
 				android:layout_height="wrap_content"
 				android:text="@string/pause"
 				android:textColor="@android:color/white"
-				android:drawablePadding="@dimen/standard_padding"
-				android:padding="@dimen/standard_padding"/>
+				android:drawablePadding="10dp"/>
 		</LinearLayout>
 		<LinearLayout
-	    	android:layout_width="0dp"
+		    android:id="@+id/ButtonFinishedContainer"
+	    	android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_weight="1"
-			android:gravity="center">
+			android:gravity="center"
+			android:padding="@dimen/standard_padding">
 			<Button
 			    android:id="@+id/ButtonFinished"
 			    style="?android:attr/buttonBarButtonStyle"
@@ -168,8 +170,7 @@
 				android:layout_height="wrap_content"
 				android:text="@string/stop"
 				android:textColor="@android:color/white"
-				android:drawablePadding="@dimen/standard_padding"
-				android:padding="@dimen/standard_padding"/>
+				android:drawablePadding="10dp"/>
 		</LinearLayout>
 	</LinearLayout>
 	
