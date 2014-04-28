@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	style="@style/ContentContainer"
+	android:orientation="vertical">
+	
+	<Button
+		android:id="@+id/menu_record"
+		android:text="@string/record"
+		android:drawableLeft="@drawable/menu_record"
+		style="?android:attr/buttonBarButtonStyle"
+		android:layout_width="match_parent"
+		android:layout_height="@dimen/menu_item_height"
+		android:gravity="left|center_vertical"
+		android:fontFamily="@string/menu_font_unselected"
+		android:textSize="@dimen/menu_font_size"
+		android:paddingLeft="@dimen/small_padding"
+		android:drawablePadding="@dimen/small_padding"/>
+	
+	<Button
+		android:id="@+id/menu_trips"
+		android:text="@string/trips"
+		android:drawableLeft="@drawable/menu_trips"
+		style="?android:attr/buttonBarButtonStyle"
+		android:layout_width="match_parent"
+		android:layout_height="@dimen/menu_item_height"
+		android:gravity="left|center_vertical"
+		android:fontFamily="@string/menu_font_unselected"
+		android:textSize="@dimen/menu_font_size"
+		android:paddingLeft="@dimen/small_padding"
+		android:drawablePadding="@dimen/small_padding"/>
+	
+	<Button
+		android:id="@+id/menu_marks"
+		android:text="@string/marks"
+		android:drawableLeft="@drawable/menu_marks"
+		style="?android:attr/buttonBarButtonStyle"
+		android:layout_width="match_parent"
+		android:layout_height="@dimen/menu_item_height"
+		android:gravity="left|center_vertical"
+		android:fontFamily="@string/menu_font_unselected"
+		android:textSize="@dimen/menu_font_size"
+		android:paddingLeft="@dimen/small_padding"
+		android:drawablePadding="@dimen/small_padding"/>
+	
+	<Button
+		android:id="@+id/menu_settings"
+		android:text="@string/settings"
+		android:drawableLeft="@drawable/menu_settings"
+		style="?android:attr/buttonBarButtonStyle"
+		android:layout_width="match_parent"
+		android:layout_height="@dimen/menu_item_height"
+		android:gravity="left|center_vertical"
+		android:fontFamily="@string/menu_font_unselected"
+		android:textSize="@dimen/menu_font_size_small"
+		android:paddingLeft="@dimen/small_padding"
+		android:drawablePadding="@dimen/small_padding"/>
+	<Button
+		android:id="@+id/menu_help"
+		android:text="@string/help"
+		android:drawableLeft="@drawable/menu_help"
+		style="?android:attr/buttonBarButtonStyle"
+		android:layout_width="match_parent"
+		android:layout_height="@dimen/menu_item_height"
+		android:gravity="left|center_vertical"
+		android:fontFamily="@string/menu_font_unselected"
+		android:textSize="@dimen/menu_font_size_small"
+		android:paddingLeft="@dimen/small_padding"
+		android:drawablePadding="@dimen/small_padding"/>
+</LinearLayout>

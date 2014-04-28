@@ -84,12 +84,6 @@ public class UserInfoActivity extends Activity {
 		}
 	}
 
-	@Override
-	public void onDestroy() {
-		savePreferences();
-		super.onDestroy();
-	}
-
 	private void savePreferences() {
 		SharedPreferences settings = getSharedPreferences("PREFS", 0);
 		SharedPreferences.Editor editor = settings.edit();

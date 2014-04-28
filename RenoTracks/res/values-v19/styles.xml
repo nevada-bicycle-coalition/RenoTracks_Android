@@ -1,0 +1,8 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+	<style name="AppBaseTheme" parent="@android:style/Theme.Holo.Light">
+	    <item name="android:windowTranslucentNavigation">false</item>
+	    <item name="android:windowTranslucentStatus">true</item>
+	    <item name="android:windowContentOverlay">@null</item>
+	    <item name="android:windowBackground">@color/accent_color</item>
+	</style>
+</resources>

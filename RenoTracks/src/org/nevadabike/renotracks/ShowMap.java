@@ -26,7 +26,7 @@ public class ShowMap extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
         getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-		setContentView(R.layout.mapview);
+		setContentView(R.layout.showtrip);
 
         Bundle cmds = getIntent().getExtras();
 

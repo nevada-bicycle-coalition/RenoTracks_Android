@@ -1,21 +1,40 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
     
-    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
+    <style name="AppBaseTheme" parent="android:Theme.Holo.Light.DarkActionBar"/>
+    
+    <style name="AppTheme" parent="AppBaseTheme">
         <item name="android:actionBarStyle">@style/AppActionBar</item>
     </style>
     
 	<style name="AppActionBar" parent="android:Widget.Holo.Light.ActionBar.Solid.Inverse">
-		<item name="android:background">@color/accent_color</item>
-		<item name="android:icon">@drawable/logo</item>  
+        <item name="android:background">@color/accent_color</item>
+        <item name="android:homeAsUpIndicator">@drawable/ic_back</item>
+        <!-- <item name="android:icon">@drawable/logo</item> -->  
 	</style>
 	
-	<style name="baseContainer">
+	<style name="BaseContainer">
 		<item name="android:layout_width">match_parent</item>
 		<item name="android:layout_height">match_parent</item>
+		<item name="android:fitsSystemWindows">true</item>
 	</style>
 	
-	<style name="contentContainer" parent="baseContainer">
-		<item name="android:padding">@dimen/standard_padding</item>
+	<style name="ContentContainer">
+		<item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:background">@android:color/white</item>
+	</style>
+	
+	<style name="Side_Menu_Button">
+	    <item name="android:gravity">left</item>
+	    <item name="android:layout_width">match_parent</item>
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:padding">5dp</item>
+		<item name="android:drawablePadding">5dp</item>
+		<item name="android:textSize">24sp</item>
+	</style>
+	
+	<style name="Side_Menu_Button_Selected" parent="Side_Menu_Button">
+	    <item name="android:textStyle">bold</item>
 	</style>
 	
 	<style name="user_pref_group">

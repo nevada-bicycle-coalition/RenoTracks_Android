@@ -38,8 +38,7 @@
 		    android:value="@integer/google_play_services_version" />
 		
 		<activity
-			android:name="org.nevadabike.renotracks.MainActivity"
-			android:label="@string/app_name">
+			android:name="org.nevadabike.renotracks.MainActivity">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />
@@ -48,21 +47,19 @@
 		
 		<activity
 			android:name="org.nevadabike.renotracks.UserInfoActivity"
+			android:parentActivityName="org.nevadabike.renotracks.MainActivity"
 			android:label="@string/edit_user_info"
-			android:windowSoftInputMode="adjustPan|adjustResize"/>
-		
-		<activity
-			android:name="org.nevadabike.renotracks.RecordingActivity"
-			android:label="@string/activity_recording_title"/>
+			android:windowSoftInputMode="adjustPan|adjustResize">
+		</activity>
 		
 		<activity
 			android:name="org.nevadabike.renotracks.SaveTripActivity"
-			android:label="@string/app_name"
+			android:label="@string/save_trip"
 			android:windowSoftInputMode="adjustPan|adjustResize"/>
 		
 		<activity
 			android:name="org.nevadabike.renotracks.ShowMap"
-			android:label="@string/app_name"/>
+			android:parentActivityName="org.nevadabike.renotracks.MainActivity"/>
 		
 		<service
 			android:name="org.nevadabike.renotracks.RecordingService"

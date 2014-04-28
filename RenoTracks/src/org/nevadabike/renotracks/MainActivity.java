@@ -1,132 +1,125 @@
 package org.nevadabike.renotracks;
 
-import java.util.List;
-import java.util.Map;
-
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.SQLException;
-import android.location.LocationManager;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.provider.Settings;
-import android.support.v4.widget.SimpleCursorAdapter;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.view.Menu;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.AdapterContextMenuInfo;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
-import android.widget.TextView;
-import android.widget.Toast;
 
-public class MainActivity extends Activity {
-    private final static int CONTEXT_RETRY = 0;
-    private final static int CONTEXT_DELETE = 1;
-	private TextView counter;
-	private ListView listSavedTrips;
-	private Activity activity;
-	private Button startButton;
+public class MainActivity extends FragmentActivity {
 
-    //DbAdapter mDb;
+	private ActionBarDrawerToggle drawerToggle;
+	private DrawerLayout drawerLayout;
+	private FragmentManager fragmentManager;
 
-	/** Called when the activity is first created. */
+	public final static int MENU_RECORD = 1;
+	public final static int MENU_TRIPS = 2;
+	public final static int MENU_MARKS = 3;
+	private int currentView;
+
+	private MenuFragment menuFragment;
+	private RecordingFragment recordingFragment;
+	private TripsFragment tripsFragment;
+	private MarksFragment marksFragment;
+	private MainActivity activity;
+
+	public final String PREFS_KEY = "PREFS";
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
+		setContentView(R.layout.main_activity);
 
 		activity = this;
 
-		counter = (TextView) findViewById(R.id.TextViewPreviousTrips);
-		listSavedTrips = (ListView) findViewById(R.id.ListSavedTrips);
+		menuFragment = new MenuFragment();
+		recordingFragment = new RecordingFragment();
+		tripsFragment = new TripsFragment();
+		marksFragment = new MarksFragment();
 
-		// Let's handle some launcher lifecycle issues:
+		fragmentManager = getSupportFragmentManager();
+		fragmentManager.beginTransaction().replace(R.id.menu_frame, menuFragment).commit();
 
-		// If we're recording or saving right now, jump to the existing activity.
-		// (This handles user who hit BACK button while recording)
+		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+		drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close);
+		drawerLayout.setDrawerListener(drawerToggle);
 
-		Intent rService = new Intent(this, RecordingService.class);
-		ServiceConnection sc = new ServiceConnection() {
-			public void onServiceDisconnected(ComponentName name) {}
-			public void onServiceConnected(ComponentName name, IBinder service) {
-				IRecordService rs = (IRecordService) service;
-				int state = rs.getState();
-				if (state > RecordingService.STATE_IDLE) {
-					if (state == RecordingService.STATE_FULL) {
-						startActivity(new Intent(activity, SaveTripActivity.class));
-					} else {  // RECORDING OR PAUSED:
-						startActivity(new Intent(activity, RecordingActivity.class));
-					}
-					finish();
-				} else {
-					// Idle. First run? Switch to user prefs screen if there are no prefs stored yet
-			        SharedPreferences settings = getSharedPreferences("PREFS", 0);
-			        if (settings.getAll().isEmpty()) {
-                        showWelcomeDialog();
-			        }
-					// Not first run - set up the list view of saved trips
-					populateList();
-				}
-				unbindService(this); // race?  this says we no longer care
-			}
-		};
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+		getActionBar().setHomeButtonEnabled(true);
 
-		// This needs to block until the onServiceConnected (above) completes.
-		// Thus, we can check the recording status before continuing on.
-		bindService(rService, sc, Context.BIND_AUTO_CREATE);
-
-		// And set up the record button
-		startButton = (Button) findViewById(R.id.ButtonStart);
-		startButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				// TODO update to google play services location api
-			    // Before we go to record, check GPS status
-			    final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
-			    if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
-			        buildAlertMessageNoGps();
-			    } else {
-	                startActivity(new Intent(activity, RecordingActivity.class));
-	                finish();
-			    }
-			}
-		});
+        SharedPreferences settings = getSharedPreferences(PREFS_KEY, 0);
+        if (settings.getAll().isEmpty()) {
+        	showWelcomeDialog();
+        }
 	}
 
-    private void buildAlertMessageNoGps() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(getResources().getString(R.string.gps_disabled))
-               .setCancelable(false)
-               .setPositiveButton(getResources().getString(R.string.gps_settings), new DialogInterface.OnClickListener() {
-                   public void onClick(final DialogInterface dialog, final int id) {
-                       final ComponentName toLaunch = new ComponentName("com.android.settings","com.android.settings.SecuritySettings");
-                       final Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                       intent.addCategory(Intent.CATEGORY_LAUNCHER);
-                       intent.setComponent(toLaunch);
-                       intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                       startActivityForResult(intent, 0);
-                   }
-               })
-               .setNegativeButton(getResources().getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                   public void onClick(final DialogInterface dialog, final int id) {
-                        dialog.cancel();
-                   }
-               });
-        final AlertDialog alert = builder.create();
-        alert.show();
-    }
+	public void selectMenu(int menuItem) {
+		Fragment newFragment = null;
+		if (menuItem == MENU_RECORD && currentView != MENU_RECORD) {
+			currentView = MENU_RECORD;
+			newFragment = recordingFragment;
+		}
+
+		if (menuItem == MENU_TRIPS && currentView != MENU_TRIPS) {
+			currentView = MENU_TRIPS;
+			newFragment = tripsFragment;
+		}
+
+		if (menuItem == MENU_MARKS && currentView != MENU_MARKS) {
+			currentView = MENU_MARKS;
+			newFragment = marksFragment;
+		}
+
+		if (newFragment != null) {
+			 fragmentManager.beginTransaction().replace(R.id.content_frame, newFragment).setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).commit();
+			 menuFragment.selectMenu(currentView);
+		}
+
+		drawerLayout.closeDrawers();
+	}
+
+	@Override
+	protected void onPostCreate(Bundle savedInstanceState) {
+		super.onPostCreate(savedInstanceState);
+		drawerToggle.syncState();
+	}
+
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+		drawerToggle.onConfigurationChanged(newConfig);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if (drawerToggle.onOptionsItemSelected(item)) {
+			return true;
+		}
+
+		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
+		Log.i(getClass().getName(), "onStart");
+	}
+
+	@Override
+	public void onStop() {
+		super.onStop();
+		Log.i(getClass().getName(), "onStop");
+	}
 
     private void showWelcomeDialog() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -142,128 +135,15 @@ public class MainActivity extends Activity {
         alert.show();
     }
 
-	void populateList() {
-		// Get list from the real phone database. W00t!
-		DbAdapter mDb = new DbAdapter(activity);
-		mDb.open();
-
-		// Clean up any bad trips & coords from crashes
-		int cleanedTrips = mDb.cleanTables();
-		if (cleanedTrips > 0) {
-		    Toast.makeText(getBaseContext(),cleanedTrips + getResources().getString(R.string.trips_removed), Toast.LENGTH_SHORT).show();
-		}
-
-		try {
-			Cursor allTrips = mDb.fetchAllTrips();
-
-			SimpleCursorAdapter sca = new SimpleCursorAdapter(this,
-				R.layout.twolinelist, allTrips,
-				new String[] { "purp", "fancystart", "fancyinfo"},
-				new int[] {R.id.text1, R.id.text2, R.id.text3}
-			);
-
-			listSavedTrips.setAdapter(sca);
-
-			int numtrips = allTrips.getCount();
-			switch (numtrips) {
-			case 0:
-				counter.setText(getResources().getString(R.string.saved_trips_0));
-				break;
-			case 1:
-				counter.setText(getResources().getString(R.string.saved_trips_1));
-				break;
-			default:
-				counter.setText(numtrips + getResources().getString(R.string.saved_trips_X));
-			}
-			// allTrips.close();
-		} catch (SQLException sqle) {
-			// Do nothing, for now!
-		}
-		mDb.close();
-
-		listSavedTrips.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-		    public void onItemClick(AdapterView<?> parent, View v, int pos, long id) {
-		        Intent i = new Intent(activity, ShowMap.class);
-		        i.putExtra("showtrip", id);
-		        startActivity(i);
-		    }
-		});
-		registerForContextMenu(listSavedTrips);
-	}
-
-	@Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-		super.onCreateContextMenu(menu, v, menuInfo);
-	    menu.add(0, CONTEXT_RETRY, 0, getResources().getString(R.string.retry_upload));
-	    menu.add(0, CONTEXT_DELETE, 0,  getResources().getString(R.string.delete));
-	}
-
-	@Override
-	public boolean onContextItemSelected(MenuItem item) {
-	    AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-	    switch (item.getItemId()) {
-	    case CONTEXT_RETRY:
-	        retryTripUpload(info.id);
-	        return true;
-	    case CONTEXT_DELETE:
-	        deleteTrip(info.id);
-	        return true;
-	    default:
-	        return super.onContextItemSelected(item);
-	    }
-	}
-
-	private void retryTripUpload(long tripId) {
-	    TripUploader uploader = new TripUploader(activity);
-        uploader.execute(tripId);
-	}
-
-	private void deleteTrip(long tripId) {
-	    DbAdapter mDbHelper = new DbAdapter(activity);
-        mDbHelper.open();
-        mDbHelper.deleteAllCoordsForTrip(tripId);
-        mDbHelper.deleteTrip(tripId);
-        mDbHelper.close();
-        listSavedTrips.invalidate();
-        populateList();
-    }
-
-	/* Creates the menu items */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-    	getMenuInflater().inflate(R.menu.main_menu, menu);
-        return true;
-    }
-
-    /* Handles item selections */
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-        case R.id.menu_help:
-        	openHelp();
-            return true;
-        case R.id.menu_user_info:
-        	openUserInfo();
-            return true;
-        }
-    	return false;
-    }
-
-    private void openHelp() {
+    public void openHelp() {
+    	Log.i(getClass().getName(), "opening help site");
     	startActivity(new Intent(
    			Intent.ACTION_VIEW,
    			Uri.parse(getResources().getString(R.string.help_url))
    		));
     }
 
-    private void openUserInfo() {
+    public void openUserInfo() {
     	startActivity(new Intent(this, UserInfoActivity.class));
     }
-}
-
-class FakeAdapter extends SimpleAdapter {
-	public FakeAdapter(Context context, List<? extends Map<String, ?>> data,
-			int resource, String[] from, int[] to) {
-		super(context, data, resource, from, to);
-	}
 }

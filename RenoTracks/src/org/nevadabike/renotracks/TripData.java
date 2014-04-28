@@ -158,7 +158,7 @@ public class TripData {
 
         mDb.open();
         boolean rtn = mDb.addCoordToTrip(tripid, pt);
-        rtn = rtn && mDb.updateTrip(tripid, "", startTime, "", "", "", distance);
+        rtn = rtn && mDb.updateTrip(tripid, "", startTime, "", "", distance);
         mDb.close();
 
         return rtn;
@@ -180,11 +180,11 @@ public class TripData {
 		return rtn;
 	}
 
-	public void updateTrip() { updateTrip("","","",""); }
-	public void updateTrip(String purpose, String fancyStart, String fancyInfo, String notes) {
+	public void updateTrip() { updateTrip("","",""); }
+	public void updateTrip(String purpose, String fancyStart, String fancyInfo) {
 		// Save the trip details to the phone database. W00t!
 		mDb.open();
-		mDb.updateTrip(tripid, purpose,	startTime, fancyStart, fancyInfo, notes, distance);
+		mDb.updateTrip(tripid, purpose,	startTime, fancyStart, fancyInfo, distance);
 		mDb.close();
 	}
 }

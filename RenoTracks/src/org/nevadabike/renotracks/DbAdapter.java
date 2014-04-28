@@ -72,7 +72,6 @@ public class DbAdapter {
 
         @Override
         public void onCreate(SQLiteDatabase db) {
-
             db.execSQL(TABLE_CREATE_TRIPS);
             db.execSQL(TABLE_CREATE_COORDS);
         }
@@ -270,10 +269,8 @@ public class DbAdapter {
         Cursor mCursor = mDb.query(true, DATA_TABLE_TRIPS, new String[] {
                 K_TRIP_ROWID, K_TRIP_PURP, K_TRIP_START, K_TRIP_FANCYSTART,
                 K_TRIP_NOTE, K_TRIP_STATUS, K_TRIP_END, K_TRIP_FANCYINFO,
-                K_TRIP_DISTANCE },
-
+                K_TRIP_DISTANCE},
                 K_TRIP_ROWID + "=" + rowId,
-
                 null, null, null, null, null);
         if (mCursor != null) {
             mCursor.moveToFirst();
@@ -281,25 +278,21 @@ public class DbAdapter {
         return mCursor;
     }
 
-    public boolean updateTrip(long tripid, String purp, double starttime,
-            String fancystart, String fancyinfo, String note, float distance) {
+    public boolean updateTrip(long tripid, String purp, double starttime, String fancystart, String fancyinfo, float distance) {
         ContentValues initialValues = new ContentValues();
         initialValues.put(K_TRIP_PURP, purp);
         initialValues.put(K_TRIP_START, starttime);
         initialValues.put(K_TRIP_FANCYSTART, fancystart);
-        initialValues.put(K_TRIP_NOTE, note);
         initialValues.put(K_TRIP_FANCYINFO, fancyinfo);
         initialValues.put(K_TRIP_DISTANCE, distance);
 
-        return mDb.update(DATA_TABLE_TRIPS, initialValues, K_TRIP_ROWID + "="
-                + tripid, null) > 0;
+        return mDb.update(DATA_TABLE_TRIPS, initialValues, K_TRIP_ROWID + "=" + tripid, null) > 0;
     }
 
     public boolean updateTripStatus(long tripid, int tripStatus) {
         ContentValues initialValues = new ContentValues();
         initialValues.put(K_TRIP_STATUS, tripStatus);
 
-        return mDb.update(DATA_TABLE_TRIPS, initialValues, K_TRIP_ROWID + "="
-                + tripid, null) > 0;
+        return mDb.update(DATA_TABLE_TRIPS, initialValues, K_TRIP_ROWID + "=" + tripid, null) > 0;
     }
 }

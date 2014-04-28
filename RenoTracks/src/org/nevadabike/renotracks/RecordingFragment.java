@@ -1,5 +1,199 @@
 package org.nevadabike.renotracks;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
+import android.os.Bundle;
+import android.os.IBinder;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.ImageButton;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.LatLng;
+
+public class RecordingFragment extends Fragment {
+
+	private Intent recordingService;
+	private ServiceConnection recordingServiceConnection;
+	private RecordingService recordingServiceInterface;
+	private BroadcastReceiver broadcastReceiver;
+
+	private ImageButton startButton;
+	private ImageButton resumeButton;
+	private ImageButton pauseButton;
+	private ImageButton stopButton;
+	private OnClickListener clickListener;
+
+	private View view;
+	private GoogleMap map;
+	private FragmentActivity activity;
+
+	private LatLng reno;
+	private SupportMapFragment mapFragment;
+	private UiSettings mapUiSettings;
+	private TripData trip;
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		super.onCreateView(inflater, container, savedInstanceState);
+
+		reno = new LatLng(39.505804, -119.789043);
+
+		activity = getActivity();
+		view = inflater.inflate(R.layout.recording_fragment, container, false);
+
+		mapFragment = (SupportMapFragment) getFragmentManager().findFragmentById(R.id.map);
+		map = mapFragment.getMap();
+		map.setMyLocationEnabled(true);
+		map.moveCamera(CameraUpdateFactory.newLatLngZoom(reno, 11));
+
+		mapUiSettings = map.getUiSettings();
+		mapUiSettings.setZoomControlsEnabled(false);
+		mapUiSettings.setMyLocationButtonEnabled(true);
+
+		recordingService = new Intent(activity, RecordingService.class);
+		recordingServiceConnection = new ServiceConnection() {
+			@Override
+			public void onServiceConnected(ComponentName name, IBinder binder) {
+				Log.i(getClass().getName(), "onServiceConnected");
+
+				recordingServiceInterface = ((RecordingService.RecordingServiceBinder) binder).getService();
+
+				if (recordingServiceInterface.recordingState() != RecordingService.STATE_STOPPED) {
+					registerService();
+				}
+				updateUI();
+			}
+
+			@Override
+			public void onServiceDisconnected(ComponentName name) {
+				Log.i(getClass().getName(), "onServiceConnected");
+			}
+		};
+
+		broadcastReceiver = new BroadcastReceiver(){
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				String action = intent.getAction();
+				Log.i(getClass().getName(), action);
+				updateUI();
+			}
+		};
+
+		clickListener = new OnClickListener(){
+			@Override
+			public void onClick(View view) {
+				switch(view.getId()) {
+					case R.id.start_recording:
+						startRecording();
+						break;
+					case R.id.resume_recording:
+						resumeRecording();
+						break;
+					case R.id.pause_recording:
+						pauseRecording();
+						break;
+					case R.id.stop_recording:
+						stopRecording();
+						break;
+				}
+				updateUI();
+			}
+		};
+
+		startButton = (ImageButton) view.findViewById(R.id.start_recording);
+		startButton.setOnClickListener(clickListener);
+
+		resumeButton = (ImageButton) view.findViewById(R.id.resume_recording);
+		resumeButton.setOnClickListener(clickListener);
+
+		pauseButton = (ImageButton) view.findViewById(R.id.pause_recording);
+		pauseButton.setOnClickListener(clickListener);
+
+		stopButton = (ImageButton) view.findViewById(R.id.stop_recording);
+		stopButton.setOnClickListener(clickListener);
+
+		return view;
+	}
+
+	private void registerService() {
+		activity.registerReceiver(broadcastReceiver, new IntentFilter(RecordingService.BROADCAST_ACTION_START));
+		activity.registerReceiver(broadcastReceiver, new IntentFilter(RecordingService.BROADCAST_ACTION_STOP));
+		activity.registerReceiver(broadcastReceiver, new IntentFilter(RecordingService.BROADCAST_ACTION_PAUSE));
+	}
+
+	private void updateUI() {
+		Log.i(getClass().getName(), "updateUI");
+		Log.i(getClass().getName(), String.valueOf(recordingServiceInterface.recordingState()));
+
+		startButton.setVisibility(recordingServiceInterface.recordingState() == RecordingService.STATE_STOPPED ? View.VISIBLE : View.GONE);
+		resumeButton.setVisibility(recordingServiceInterface.recordingState() == RecordingService.STATE_PAUSED ? View.VISIBLE : View.GONE);
+		pauseButton.setVisibility(recordingServiceInterface.recordingState() == RecordingService.STATE_RECORDING ? View.VISIBLE : View.GONE);
+		stopButton.setVisibility(recordingServiceInterface.recordingState() != RecordingService.STATE_STOPPED ? View.VISIBLE : View.GONE);
+	}
+
+	private void startRecording() {
+		trip = TripData.createTrip(activity);
+		recordingServiceInterface.startRecording(trip);
+		activity.startService(recordingService);
+		registerService();
+	}
+
+	private void pauseRecording() {
+		recordingServiceInterface.pauseRecording();
+	}
+
+	private void resumeRecording() {
+		recordingServiceInterface.resumeRecording();
+	}
+
+	private void stopRecording() {
+		recordingServiceInterface.stopRecording();
+		activity.stopService(recordingService);
+		unregisterService();
+
+		Intent finishedActivity = new Intent(activity, SaveTripActivity.class);
+		activity.startActivity(finishedActivity);
+	}
+
+	private void unregisterService() {
+		activity.unregisterReceiver(broadcastReceiver);
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
+		activity.bindService(recordingService, recordingServiceConnection, Context.BIND_AUTO_CREATE);
+	}
+
+	@Override
+	public void onStop() {
+		super.onStop();
+		if (recordingServiceInterface.recordingState() != RecordingService.STATE_STOPPED) {
+			unregisterService();
+		}
+		activity.unbindService(recordingServiceConnection);
+	}
+
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		activity.getSupportFragmentManager().beginTransaction().remove(mapFragment).commit();
+	}
+}
+
+/*
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 import java.util.Timer;
@@ -19,7 +213,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class RecordingActivity extends Activity {
+public class RecordingFragment extends Activity {
 	Intent fi;
 	TripData trip;
 	boolean isRecording = false;
@@ -90,7 +284,7 @@ public class RecordingActivity extends Activity {
 
 				switch (rs.getState()) {
 					case RecordingService.STATE_IDLE:
-						trip = TripData.createTrip(RecordingActivity.this);
+						trip = TripData.createTrip(RecordingFragment.this);
 						rs.startRecording(trip);
 						isRecording = true;
 						pauseButton.setEnabled(true);
@@ -100,7 +294,7 @@ public class RecordingActivity extends Activity {
 						break;
 					case RecordingService.STATE_RECORDING:
 						long id = rs.getCurrentTrip();
-						trip = TripData.fetchTrip(RecordingActivity.this, id);
+						trip = TripData.fetchTrip(RecordingFragment.this, id);
 						isRecording = true;
 						pauseButton.setEnabled(true);
 						pauseButton.setCompoundDrawablesWithIntrinsicBounds(pauseDrawable, null, null, null);
@@ -110,7 +304,7 @@ public class RecordingActivity extends Activity {
 					case RecordingService.STATE_PAUSED:
 						long tid = rs.getCurrentTrip();
 						isRecording = false;
-						trip = TripData.fetchTrip(RecordingActivity.this, tid);
+						trip = TripData.fetchTrip(RecordingFragment.this, tid);
 						pauseButton.setEnabled(true);
 						pauseButton.setCompoundDrawablesWithIntrinsicBounds(recordDrawable, null, null, null);
 						pauseButton.setText(resume);
@@ -120,7 +314,7 @@ public class RecordingActivity extends Activity {
 						// Should never get here, right?
 						break;
 				}
-				rs.setListener(RecordingActivity.this);
+				rs.setListener(RecordingFragment.this);
 				unbindService(this);
 			}
 		};
@@ -165,7 +359,7 @@ public class RecordingActivity extends Activity {
                         trip.endTime = System.currentTimeMillis() - trip.totalPauseTime;
                     }
 					// Save trip so far (points and extent, but no purpose or notes)
-					fi = new Intent(RecordingActivity.this, SaveTripActivity.class);
+					fi = new Intent(RecordingFragment.this, SaveTripActivity.class);
 					trip.updateTrip("","","","");
 				}
 				// Otherwise, cancel and go back to main screen
@@ -175,7 +369,7 @@ public class RecordingActivity extends Activity {
 					cancelRecording();
 
 			    	// Go back to main screen
-					fi = new Intent(RecordingActivity.this, MainActivity.class);
+					fi = new Intent(RecordingFragment.this, MainActivity.class);
 					fi.putExtra("keep", true);
 				}
 
@@ -268,4 +462,28 @@ public class RecordingActivity extends Activity {
         super.onPause();
         if (timer != null) timer.cancel();
     }
+
+    private void buildAlertMessageNoGps() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(getResources().getString(R.string.gps_disabled))
+               .setCancelable(false)
+               .setPositiveButton(getResources().getString(R.string.gps_settings), new DialogInterface.OnClickListener() {
+                   public void onClick(final DialogInterface dialog, final int id) {
+                       final ComponentName toLaunch = new ComponentName("com.android.settings","com.android.settings.SecuritySettings");
+                       final Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                       intent.addCategory(Intent.CATEGORY_LAUNCHER);
+                       intent.setComponent(toLaunch);
+                       intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                       startActivityForResult(intent, 0);
+                   }
+               })
+               .setNegativeButton(getResources().getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                   public void onClick(final DialogInterface dialog, final int id) {
+                        dialog.cancel();
+                   }
+               });
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
 }
+*/

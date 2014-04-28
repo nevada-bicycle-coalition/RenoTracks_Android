@@ -1,10 +1,7 @@
 package org.nevadabike.renotracks;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.TimeZone;
 
 import org.nevadabike.renotracks.IconSpinnerAdapter.IconItem;
 
@@ -19,11 +16,9 @@ import android.os.IBinder;
 import android.text.Html;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -41,6 +36,7 @@ public class SaveTripActivity extends Activity {
 	private String discarded;
 	private String select_purpose;
 	private Button prefsButton;
+	private LinearLayout prefsButtonContainer;
 	private Button btnSubmit;
 	private Button btnDiscard;
 	private LinearLayout tripButtons;
@@ -101,6 +97,7 @@ public class SaveTripActivity extends Activity {
 		preparePurposeButtons();
 
 		prefsButton = (Button) findViewById(R.id.ButtonPrefs);
+		prefsButtonContainer = (LinearLayout) findViewById(R.id.user_info_button);
 		tripButtons = (LinearLayout) findViewById(R.id.trip_buttons);
 		btnSubmit = (Button) findViewById(R.id.ButtonSubmit);
 		btnDiscard = (Button) findViewById(R.id.ButtonDiscard);
@@ -108,7 +105,7 @@ public class SaveTripActivity extends Activity {
 		//if the users has not yet entered their profile information, require them to do so now
 		SharedPreferences settings = getSharedPreferences("PREFS", 0);
 		if (settings.getAll().size() >= 1) {
-			prefsButton.setVisibility(View.GONE);
+			prefsButtonContainer.setVisibility(View.GONE);
 
 			discarded = getResources().getString(R.string.discarded);
 			select_purpose = getResources().getString(R.string.select_purpose);
@@ -145,10 +142,9 @@ public class SaveTripActivity extends Activity {
 		final Button btnSubmit = (Button) findViewById(R.id.ButtonSubmit);
 		final Intent xi = new Intent(this, ShowMap.class);
 		btnSubmit.setEnabled(true);
-
 		btnSubmit.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-
+				/*
 				TripData trip = TripData.fetchTrip(activity, tripid);
 				trip.populateDetails();
 
@@ -159,7 +155,7 @@ public class SaveTripActivity extends Activity {
 					return;
 				}
 
-				EditText notes = (EditText) findViewById(R.id.NotesField);
+				//EditText notes = (EditText) findViewById(R.id.NotesField);
 
 				String fancyStartTime = DateFormat.getInstance().format(trip.startTime);
 
@@ -169,14 +165,14 @@ public class SaveTripActivity extends Activity {
 				String minutes = sdf.format(trip.endTime - trip.startTime);
 				String fancyEndInfo = String.format("%1.1f miles, %s minutes.  %s",
 						(0.0006212f * trip.distance),
-						minutes,
-						notes.getEditableText().toString());
+						minutes);
+						//notes.getEditableText().toString());
 
 				// Save the trip details to the phone database. W00t!
 				trip.updateTrip(
 						getResources().getString(selected_purpose_id),
-						fancyStartTime, fancyEndInfo,
-						notes.getEditableText().toString());
+						fancyStartTime, fancyEndInfo);
+						//notes.getEditableText().toString());
 				trip.updateTripStatus(TripData.STATUS_COMPLETE);
 				resetService();
 
@@ -193,32 +189,18 @@ public class SaveTripActivity extends Activity {
 				xi.putExtra("uploadTrip", true);
 				startActivity(xi);
 				finish();
+				*/
 			}
 		});
-
 	}
 
 	void cancelRecording() {
 		Intent rService = new Intent(this, RecordingService.class);
 		ServiceConnection sc = new ServiceConnection() {
 			public void onServiceDisconnected(ComponentName name) {}
-			public void onServiceConnected(ComponentName name, IBinder service) {
-				IRecordService rs = (IRecordService) service;
+			public void onServiceConnected(ComponentName name, IBinder binder) {
+				RecordingService rs = ((RecordingService.RecordingServiceBinder) binder).getService();
 				rs.cancelRecording();
-				unbindService(this);
-			}
-		};
-		// This should block until the onServiceConnected (above) completes.
-		bindService(rService, sc, Context.BIND_AUTO_CREATE);
-	}
-
-	void resetService() {
-		Intent rService = new Intent(this, RecordingService.class);
-		ServiceConnection sc = new ServiceConnection() {
-			public void onServiceDisconnected(ComponentName name) {}
-			public void onServiceConnected(ComponentName name, IBinder service) {
-				IRecordService rs = (IRecordService) service;
-				rs.reset();
 				unbindService(this);
 			}
 		};
@@ -230,8 +212,8 @@ public class SaveTripActivity extends Activity {
 		Intent rService = new Intent(this, RecordingService.class);
 		ServiceConnection sc = new ServiceConnection() {
 			public void onServiceDisconnected(ComponentName name) {}
-			public void onServiceConnected(ComponentName name, IBinder service) {
-				IRecordService rs = (IRecordService) service;
+			public void onServiceConnected(ComponentName name, IBinder binder) {
+				RecordingService rs = ((RecordingService.RecordingServiceBinder) binder).getService();
 				tripid = rs.finishRecording();
 				activateSubmitButton();
 				unbindService(this);

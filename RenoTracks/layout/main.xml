@@ -5,7 +5,6 @@
     
     <LinearLayout
         style="@style/contentContainer"
-        android:layout_height="wrap_content"
         android:orientation="vertical">
         
         <Button
@@ -27,10 +26,10 @@
 			android:layout_height="wrap_content"
 			android:gravity="center"
 			android:paddingTop="@dimen/standard_padding"/>
+		
+		<ListView
+			android:id="@+id/ListSavedTrips"
+			android:layout_width="match_parent"
+			android:layout_height="fill_parent"/>
 	</LinearLayout>	
-	
-	<ListView
-		android:id="@+id/ListSavedTrips"
-		android:layout_width="match_parent"
-		android:layout_height="fill_parent"/>
 </LinearLayout>
