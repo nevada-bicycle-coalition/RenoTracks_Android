@@ -1,7 +1,10 @@
 package org.nevadabike.renotracks;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.TimeZone;
 
 import org.nevadabike.renotracks.IconSpinnerAdapter.IconItem;
 
@@ -144,7 +147,7 @@ public class SaveTripActivity extends Activity {
 		btnSubmit.setEnabled(true);
 		btnSubmit.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				/*
+
 				TripData trip = TripData.fetchTrip(activity, tripid);
 				trip.populateDetails();
 
@@ -155,41 +158,31 @@ public class SaveTripActivity extends Activity {
 					return;
 				}
 
-				//EditText notes = (EditText) findViewById(R.id.NotesField);
-
 				String fancyStartTime = DateFormat.getInstance().format(trip.startTime);
 
 				// "3.5 miles in 26 minutes"
 				SimpleDateFormat sdf = new SimpleDateFormat("m");
 				sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-				String minutes = sdf.format(trip.endTime - trip.startTime);
-				String fancyEndInfo = String.format("%1.1f miles, %s minutes.  %s",
-						(0.0006212f * trip.distance),
-						minutes);
-						//notes.getEditableText().toString());
 
-				// Save the trip details to the phone database. W00t!
+				String minutes = sdf.format(trip.endTime - trip.startTime);
+				String fancyEndInfo = String.format("%1.1f miles, %s minutes.", (0.0006212f * trip.distance), minutes);
+
+				// Save the trip details to the phone database.
 				trip.updateTrip(
 						getResources().getString(selected_purpose_id),
 						fancyStartTime, fancyEndInfo);
 						//notes.getEditableText().toString());
 				trip.updateTripStatus(TripData.STATUS_COMPLETE);
-				resetService();
 
-				// Force-drop the soft keyboard for performance
-				InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-
-				// Now create the MainInput Activity so BACK btn works properly
-				Intent i = new Intent(getApplicationContext(), MainActivity.class);
-				startActivity(i);
+				// TODO Now create the MainInput Activity so BACK btn works properly
+				//Intent i = new Intent(getApplicationContext(), MainActivity.class);
+				//startActivity(i);
 
 				// And, show the map!
 				xi.putExtra("showtrip", trip.tripid);
-				xi.putExtra("uploadTrip", true);
+				//xi.putExtra("uploadTrip", true);
 				startActivity(xi);
 				finish();
-				*/
 			}
 		});
 	}

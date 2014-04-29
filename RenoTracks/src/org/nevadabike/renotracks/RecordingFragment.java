@@ -1,4 +1,7 @@
 package org.nevadabike.renotracks;
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
+
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -43,6 +46,8 @@ public class RecordingFragment extends Fragment {
 	private SupportMapFragment mapFragment;
 	private UiSettings mapUiSettings;
 	private TripData trip;
+
+	final SimpleDateFormat sdf = new SimpleDateFormat("H:mm:ss");
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -124,6 +129,8 @@ public class RecordingFragment extends Fragment {
 		stopButton = (ImageButton) view.findViewById(R.id.stop_recording);
 		stopButton.setOnClickListener(clickListener);
 
+		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+
 		return view;
 	}
 
@@ -141,6 +148,11 @@ public class RecordingFragment extends Fragment {
 		resumeButton.setVisibility(recordingServiceInterface.recordingState() == RecordingService.STATE_PAUSED ? View.VISIBLE : View.GONE);
 		pauseButton.setVisibility(recordingServiceInterface.recordingState() == RecordingService.STATE_RECORDING ? View.VISIBLE : View.GONE);
 		stopButton.setVisibility(recordingServiceInterface.recordingState() != RecordingService.STATE_STOPPED ? View.VISIBLE : View.GONE);
+		trip = TripData.createTrip(activity);
+
+		if(recordingServiceInterface.recordingState() == RecordingService.STATE_PAUSED || recordingServiceInterface.recordingState() == RecordingService.STATE_RECORDING) {
+			trip = TripData.fetchTrip(activity, recordingServiceInterface.getCurrentTrip());
+		}
 	}
 
 	private void startRecording() {
@@ -162,6 +174,15 @@ public class RecordingFragment extends Fragment {
 		recordingServiceInterface.stopRecording();
 		activity.stopService(recordingService);
 		unregisterService();
+
+		// Handle pause time gracefully
+        if (trip.pauseStartedAt> 0) {
+            trip.totalPauseTime += (System.currentTimeMillis() - trip.pauseStartedAt);
+        }
+        if (trip.totalPauseTime > 0) {
+            trip.endTime = System.currentTimeMillis() - trip.totalPauseTime;
+        }
+        trip.updateTrip("","","");
 
 		Intent finishedActivity = new Intent(activity, SaveTripActivity.class);
 		activity.startActivity(finishedActivity);
@@ -194,25 +215,6 @@ public class RecordingFragment extends Fragment {
 }
 
 /*
-import java.text.SimpleDateFormat;
-import java.util.TimeZone;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import android.app.Activity;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.graphics.drawable.Drawable;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.IBinder;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
-
 public class RecordingFragment extends Activity {
 	Intent fi;
 	TripData trip;
@@ -228,8 +230,6 @@ public class RecordingFragment extends Activity {
     TextView txtCurSpeed;
     TextView txtMaxSpeed;
     TextView txtAvgSpeed;
-
-    final SimpleDateFormat sdf = new SimpleDateFormat("H:mm:ss");
 
     // Need handler for callbacks to the UI thread
     final Handler mHandler = new Handler();
@@ -272,8 +272,6 @@ public class RecordingFragment extends Activity {
 		pause = getResources().getString(R.string.pause);
 		resume = getResources().getString(R.string.resume);
 
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-
 		// Query the RecordingService to figure out what to do.
 		Intent rService = new Intent(this, RecordingService.class);
 		startService(rService);
@@ -283,36 +281,7 @@ public class RecordingFragment extends Activity {
 				IRecordService rs = (IRecordService) service;
 
 				switch (rs.getState()) {
-					case RecordingService.STATE_IDLE:
-						trip = TripData.createTrip(RecordingFragment.this);
-						rs.startRecording(trip);
-						isRecording = true;
-						pauseButton.setEnabled(true);
-						pauseButton.setCompoundDrawablesWithIntrinsicBounds(pauseDrawable, null, null, null);
-						pauseButton.setText(pause);
-						setTitle(recordingTitle);
-						break;
-					case RecordingService.STATE_RECORDING:
-						long id = rs.getCurrentTrip();
-						trip = TripData.fetchTrip(RecordingFragment.this, id);
-						isRecording = true;
-						pauseButton.setEnabled(true);
-						pauseButton.setCompoundDrawablesWithIntrinsicBounds(pauseDrawable, null, null, null);
-						pauseButton.setText(pause);
-						setTitle(recordingTitle);
-						break;
-					case RecordingService.STATE_PAUSED:
-						long tid = rs.getCurrentTrip();
-						isRecording = false;
-						trip = TripData.fetchTrip(RecordingFragment.this, tid);
-						pauseButton.setEnabled(true);
-						pauseButton.setCompoundDrawablesWithIntrinsicBounds(recordDrawable, null, null, null);
-						pauseButton.setText(resume);
-						setTitle(pausedTitle);
-						break;
-					case RecordingService.STATE_FULL:
-						// Should never get here, right?
-						break;
+
 				}
 				rs.setListener(RecordingFragment.this);
 				unbindService(this);
@@ -343,39 +312,6 @@ public class RecordingFragment extends Activity {
 					Toast.makeText(getBaseContext(),getResources().getString(R.string.recording_paused), Toast.LENGTH_LONG).show();
 				}
 				setListener();
-			}
-		});
-
-		// Finish button
-		finishButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				// If we have points, go to the save-trip activity
-				if (trip.numpoints > 0) {
-				    // Handle pause time gracefully
-                    if (trip.pauseStartedAt> 0) {
-                        trip.totalPauseTime += (System.currentTimeMillis() - trip.pauseStartedAt);
-                    }
-                    if (trip.totalPauseTime > 0) {
-                        trip.endTime = System.currentTimeMillis() - trip.totalPauseTime;
-                    }
-					// Save trip so far (points and extent, but no purpose or notes)
-					fi = new Intent(RecordingFragment.this, SaveTripActivity.class);
-					trip.updateTrip("","","","");
-				}
-				// Otherwise, cancel and go back to main screen
-				else {
-					Toast.makeText(getBaseContext(),getResources().getString(R.string.no_gps_data), Toast.LENGTH_SHORT).show();
-
-					cancelRecording();
-
-			    	// Go back to main screen
-					fi = new Intent(RecordingFragment.this, MainActivity.class);
-					fi.putExtra("keep", true);
-				}
-
-				// Either way, activate next task, and then kill this task
-				startActivity(fi);
-				finish();
 			}
 		});
 	}
@@ -411,20 +347,6 @@ public class RecordingFragment extends Activity {
 			}
 		};
 		// This should block until the onServiceConnected (above) completes, but doesn't
-		bindService(rService, sc, Context.BIND_AUTO_CREATE);
-	}
-
-	void cancelRecording() {
-		Intent rService = new Intent(this, RecordingService.class);
-		ServiceConnection sc = new ServiceConnection() {
-			public void onServiceDisconnected(ComponentName name) {}
-			public void onServiceConnected(ComponentName name, IBinder service) {
-				IRecordService rs = (IRecordService) service;
-				rs.cancelRecording();
-				unbindService(this);
-			}
-		};
-		// This should block until the onServiceConnected (above) completes.
 		bindService(rService, sc, Context.BIND_AUTO_CREATE);
 	}
 

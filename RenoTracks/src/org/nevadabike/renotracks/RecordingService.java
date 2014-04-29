@@ -169,11 +169,10 @@ public class RecordingService extends Service implements
 		if (trip != null) {
 			trip.dropTrip();
 		}
-		stopRecording();
 	}
 
 	public long finishRecording() {
-		stopRecording();
+		Log.i(getClass().getName(), "finishRecording");
 		return trip.tripid;
 	}
 
@@ -283,6 +282,13 @@ public class RecordingService extends Service implements
         lastLocation = newLocation;
     }
 
+	public long getCurrentTrip() {
+		if (RecordingService.this.trip != null) {
+			return RecordingService.this.trip.tripid;
+		}
+		return -1;
+	}
+
 	// Required for location implementation
 	@Override
 	public void onConnectionFailed(ConnectionResult arg0) {
@@ -330,12 +336,7 @@ public class RecordingService extends Service implements
 		public long finishRecording() {
 			return RecordingService.this.finishRecording();
 		}
-		public long getCurrentTrip() {
-			if (RecordingService.this.trip != null) {
-				return RecordingService.this.trip.tripid;
-			}
-			return -1;
-		}
+
 		public void setListener(RecordingActivity ra) {
 			RecordingService.this.recordActivity = ra;
 			notifyListeners();

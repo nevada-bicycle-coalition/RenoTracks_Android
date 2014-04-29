@@ -218,6 +218,7 @@ public class DbAdapter {
                 K_TRIP_PURP, K_TRIP_START, K_TRIP_FANCYSTART, K_TRIP_NOTE, K_TRIP_FANCYINFO },
                 null, null, null, null, "-" + K_TRIP_START);
         if (c != null && c.getCount()>0) {
+        	Log.i(getClass().getName(), "at least 1");
         	c.moveToFirst();
         }
         return c;
