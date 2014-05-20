@@ -54,8 +54,10 @@
 		
 		<activity
 			android:name="org.nevadabike.renotracks.SaveTripActivity"
+			android:parentActivityName="org.nevadabike.renotracks.MainActivity"
 			android:label="@string/save_trip"
-			android:windowSoftInputMode="adjustPan|adjustResize"/>
+			android:windowSoftInputMode="adjustPan|adjustResize">
+		</activity>
 		
 		<activity
 			android:name="org.nevadabike.renotracks.ShowMap"

@@ -34,13 +34,6 @@ public class TripsFragment extends Fragment {
 		activity = getActivity();
 		view = inflater.inflate(R.layout.trips_fragment, container, false);
 
-		/*
-		trips = new ArrayList<Trip>();
-		for(int i = 1; i<=tripsCount; i++) {
-			trips.add(new Trip(i));
-		}
-		TripsAdapter adapter = new TripsAdapter(getActivity(), trips);
-		*/
 		listView = (ListView) view.findViewById(R.id.listView1);
 		populateList();
 
@@ -48,47 +41,7 @@ public class TripsFragment extends Fragment {
 
         return view;
     }
-/*
-	private class Trip {
-		public String note;
-		public String timestamp = "April 23, 2014 at 12:00 PM";
-		public String length = "01:00:00";
-		public String co2 = "CO2 Saved: 1.0 lbs";
-		public String kcal = "Calories Burned 1.0 kcal";
 
-		public Trip(int index) {
-			note = "Trip " + index;
-		}
-	}
-
-	private class TripsAdapter extends ArrayAdapter<Trip> {
-		public TripsAdapter(Context context, ArrayList<Trip> trips) {
-			super(context, R.layout.trips_list_item, trips);
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			Trip trip = getItem(position);
-			if (convertView == null) {
-				convertView = LayoutInflater.from(getContext()).inflate(R.layout.trips_list_item, null);
-			}
-
-			TextView note = (TextView) convertView.findViewById(R.id.note);
-			TextView timestamp = (TextView) convertView.findViewById(R.id.timestamp);
-			TextView length = (TextView) convertView.findViewById(R.id.length);
-			TextView co2 = (TextView) convertView.findViewById(R.id.co2);
-			TextView kcal = (TextView) convertView.findViewById(R.id.kcal);
-
-			note.setText(trip.note);
-			timestamp.setText(trip.timestamp);
-			length.setText(trip.length);
-			co2.setText(trip.co2);
-			kcal.setText(trip.kcal);
-
-			return convertView;
-		}
-	}
-*/
 	void populateList() {
 		// Get list from the real phone database. W00t!
 		DbAdapter mDb = new DbAdapter(activity);

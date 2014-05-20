@@ -202,4 +202,7 @@
     
     <string name="reno_lat">39.505804</string>
     <string name="reno_long">-119.789043</string>
+    
+    <string name="calories">calories</string>
+    <string name="co2">CO2 saved</string>
 </resources>

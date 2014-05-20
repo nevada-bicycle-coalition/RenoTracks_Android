@@ -75,7 +75,7 @@ public class RecordingFragment extends Fragment {
 
 				recordingServiceInterface = ((RecordingService.RecordingServiceBinder) binder).getService();
 
-				if (recordingServiceInterface.recordingState() != RecordingService.STATE_STOPPED) {
+				if (recordingServiceInterface.recordingState() == RecordingService.STATE_STOPPED) {
 					registerService();
 				}
 				updateUI();
@@ -136,8 +136,11 @@ public class RecordingFragment extends Fragment {
 
 	private void registerService() {
 		activity.registerReceiver(broadcastReceiver, new IntentFilter(RecordingService.BROADCAST_ACTION_START));
-		activity.registerReceiver(broadcastReceiver, new IntentFilter(RecordingService.BROADCAST_ACTION_STOP));
 		activity.registerReceiver(broadcastReceiver, new IntentFilter(RecordingService.BROADCAST_ACTION_PAUSE));
+	}
+
+	private void unregisterService() {
+		activity.unregisterReceiver(broadcastReceiver);
 	}
 
 	private void updateUI() {
@@ -148,17 +151,10 @@ public class RecordingFragment extends Fragment {
 		resumeButton.setVisibility(recordingServiceInterface.recordingState() == RecordingService.STATE_PAUSED ? View.VISIBLE : View.GONE);
 		pauseButton.setVisibility(recordingServiceInterface.recordingState() == RecordingService.STATE_RECORDING ? View.VISIBLE : View.GONE);
 		stopButton.setVisibility(recordingServiceInterface.recordingState() != RecordingService.STATE_STOPPED ? View.VISIBLE : View.GONE);
-		trip = TripData.createTrip(activity);
-
-		if(recordingServiceInterface.recordingState() == RecordingService.STATE_PAUSED || recordingServiceInterface.recordingState() == RecordingService.STATE_RECORDING) {
-			trip = TripData.fetchTrip(activity, recordingServiceInterface.getCurrentTrip());
-		}
 	}
 
 	private void startRecording() {
-		trip = TripData.createTrip(activity);
-		recordingServiceInterface.startRecording(trip);
-		activity.startService(recordingService);
+		recordingServiceInterface.startRecording(TripData.createTrip(activity));
 		registerService();
 	}
 
@@ -172,9 +168,8 @@ public class RecordingFragment extends Fragment {
 
 	private void stopRecording() {
 		recordingServiceInterface.stopRecording();
-		activity.stopService(recordingService);
-		unregisterService();
 
+		/*
 		// Handle pause time gracefully
         if (trip.pauseStartedAt> 0) {
             trip.totalPauseTime += (System.currentTimeMillis() - trip.pauseStartedAt);
@@ -183,27 +178,31 @@ public class RecordingFragment extends Fragment {
             trip.endTime = System.currentTimeMillis() - trip.totalPauseTime;
         }
         trip.updateTrip("","","");
+		 */
 
 		Intent finishedActivity = new Intent(activity, SaveTripActivity.class);
 		activity.startActivity(finishedActivity);
 	}
 
-	private void unregisterService() {
-		activity.unregisterReceiver(broadcastReceiver);
-	}
-
 	@Override
 	public void onStart() {
 		super.onStart();
+
+		activity.startService(recordingService);
+
+		registerService();
 		activity.bindService(recordingService, recordingServiceConnection, Context.BIND_AUTO_CREATE);
 	}
 
 	@Override
 	public void onStop() {
 		super.onStop();
-		if (recordingServiceInterface.recordingState() != RecordingService.STATE_STOPPED) {
-			unregisterService();
+
+		if (recordingServiceInterface.recordingState() == RecordingService.STATE_STOPPED) {
+			activity.stopService(recordingService);
 		}
+
+		unregisterService();
 		activity.unbindService(recordingServiceConnection);
 	}
 

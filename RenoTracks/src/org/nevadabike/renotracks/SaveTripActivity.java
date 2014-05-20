@@ -17,6 +17,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.text.Html;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -29,26 +30,109 @@ import android.widget.Toast;
 
 public class SaveTripActivity extends Activity {
 	Activity activity;
-	long tripid;
+	TripData trip;
 
 	private int selected_purpose_id = 0;
 	private TextView purpose_description;
 	private final ArrayList<IconItem> tripPurposes = new ArrayList<IconSpinnerAdapter.IconItem>();
 	private final HashMap <Integer, String> purpDescriptions = new HashMap<Integer, String>();
 
-	private String discarded;
-	private String select_purpose;
+
+	private Spinner tripPurposeSpinner;
+
 	private Button prefsButton;
 	private LinearLayout prefsButtonContainer;
 	private Button btnSubmit;
 	private Button btnDiscard;
 	private LinearLayout tripButtons;
 
+	private Intent recordingService;
+	private ServiceConnection recordingServiceConnection;
+	private RecordingService recordingServiceInterface;
+
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.save);
+
+		this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+		recordingService = new Intent(this, RecordingService.class);
+		recordingServiceConnection = new ServiceConnection() {
+			@Override
+			public void onServiceConnected(ComponentName name, IBinder binder) {
+				Log.i(getClass().getName(), "onServiceConnected");
+
+				recordingServiceInterface = ((RecordingService.RecordingServiceBinder) binder).getService();
+				if (recordingServiceInterface.recordingState() != RecordingService.STATE_STOPPED) {
+					recordingServiceInterface.stopRecording();
+				}
+
+				trip = recordingServiceInterface.getCurrentTrip();
+			}
+
+			@Override
+			public void onServiceDisconnected(ComponentName name) {
+				Log.i(getClass().getName(), "onServiceConnected");
+			}
+		};
+
+		activity = this;
+
+		// Set up trip purpose buttons
+		preparePurposeButtons();
+
+		prefsButton = (Button) findViewById(R.id.ButtonPrefs);
+		prefsButtonContainer = (LinearLayout) findViewById(R.id.user_info_button);
+		purpose_description = (TextView) findViewById(R.id.TextPurpDescription);
+		tripButtons = (LinearLayout) findViewById(R.id.trip_buttons);
+		btnSubmit = (Button) findViewById(R.id.ButtonSubmit);
+		btnDiscard = (Button) findViewById(R.id.ButtonDiscard);
+
+		//if the users has not yet entered their profile information, require them to do so now
+		SharedPreferences settings = getSharedPreferences("PREFS", 0);
+		if (settings.getAll().size() >= 1) {
+			prefsButtonContainer.setVisibility(View.GONE);
+
+			btnDiscard.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					discardTrip();
+				}
+			});
+
+			btnSubmit.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					saveTrip();
+				}
+			});
+		} else {
+			tripButtons.setVisibility(View.GONE);
+
+			prefsButton.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					startActivity(new Intent(activity, UserInfoActivity.class));
+				}
+			});
+		}
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		Log.i(getClass().getName(), "onPause");
+		unbindService(recordingServiceConnection);
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		Log.i(getClass().getName(), "onResume");
+		bindService(recordingService, recordingServiceConnection, Context.BIND_AUTO_CREATE);
+	}
+
 	// Set up the purpose buttons to be one-click only
 	void preparePurposeButtons() {
-
-		purpose_description = (TextView) findViewById(R.id.TextPurpDescription);
-
 		tripPurposes.add(new IconSpinnerAdapter.IconItem(null, "", 0));
 		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.commute), getResources().getString(R.string.trip_purpose_commute), R.string.trip_purpose_commute));
 		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.school), getResources().getString(R.string.trip_purpose_school), R.string.trip_purpose_school));
@@ -69,10 +153,9 @@ public class SaveTripActivity extends Activity {
 		purpDescriptions.put(R.string.trip_purpose_errand, getResources().getString(R.string.trip_purpose_errand_details));
 		purpDescriptions.put(R.string.trip_purpose_other, getResources().getString(R.string.trip_purpose_other_details));
 
-		Spinner tripPurposeSpinner = (Spinner) findViewById(R.id.tripPurposeSpinner);
+		tripPurposeSpinner = (Spinner) findViewById(R.id.tripPurposeSpinner);
 		tripPurposeSpinner.setAdapter(new IconSpinnerAdapter(this, tripPurposes));
 		tripPurposeSpinner.setOnItemSelectedListener(new OnItemSelectedListener(){
-
 			@Override
 			public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
 				IconSpinnerAdapter.IconItem selected_purpose = tripPurposes.get(position);
@@ -86,133 +169,44 @@ public class SaveTripActivity extends Activity {
 		});
 	}
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.save);
+	private void saveTrip() {
+		trip.populateDetails();
 
-		this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-
-		activity = this;
-		finishRecording();
-
-		// Set up trip purpose buttons
-		preparePurposeButtons();
-
-		prefsButton = (Button) findViewById(R.id.ButtonPrefs);
-		prefsButtonContainer = (LinearLayout) findViewById(R.id.user_info_button);
-		tripButtons = (LinearLayout) findViewById(R.id.trip_buttons);
-		btnSubmit = (Button) findViewById(R.id.ButtonSubmit);
-		btnDiscard = (Button) findViewById(R.id.ButtonDiscard);
-
-		//if the users has not yet entered their profile information, require them to do so now
-		SharedPreferences settings = getSharedPreferences("PREFS", 0);
-		if (settings.getAll().size() >= 1) {
-			prefsButtonContainer.setVisibility(View.GONE);
-
-			discarded = getResources().getString(R.string.discarded);
-			select_purpose = getResources().getString(R.string.select_purpose);
-
-			// Discard btn
-			btnDiscard.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View v) {
-					Toast.makeText(getBaseContext(), discarded, Toast.LENGTH_SHORT).show();
-
-					cancelRecording();
-
-					Intent i = new Intent(activity, MainActivity.class);
-					i.putExtra("keepme", true);
-					startActivity(i);
-					finish();
-				}
-			});
-
-			// Submit btn
-			btnSubmit.setEnabled(false);
-		} else {
-			tripButtons.setVisibility(View.GONE);
-
-			prefsButton.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View v) {
-					startActivity(new Intent(activity, UserInfoActivity.class));
-				}
-			});
+		if (selected_purpose_id == 0) {
+			// Oh no!  No trip purpose!
+			Toast.makeText(getBaseContext(), getResources().getString(R.string.select_purpose), Toast.LENGTH_SHORT).show();
+			return;
 		}
+
+		String fancyStartTime = DateFormat.getInstance().format(trip.startTime);
+
+		// "3.5 miles in 26 minutes"
+		SimpleDateFormat sdf = new SimpleDateFormat("m");
+		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+		String minutes = sdf.format(trip.endTime - trip.startTime);
+		String fancyEndInfo = String.format("%1.1f miles, %s minutes.", (0.0006212f * trip.distance), minutes);
+
+		// Save the trip details to the phone database.
+		trip.updateTrip(getResources().getString(selected_purpose_id), fancyStartTime, fancyEndInfo);
+		trip.updateTripStatus(TripData.STATUS_COMPLETE);
+
+		// TODO Upload the trip
+
+		// And, show the map!
+		Intent showTrip = new Intent(this, ShowMap.class);
+		showTrip.putExtra("showtrip", trip.tripid);
+		startActivity(showTrip);
+		finish();
 	}
 
-	// submit btn is only activated after the service.finishedRecording() is completed.
-	void activateSubmitButton() {
-		final Button btnSubmit = (Button) findViewById(R.id.ButtonSubmit);
-		final Intent xi = new Intent(this, ShowMap.class);
-		btnSubmit.setEnabled(true);
-		btnSubmit.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
+	private void discardTrip() {
+		Toast.makeText(getBaseContext(), getResources().getString(R.string.discarded), Toast.LENGTH_SHORT).show();
 
-				TripData trip = TripData.fetchTrip(activity, tripid);
-				trip.populateDetails();
+		trip.dropTrip();
 
-				// Make sure trip purpose has been selected
-				if (selected_purpose_id == 0) {
-					// Oh no!  No trip purpose!
-					Toast.makeText(getBaseContext(), select_purpose, Toast.LENGTH_SHORT).show();
-					return;
-				}
-
-				String fancyStartTime = DateFormat.getInstance().format(trip.startTime);
-
-				// "3.5 miles in 26 minutes"
-				SimpleDateFormat sdf = new SimpleDateFormat("m");
-				sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-				String minutes = sdf.format(trip.endTime - trip.startTime);
-				String fancyEndInfo = String.format("%1.1f miles, %s minutes.", (0.0006212f * trip.distance), minutes);
-
-				// Save the trip details to the phone database.
-				trip.updateTrip(
-						getResources().getString(selected_purpose_id),
-						fancyStartTime, fancyEndInfo);
-						//notes.getEditableText().toString());
-				trip.updateTripStatus(TripData.STATUS_COMPLETE);
-
-				// TODO Now create the MainInput Activity so BACK btn works properly
-				//Intent i = new Intent(getApplicationContext(), MainActivity.class);
-				//startActivity(i);
-
-				// And, show the map!
-				xi.putExtra("showtrip", trip.tripid);
-				//xi.putExtra("uploadTrip", true);
-				startActivity(xi);
-				finish();
-			}
-		});
-	}
-
-	void cancelRecording() {
-		Intent rService = new Intent(this, RecordingService.class);
-		ServiceConnection sc = new ServiceConnection() {
-			public void onServiceDisconnected(ComponentName name) {}
-			public void onServiceConnected(ComponentName name, IBinder binder) {
-				RecordingService rs = ((RecordingService.RecordingServiceBinder) binder).getService();
-				rs.cancelRecording();
-				unbindService(this);
-			}
-		};
-		// This should block until the onServiceConnected (above) completes.
-		bindService(rService, sc, Context.BIND_AUTO_CREATE);
-	}
-
-	void finishRecording() {
-		Intent rService = new Intent(this, RecordingService.class);
-		ServiceConnection sc = new ServiceConnection() {
-			public void onServiceDisconnected(ComponentName name) {}
-			public void onServiceConnected(ComponentName name, IBinder binder) {
-				RecordingService rs = ((RecordingService.RecordingServiceBinder) binder).getService();
-				tripid = rs.finishRecording();
-				activateSubmitButton();
-				unbindService(this);
-			}
-		};
-		// This should block until the onServiceConnected (above) completes.
-		bindService(rService, sc, Context.BIND_AUTO_CREATE);
+		Intent discardTrip = new Intent(this, MainActivity.class);
+		startActivity(discardTrip);
+		finish();
 	}
 }

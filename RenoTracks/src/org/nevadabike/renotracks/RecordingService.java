@@ -8,7 +8,6 @@ import android.content.IntentFilter;
 import android.location.Location;
 import android.os.Binder;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Builder;
@@ -41,6 +40,28 @@ public class RecordingService extends Service implements
 	public final static String BROADCAST_ACTION_STOP = "BROADCAST_ACTION_STOP";
 	public final static String BROADCAST_ACTION_PAUSE = "BROADCAST_ACTION_PAUSE";
 
+	public static final int STATE_RECORDING = 1;
+	public static final int STATE_PAUSED = 2;
+	public static final int STATE_STOPPED = 3;
+
+	private int recordingState = STATE_STOPPED;
+
+	public final static int RECORDING_SPEED = 2 * 1000; //2 second intervals
+
+	double lastUpdate;
+	Location lastLocation;
+	float distanceTraveled;
+	float curSpeed, maxSpeed;
+	TripData trip;
+	final float spdConvert = 2.2369f; //Meters per second to miles per hour
+
+	//SERVICE LIFECYCLE FUNCTIONS
+	public class RecordingServiceBinder extends Binder {
+		RecordingService getService() {
+			return RecordingService.this;
+		}
+	}
+
 	@Override
 	public void onCreate() {
 		notificationView = new RemoteViews(getPackageName(), R.layout.customnotification);
@@ -53,8 +74,6 @@ public class RecordingService extends Service implements
 				Log.i(getClass().getName(), action);
 				if (action == BROADCAST_ACTION_START) {
 					resumeRecording();
-				} else if (action == BROADCAST_ACTION_STOP) {
-					stopRecording();
 				} else if (action == BROADCAST_ACTION_PAUSE) {
 					pauseRecording();
 				}
@@ -74,22 +93,24 @@ public class RecordingService extends Service implements
 		pendingNotificationIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 
 		notificationBuilder = new NotificationCompat.Builder(this)
-		.setContentTitle(getResources().getString(R.string.recording))
-		.setSmallIcon(R.drawable.ic_notification)
-		.setOngoing(true)
-		.setContentIntent(pendingNotificationIntent)
-		.setContent(notificationView);
+			.setContentTitle(getResources().getString(R.string.recording))
+			.setSmallIcon(R.drawable.ic_notification)
+			.setOngoing(true)
+			.setContentIntent(pendingNotificationIntent)
+			.setContent(notificationView);
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.i(getClass().getName(), "onStartCommand");
+		locationClientStart();
 		return super.onStartCommand(intent, flags, startId);
 	}
 
 	@Override
 	public void onDestroy() {
 		Log.i(getClass().getName(), "onDestroy");
+		locationClientStop();
 		super.onDestroy();
 	}
 
@@ -105,62 +126,114 @@ public class RecordingService extends Service implements
 		return false;
 	}
 
-	public class RecordingServiceBinder extends Binder {
-		RecordingService getService() {
-			return RecordingService.this;
+	//LOCATION FUNCTIONS
+	private LocationClient locationClient;
+	private LocationRequest locationRequest;
+
+	private void locationClientStart() {
+		Log.i(getClass().getName(), "locationClientInit");
+		if (locationClient == null) {
+			locationClient = new LocationClient(this, this, this);
+			locationClient.connect();
 		}
 	}
 
+	private void locationClientStop() {
+		Log.i(getClass().getName(), "locationClientStopListening");
+		locationClient.removeLocationUpdates(this);
+	}
+
+	@Override
+	public void onConnected(Bundle arg0) {
+		Log.i(getClass().getName(), "onConnected");
+		locationRequest = new LocationRequest();
+		locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY).setInterval(RECORDING_SPEED);
+		locationClient.requestLocationUpdates(locationRequest, this);
+	}
+
+	@Override
+	public void onConnectionFailed(ConnectionResult arg0) {
+		// Required for location implementation
+		Log.i(getClass().getName(), "onConnectionFailed");
+	}
+
+	@Override
+	public void onDisconnected() {
+		// Required for location implementation
+		Log.i(getClass().getName(), "onDisconnected");
+	}
+
+	@Override
+	public void onLocationChanged(Location location) {
+		if (location!= null) {
+			Log.i(getClass().getName(), "onLocationChanged");
+			Log.i(getClass().getName(), location.getLatitude() + ", " + location.getLongitude() + ", " + location.getAltitude() + " (" + location.getAccuracy() + ")");
+
+			double currentTime = System.currentTimeMillis();
+			if (recordingState == this.STATE_RECORDING && currentTime - lastUpdate >= 1000 && location.getAccuracy() < 50) {
+				//Convert speed
+				//TODO consider keeping at meters per second and only convert when displayed
+				curSpeed = location.getSpeed() * spdConvert;
+
+				//Get out of the car and back on the bike
+		        if (curSpeed < 60) {
+		        	maxSpeed = Math.max(maxSpeed, curSpeed);
+		        }
+
+		        if (lastLocation != null) {
+		            float segmentDistance = lastLocation.distanceTo(location);
+		            distanceTraveled = distanceTraveled + segmentDistance;
+		        }
+
+		        trip.addPointNow(location, currentTime, distanceTraveled);
+
+		        updateNotification();
+		        notifyListeners();
+
+		        lastUpdate = currentTime;
+		        lastLocation = location;
+			}
+		}
+	}
+
+	//RECORDING FUNCTIONS
 	public void startRecording(TripData trip) {
 		Log.i(getClass().getName(), "startRecording");
 		recordingState = STATE_RECORDING;
-		setUpdateNotification();
-		updateTime();
-		//setupTimer();
 
+		updateNotification();
 		registerReceivers();
 
 		this.trip = trip;
-
 	    curSpeed = maxSpeed = distanceTraveled = 0.0f;
 	    lastLocation = null;
-	    locationClientInit();
+
+	    //setupTimer();
 	}
 
 	private void registerReceivers() {
 		registerReceiver(broadcastReceiver, new IntentFilter(BROADCAST_ACTION_START));
-		registerReceiver(broadcastReceiver, new IntentFilter(BROADCAST_ACTION_STOP));
 		registerReceiver(broadcastReceiver, new IntentFilter(BROADCAST_ACTION_PAUSE));
 	}
 
 	public void pauseRecording() {
 		Log.i(getClass().getName(), "pauseRecording");
 		recordingState = STATE_PAUSED;
-		setUpdateNotification();
-		locationClientStopRecording();
 
-		stopUpdatingTime();
+		updateNotification();
 	}
 
 	public void resumeRecording() {
 		Log.i(getClass().getName(), "resumeRecording");
 		recordingState = STATE_RECORDING;
-		setUpdateNotification();
-		updateTime();
-
-		registerReceivers();
-
-		locationClientStartRecording();
+		updateNotification();
 	}
 
 	public void stopRecording() {
 		Log.i(getClass().getName(), "stopRecording");
 		recordingState = STATE_STOPPED;
+
 		stopForeground(true);
-
-		stopUpdatingTime();
-		locationClientStopRecording();
-
 		unregisterReceiver(broadcastReceiver);
 	}
 
@@ -171,133 +244,46 @@ public class RecordingService extends Service implements
 		}
 	}
 
-	public long finishRecording() {
-		Log.i(getClass().getName(), "finishRecording");
-		return trip.tripid;
-	}
-
-	private void setUpdateNotification() {
-		notificationView.setViewVisibility(R.id.notification_record, recordingState == STATE_RECORDING ? View.GONE : View.VISIBLE);
-		notificationView.setViewVisibility(R.id.notification_pause, recordingState == STATE_PAUSED ? View.GONE : View.VISIBLE);
-		startForeground(NOTIFICATION_ID, notificationBuilder.build());
-	}
-
-	public static final int STATE_RECORDING = 1;
-	public static final int STATE_PAUSED = 2;
-	public static final int STATE_STOPPED = 3;
-
-	private int recordingState = STATE_STOPPED;
 	public int recordingState() {
 		return recordingState;
 	}
 
-	private void updateTime() {
-		notificationView.setTextViewText(R.id.notification_time_display, String.valueOf(System.currentTimeMillis()));
-		setUpdateNotification();
-
-		updateDisplayTimer.postDelayed(updateDisplayHandler, LOOP_TIME);
+	private void updateNotification() {
+		notificationView.setViewVisibility(R.id.notification_record, recordingState == STATE_RECORDING ? View.GONE : View.VISIBLE);
+		notificationView.setViewVisibility(R.id.notification_pause, recordingState == STATE_PAUSED ? View.GONE : View.VISIBLE);
+		notificationView.setTextViewText(R.id.notification_time_display, String.valueOf(this.distanceTraveled));
+		startForeground(NOTIFICATION_ID, notificationBuilder.build());
 	}
 
-	private void stopUpdatingTime() {
-		updateDisplayTimer.removeCallbacks(updateDisplayHandler);
+	public TripData getCurrentTrip() {
+		return trip;
 	}
 
-	private static final int LOOP_TIME = 500;
-	private final Handler updateDisplayTimer = new Handler();
-	private final Runnable updateDisplayHandler = new Runnable() {
-		@Override
-		public void run() {
-			updateTime();
-		}
-	};
-
-	double latestUpdate;
-	Location lastLocation;
-	float distanceTraveled;
-	float curSpeed, maxSpeed;
-	TripData trip;
-
-	public final static int RECORDING_SPEED = 2 * 1000; //2 second intervals
-
-	@Override
-	public void onLocationChanged(Location location) {
-		if (location != null) {
-			double currentTime = System.currentTimeMillis();
-			if (currentTime - latestUpdate >= 1000) {
-
-				latestUpdate = currentTime;
-				updateTripStats(location);
-				trip.addPointNow(location, currentTime, distanceTraveled);
-				// TODO Update the status page every time, if we can.
-				//notifyListeners();
-			}
-		}
-	}
-
-	private LocationClient locationClient;
-	private LocationRequest locationRequest;
-
-	private void locationClientInit() {
-		locationClient = new LocationClient(this, this, this);
-		locationClient.connect();
-	}
-
-	private void locationClientStartRecording() {
-		if (locationClient != null) {
-			locationClient.requestLocationUpdates(locationRequest, this);
-		}
-	}
-
-	private void locationClientStopRecording() {
-		if (locationClient != null) {
-			//locationClient.removeLocationUpdates(this);
-		}
-	}
-
-	@Override
-	public void onConnected(Bundle arg0) {
-		locationRequest = new LocationRequest();
-		locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY).setInterval(RECORDING_SPEED);
-		locationClientStartRecording();
-	}
-
-	final float spdConvert = 2.2369f; //Meters per second to miles per hour
-    private void updateTripStats(Location newLocation) {
-    	//Update if accuracy is within 50 meters
-    	if (newLocation.getAccuracy() > 50) return;
-
-		//Convert speed TODO consider keeping at meters per second and only convert when displayed
-		curSpeed = newLocation.getSpeed() * spdConvert;
-
-		//Get out of the car and back on the bike
-        if (curSpeed < 60) {
-        	maxSpeed = Math.max(maxSpeed, curSpeed);
-        }
-
-        if (lastLocation != null) {
-            float segmentDistance = lastLocation.distanceTo(newLocation);
-            distanceTraveled = distanceTraveled + segmentDistance;
-        }
-
-        lastLocation = newLocation;
+    void notifyListeners() {
+    	// TODO Update the status page every time, if we can.
+    	/*
+    	if (recordActivity != null) {
+    		recordActivity.updateStatus(trip.numpoints, distanceTraveled, curSpeed, maxSpeed);
+    	}
+    	*/
     }
-
-	public long getCurrentTrip() {
-		if (RecordingService.this.trip != null) {
-			return RecordingService.this.trip.tripid;
-		}
-		return -1;
-	}
-
-	// Required for location implementation
-	@Override
-	public void onConnectionFailed(ConnectionResult arg0) {
-	}
-
-	@Override
-	public void onDisconnected() {
-	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /*
 public class RecordingService extends Service implements
@@ -345,9 +331,6 @@ public class RecordingService extends Service implements
 	// END SERVICE METHODS
 
 	// BEGIN RECORDING METHODS
-
-
-
 	public void registerUpdates(RecordingActivity r) {
 		this.recordActivity = r;
 	}
