@@ -40,6 +40,8 @@ public class RecordingService extends Service implements
 	public final static String BROADCAST_ACTION_STOP = "BROADCAST_ACTION_STOP";
 	public final static String BROADCAST_ACTION_PAUSE = "BROADCAST_ACTION_PAUSE";
 
+	public final static String BROADCAST_ACTION_LOCATION_CHANGED = "BROADCAST_ACTION_LOCATION_CHANGED";
+
 	public static final int STATE_RECORDING = 1;
 	public static final int STATE_PAUSED = 2;
 	public static final int STATE_STOPPED = 3;
@@ -175,12 +177,10 @@ public class RecordingService extends Service implements
 				//TODO consider keeping at meters per second and only convert when displayed
 				curSpeed = location.getSpeed() * spdConvert;
 
-				//Get out of the car and back on the bike
-		        if (curSpeed < 60) {
-		        	maxSpeed = Math.max(maxSpeed, curSpeed);
-		        }
+				//Don't record anything faster than 60 mph
+		        maxSpeed = Math.min(Math.max(maxSpeed, curSpeed), 60);
 
-		        if (lastLocation != null) {
+		        if (lastLocation != null && location != lastLocation) {
 		            float segmentDistance = lastLocation.distanceTo(location);
 		            distanceTraveled = distanceTraveled + segmentDistance;
 		        }
@@ -188,11 +188,12 @@ public class RecordingService extends Service implements
 		        trip.addPointNow(location, currentTime, distanceTraveled);
 
 		        updateNotification();
-		        notifyListeners();
-
-		        lastUpdate = currentTime;
-		        lastLocation = location;
 			}
+
+	        notifyListeners();
+
+	        lastUpdate = currentTime;
+	        lastLocation = location;
 		}
 	}
 
@@ -205,10 +206,8 @@ public class RecordingService extends Service implements
 		registerReceivers();
 
 		this.trip = trip;
-	    curSpeed = maxSpeed = distanceTraveled = 0.0f;
-	    lastLocation = null;
-
-	    //setupTimer();
+		lastUpdate = curSpeed = maxSpeed = distanceTraveled = 0.0f;
+	    onLocationChanged(lastLocation);
 	}
 
 	private void registerReceivers() {
@@ -259,13 +258,12 @@ public class RecordingService extends Service implements
 		return trip;
 	}
 
-    void notifyListeners() {
-    	// TODO Update the status page every time, if we can.
-    	/*
-    	if (recordActivity != null) {
-    		recordActivity.updateStatus(trip.numpoints, distanceTraveled, curSpeed, maxSpeed);
-    	}
-    	*/
+    private void notifyListeners() {
+    	sendBroadcast(new Intent(BROADCAST_ACTION_LOCATION_CHANGED));
+    }
+
+    public Location getLastLocation() {
+    	return lastLocation;
     }
 }
 

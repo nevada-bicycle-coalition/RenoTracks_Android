@@ -83,8 +83,8 @@
 		android:layout_marginBottom="@dimen/standard_padding">
 		
 		<LinearLayout
-	        android:layout_toLeftOf="@+id/mark_button"
-	        android:layout_toRightOf="@+id/recording_buttons"
+	        android:layout_toLeftOf="@+id/mark_button_container"
+	        android:layout_toRightOf="@+id/recording_buttons_container"
 	        android:layout_width="fill_parent"
 	        android:layout_height="wrap_content"
 	        android:layout_marginLeft="@dimen/negative_standard_padding"
@@ -134,7 +134,7 @@
 		</LinearLayout>
 		
 	    <LinearLayout
-	        android:id="@+id/recording_buttons"
+	        android:id="@+id/recording_buttons_container"
 	        android:layout_width="@dimen/recording_buttons"
 			android:layout_height="wrap_content"
 			android:orientation="horizontal"
@@ -179,7 +179,7 @@
 	    </LinearLayout>
 	    
 	    <LinearLayout
-	        android:id="@+id/mark_button"
+	        android:id="@+id/mark_button_container"
 	        android:layout_width="@dimen/recording_buttons"
 			android:layout_height="wrap_content"
 			android:orientation="horizontal"
@@ -187,7 +187,7 @@
 			android:background="@color/accent_color"
 			android:layout_centerVertical="true">
 			<ImageButton
-				android:id="@+id/mark"
+				android:id="@+id/mark_button"
 				style="?android:attr/buttonBarButtonStyle"
 				android:layout_width="0dp"
 				android:layout_weight="1"

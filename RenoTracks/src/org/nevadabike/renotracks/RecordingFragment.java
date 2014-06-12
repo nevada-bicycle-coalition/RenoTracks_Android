@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
@@ -19,18 +20,25 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 public class RecordingFragment extends Fragment {
 
 	private Intent recordingService;
 	private ServiceConnection recordingServiceConnection;
 	private RecordingService recordingServiceInterface;
-	private BroadcastReceiver broadcastReceiver;
+	private BroadcastReceiver recordingBroadcastReceiver;
+	private BroadcastReceiver locationBroadcastReceiver;
 
 	private ImageButton startButton;
 	private ImageButton resumeButton;
@@ -48,6 +56,8 @@ public class RecordingFragment extends Fragment {
 	private TripData trip;
 
 	final SimpleDateFormat sdf = new SimpleDateFormat("H:mm:ss");
+	private ImageButton markButton;
+	private BitmapDescriptor myLocationMarkerIcon;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -58,14 +68,23 @@ public class RecordingFragment extends Fragment {
 		activity = getActivity();
 		view = inflater.inflate(R.layout.recording_fragment, container, false);
 
+		try {
+			MapsInitializer.initialize(getActivity());
+		} catch (GooglePlayServicesNotAvailableException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		mapFragment = (SupportMapFragment) getFragmentManager().findFragmentById(R.id.map);
 		map = mapFragment.getMap();
-		map.setMyLocationEnabled(true);
 		map.moveCamera(CameraUpdateFactory.newLatLngZoom(reno, 11));
 
+		myLocationMarkerIcon = BitmapDescriptorFactory.fromResource(R.drawable.trip_start);
+
+		//Disable most interaction with the map
 		mapUiSettings = map.getUiSettings();
+		mapUiSettings.setAllGesturesEnabled(false);
 		mapUiSettings.setZoomControlsEnabled(false);
-		mapUiSettings.setMyLocationButtonEnabled(true);
 
 		recordingService = new Intent(activity, RecordingService.class);
 		recordingServiceConnection = new ServiceConnection() {
@@ -79,6 +98,7 @@ public class RecordingFragment extends Fragment {
 					registerService();
 				}
 				updateUI();
+				updateMap();
 			}
 
 			@Override
@@ -87,12 +107,21 @@ public class RecordingFragment extends Fragment {
 			}
 		};
 
-		broadcastReceiver = new BroadcastReceiver(){
+		recordingBroadcastReceiver = new BroadcastReceiver(){
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				String action = intent.getAction();
 				Log.i(getClass().getName(), action);
 				updateUI();
+			}
+		};
+
+		locationBroadcastReceiver = new BroadcastReceiver(){
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				String action = intent.getAction();
+				Log.i(getClass().getName(), action);
+				updateMap();
 			}
 		};
 
@@ -112,6 +141,9 @@ public class RecordingFragment extends Fragment {
 					case R.id.stop_recording:
 						stopRecording();
 						break;
+					case R.id.mark_button:
+						makeMark();
+						break;
 				}
 				updateUI();
 			}
@@ -129,18 +161,49 @@ public class RecordingFragment extends Fragment {
 		stopButton = (ImageButton) view.findViewById(R.id.stop_recording);
 		stopButton.setOnClickListener(clickListener);
 
+		markButton = (ImageButton) view.findViewById(R.id.mark_button);
+		markButton.setOnClickListener(clickListener);
+
 		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 
 		return view;
 	}
 
+	private Location myLocation;
+	private LatLng myLocationLatLng;
+	private Marker myLocationMarker;
+	protected void updateMap() {
+		myLocation = recordingServiceInterface.getLastLocation();
+
+		if (myLocation != null) {
+			if (myLocationMarker != null) myLocationMarker.remove();
+
+			myLocationLatLng = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
+			myLocationMarker = map.addMarker(new MarkerOptions().position(myLocationLatLng).icon(myLocationMarkerIcon).anchor(.5f,.5f));
+
+			map.animateCamera(CameraUpdateFactory.newLatLngZoom(myLocationLatLng, 15));
+		}
+	}
+
+	protected void makeMark() {
+		if (myLocation != null) {
+			Intent markActivity = new Intent(activity, MarkActivity.class);
+			Bundle myLocationBundle = new Bundle();
+			myLocationBundle.putParcelable("position", myLocation);
+			markActivity.putExtras(myLocationBundle);
+			activity.startActivity(markActivity);
+		}
+	}
+
 	private void registerService() {
-		activity.registerReceiver(broadcastReceiver, new IntentFilter(RecordingService.BROADCAST_ACTION_START));
-		activity.registerReceiver(broadcastReceiver, new IntentFilter(RecordingService.BROADCAST_ACTION_PAUSE));
+		activity.registerReceiver(recordingBroadcastReceiver, new IntentFilter(RecordingService.BROADCAST_ACTION_START));
+		activity.registerReceiver(recordingBroadcastReceiver, new IntentFilter(RecordingService.BROADCAST_ACTION_PAUSE));
+		activity.registerReceiver(locationBroadcastReceiver, new IntentFilter(RecordingService.BROADCAST_ACTION_LOCATION_CHANGED));
 	}
 
 	private void unregisterService() {
-		activity.unregisterReceiver(broadcastReceiver);
+		activity.unregisterReceiver(recordingBroadcastReceiver);
+		activity.unregisterReceiver(locationBroadcastReceiver);
 	}
 
 	private void updateUI() {
@@ -181,12 +244,14 @@ public class RecordingFragment extends Fragment {
 		 */
 
 		Intent finishedActivity = new Intent(activity, SaveTripActivity.class);
+		finishedActivity.putExtra("tripID", recordingServiceInterface.trip.tripid);
 		activity.startActivity(finishedActivity);
 	}
 
 	@Override
 	public void onStart() {
 		super.onStart();
+		Log.i(getClass().getName(), "onStart");
 
 		activity.startService(recordingService);
 
@@ -197,6 +262,7 @@ public class RecordingFragment extends Fragment {
 	@Override
 	public void onStop() {
 		super.onStop();
+		Log.i(getClass().getName(), "onStop");
 
 		if (recordingServiceInterface.recordingState() == RecordingService.STATE_STOPPED) {
 			activity.stopService(recordingService);
@@ -209,6 +275,7 @@ public class RecordingFragment extends Fragment {
 	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
+		Log.i(getClass().getName(), "onDestroyView");
 		activity.getSupportFragmentManager().beginTransaction().remove(mapFragment).commit();
 	}
 }
