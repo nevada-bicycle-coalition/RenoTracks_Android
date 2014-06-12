@@ -70,6 +70,10 @@ public class SaveTripActivity extends Activity {
 				}
 
 				trip = recordingServiceInterface.getCurrentTrip();
+
+				if (trip.getPoints().size() == 0) {
+					discardTrip(true);
+				}
 			}
 
 			@Override
@@ -133,25 +137,29 @@ public class SaveTripActivity extends Activity {
 
 	// Set up the purpose buttons to be one-click only
 	void preparePurposeButtons() {
-		tripPurposes.add(new IconSpinnerAdapter.IconItem(null, "", 0));
-		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.commute), getResources().getString(R.string.trip_purpose_commute), R.string.trip_purpose_commute));
-		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.school), getResources().getString(R.string.trip_purpose_school), R.string.trip_purpose_school));
-		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.workrel), getResources().getString(R.string.trip_purpose_work_rel), R.string.trip_purpose_work_rel));
-		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.exercise), getResources().getString(R.string.trip_purpose_exercise), R.string.trip_purpose_exercise));
-		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.social), getResources().getString(R.string.trip_purpose_social), R.string.trip_purpose_social));
-		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.shopping), getResources().getString(R.string.trip_purpose_shopping), R.string.trip_purpose_shopping));
-		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.errands), getResources().getString(R.string.trip_purpose_errand), R.string.trip_purpose_errand));
-		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.other), getResources().getString(R.string.trip_purpose_other), R.string.trip_purpose_other));
+		tripPurposes.add(new IconSpinnerAdapter.IconItem(null, "", 1000));
+		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.commute), getResources().getString(R.string.trip_purpose_commute), 0));
+		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.school), getResources().getString(R.string.trip_purpose_school), 1));
+		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.work_related), getResources().getString(R.string.trip_purpose_work_rel), 2));
+		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.exercise), getResources().getString(R.string.trip_purpose_exercise), 3));
+		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.social), getResources().getString(R.string.trip_purpose_social), 4));
+		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.shopping), getResources().getString(R.string.trip_purpose_shopping), 5));
+		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.errands), getResources().getString(R.string.trip_purpose_errand), 6));
+		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.bike_event), getResources().getString(R.string.trip_purpose_bike_event), 7));
+		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.scalley_cat), getResources().getString(R.string.trip_purpose_scalley_cat), 8));
+		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.other), getResources().getString(R.string.trip_purpose_other), 9));
 
-		purpDescriptions.put(0, getResources().getString(R.string.select_trip_purpose));
-		purpDescriptions.put(R.string.trip_purpose_commute, getResources().getString(R.string.trip_purpose_commute_details));
-		purpDescriptions.put(R.string.trip_purpose_school, getResources().getString(R.string.trip_purpose_school_details));
-		purpDescriptions.put(R.string.trip_purpose_work_rel, getResources().getString(R.string.trip_purpose_work_rel_details));
-		purpDescriptions.put(R.string.trip_purpose_exercise, getResources().getString(R.string.trip_purpose_exercise_details));
-		purpDescriptions.put(R.string.trip_purpose_social, getResources().getString(R.string.trip_purpose_social_details));
-		purpDescriptions.put(R.string.trip_purpose_shopping, getResources().getString(R.string.trip_purpose_shopping_details));
-		purpDescriptions.put(R.string.trip_purpose_errand, getResources().getString(R.string.trip_purpose_errand_details));
-		purpDescriptions.put(R.string.trip_purpose_other, getResources().getString(R.string.trip_purpose_other_details));
+		purpDescriptions.put(1000, getResources().getString(R.string.select_trip_purpose));
+		purpDescriptions.put(0, getResources().getString(R.string.trip_purpose_commute_details));
+		purpDescriptions.put(1, getResources().getString(R.string.trip_purpose_school_details));
+		purpDescriptions.put(2, getResources().getString(R.string.trip_purpose_work_rel_details));
+		purpDescriptions.put(3, getResources().getString(R.string.trip_purpose_exercise_details));
+		purpDescriptions.put(4, getResources().getString(R.string.trip_purpose_social_details));
+		purpDescriptions.put(5, getResources().getString(R.string.trip_purpose_shopping_details));
+		purpDescriptions.put(6, getResources().getString(R.string.trip_purpose_errand_details));
+		purpDescriptions.put(7, getResources().getString(R.string.trip_purpose_bike_event_details));
+		purpDescriptions.put(8, getResources().getString(R.string.trip_purpose_scalley_cat_details));
+		purpDescriptions.put(9, getResources().getString(R.string.trip_purpose_other_details));
 
 		tripPurposeSpinner = (Spinner) findViewById(R.id.tripPurposeSpinner);
 		tripPurposeSpinner.setAdapter(new IconSpinnerAdapter(this, tripPurposes));
@@ -201,7 +209,13 @@ public class SaveTripActivity extends Activity {
 	}
 
 	private void discardTrip() {
-		Toast.makeText(getBaseContext(), getResources().getString(R.string.discarded), Toast.LENGTH_SHORT).show();
+		discardTrip(false);
+	}
+
+	private void discardTrip(Boolean too_short) {
+		Toast.makeText(getBaseContext(), getResources().getString(
+			too_short ? R.string.no_gps_data : R.string.discarded
+		), Toast.LENGTH_SHORT).show();
 
 		trip.dropTrip();
 

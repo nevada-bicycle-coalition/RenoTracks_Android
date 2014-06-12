@@ -150,6 +150,8 @@
 	<string name="trip_purpose_social">Social</string>
 	<string name="trip_purpose_shopping">Shopping</string>
 	<string name="trip_purpose_errand">Errand</string>
+	<string name="trip_purpose_bike_event">Bike Event</string>
+	<string name="trip_purpose_scalley_cat">ScalleyCat</string>
 	<string name="trip_purpose_other">Other</string>
 	
 	<string name="trip_purpose_commute_details"><b>Commute:</b> this bike trip was primarily to get between home and your main workplace.</string>
@@ -159,6 +161,8 @@
 	<string name="trip_purpose_social_details"><b>Social:</b> this bike trip was primarily for going to or from a social activity, e.g. at a friend\'s house, the park, a restaurant, the movies.</string>
 	<string name="trip_purpose_shopping_details"><b>Shopping:</b> this bike trip was primarily to purchase or bring home goods or groceries.</string>
 	<string name="trip_purpose_errand_details"><b>Errand:</b> this bike trip was primarily to attend to personal business such as banking, a doctor  visit, going to the gym, etc.</string>
+	<string name="trip_purpose_bike_event_details"><b>Bike Event:</b> this bike trip was an event such as a race, fund raiser, or scavenger hunt..</string>
+	<string name="trip_purpose_scalley_cat_details"><b>ScalleyCat:</b> the baddest, longest, toughest, drunkest, mayhem-est bike race in the world in the Biggest Little City in the World.</string>
 	<string name="trip_purpose_other_details"><b>Other:</b> if none of the other reasons applied to this trip, you can enter comments below to tell us more.</string>
 	
 	<string name="gps_disabled">Your phone\'s GPS is disabled. Reno Tracks needs GPS to determine your location.\n\nGo to System Settings now to enable GPS?</string>
@@ -205,4 +209,19 @@
     
     <string name="calories">calories</string>
     <string name="co2">CO2 saved</string>
+    
+	<string name="marks_0">Pavement issue</string>
+	<string name="marks_1">Traffic signal</string>
+	<string name="marks_2">Enforcement</string>
+	<string name="marks_3">Rack Em Up - park now</string>
+	<string name="marks_4">Bike lane issue</string>
+	<string name="marks_5">Note this issue</string>
+	<string name="marks_6">Rack Em Up - park future</string>
+	<string name="marks_7">Bike shops</string>
+	<string name="marks_8">Public restrooms</string>
+	<string name="marks_9">Secret passage</string>
+	<string name="marks_10">Water fountain</string>
+	<string name="marks_11">Note this asset</string>
+	
+	<string name="select_mark_type">Select Mark Type</string>
 </resources>
