@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.location.Location;
 import android.util.Log;
 
 /**
@@ -22,7 +23,7 @@ import android.util.Log;
  * SDK**
  */
 public class DbAdapter {
-    private static final int DATABASE_VERSION = 23;
+    private static final int DATABASE_VERSION = 25;
 
     public static final String K_TRIP_ROWID = "_id";
     public static final String K_TRIP_PURP = "purp";
@@ -43,6 +44,18 @@ public class DbAdapter {
     public static final String K_POINT_ALT   = "altitude";
     public static final String K_POINT_SPEED = "speed";
 
+    public static final String K_NOTE_ROWID = "_id";
+    public static final String K_NOTE_TRIP  = "trip_id";
+    public static final String K_NOTE_TIME  = "recorded";
+    public static final String K_NOTE_LAT   = "latitude";
+    public static final String K_NOTE_LGT   = "longitude";
+    public static final String K_NOTE_ALT   = "altitude";
+    public static final String K_NOTE_SPEED = "speed";
+    public static final String K_NOTE_ACC   = "accuracy";
+    public static final String K_NOTE_TYPE  = "type";
+    public static final String K_NOTE_DET   = "details";
+    public static final String K_NOTE_IMG   = "image_url";
+
     private DatabaseHelper mDbHelper;
     private SQLiteDatabase mDb;
 
@@ -58,9 +71,16 @@ public class DbAdapter {
         + "trip integer, latitude double, longitude double, "
         + "time double, accuracy float, altitude double, speed float);";
 
+    private static final String TABLE_CREATE_MARKS = "create table marks "
+        + "(_id integer primary key autoincrement, trip_id integer,"
+        + "recorded double, latitude double, longitude double, "
+        + "altitude double, speed float, accuracy float"
+        + "type integer, details text, image_url text);";
+
     private static final String DATABASE_NAME = "data";
     private static final String DATA_TABLE_TRIPS = "trips";
     private static final String DATA_TABLE_COORDS = "coords";
+    private static final String DATA_TABLE_MARKS = "marks";
 
     private final Context mCtx;
 
@@ -74,14 +94,15 @@ public class DbAdapter {
         public void onCreate(SQLiteDatabase db) {
             db.execSQL(TABLE_CREATE_TRIPS);
             db.execSQL(TABLE_CREATE_COORDS);
+            db.execSQL(TABLE_CREATE_MARKS);
         }
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            //Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
-              //      + newVersion + ", which will destroy all old data");
+            Log.w(getClass().getName(), "Upgrading database from version " + oldVersion + " to " + newVersion + ", which will destroy all old data");
             db.execSQL("DROP TABLE IF EXISTS " + DATA_TABLE_TRIPS);
             db.execSQL("DROP TABLE IF EXISTS " + DATA_TABLE_COORDS);
+            db.execSQL("DROP TABLE IF EXISTS " + DATA_TABLE_MARKS);
             onCreate(db);
         }
     }
@@ -198,6 +219,45 @@ public class DbAdapter {
     }
 
     /**
+     * Return a Cursor positioned at the trip that matches the given rowId
+     *
+     * @param rowId id of trip to retrieve
+     * @return Cursor positioned to matching trip, if found
+     * @throws SQLException if trip could not be found/retrieved
+     */
+    public Cursor fetchTrip(long rowId) throws SQLException {
+        Cursor mCursor = mDb.query(true, DATA_TABLE_TRIPS, new String[] {
+                K_TRIP_ROWID, K_TRIP_PURP, K_TRIP_START, K_TRIP_FANCYSTART,
+                K_TRIP_NOTE, K_TRIP_STATUS, K_TRIP_END, K_TRIP_FANCYINFO,
+                K_TRIP_DISTANCE},
+                K_TRIP_ROWID + "=" + rowId,
+                null, null, null, null, null);
+        if (mCursor != null) {
+            mCursor.moveToFirst();
+        }
+        return mCursor;
+    }
+
+    public boolean updateTrip(long tripid, String purp, double starttime, String fancystart, String fancyinfo, float distance) {
+        ContentValues initialValues = new ContentValues();
+        initialValues.put(K_TRIP_PURP, purp);
+        initialValues.put(K_TRIP_START, starttime);
+        initialValues.put(K_TRIP_FANCYSTART, fancystart);
+        initialValues.put(K_TRIP_FANCYINFO, fancyinfo);
+        initialValues.put(K_TRIP_DISTANCE, distance);
+
+        return mDb.update(DATA_TABLE_TRIPS, initialValues, K_TRIP_ROWID + "=" + tripid, null) > 0;
+    }
+
+    public boolean updateTripStatus(long tripid, int tripStatus) {
+        ContentValues initialValues = new ContentValues();
+        initialValues.put(K_TRIP_STATUS, tripStatus);
+
+        return mDb.update(DATA_TABLE_TRIPS, initialValues, K_TRIP_ROWID + "=" + tripid, null) > 0;
+    }
+
+
+    /**
      * Delete the trip with the given rowId
      *
      * @param rowId
@@ -259,41 +319,37 @@ public class DbAdapter {
         return badTrips;
     }
 
-    /**
-     * Return a Cursor positioned at the trip that matches the given rowId
-     *
-     * @param rowId id of trip to retrieve
-     * @return Cursor positioned to matching trip, if found
-     * @throws SQLException if trip could not be found/retrieved
-     */
-    public Cursor fetchTrip(long rowId) throws SQLException {
-        Cursor mCursor = mDb.query(true, DATA_TABLE_TRIPS, new String[] {
-                K_TRIP_ROWID, K_TRIP_PURP, K_TRIP_START, K_TRIP_FANCYSTART,
-                K_TRIP_NOTE, K_TRIP_STATUS, K_TRIP_END, K_TRIP_FANCYINFO,
-                K_TRIP_DISTANCE},
-                K_TRIP_ROWID + "=" + rowId,
-                null, null, null, null, null);
-        if (mCursor != null) {
-            mCursor.moveToFirst();
+    public long insertMark(int tripID, Location location, int type, String details, String image_url) {
+
+        ContentValues initialValues = new ContentValues();
+        initialValues.put(K_NOTE_TRIP, tripID);
+        initialValues.put(K_NOTE_TIME, System.currentTimeMillis());
+        initialValues.put(K_NOTE_LAT, location.getLatitude());
+        initialValues.put(K_NOTE_LGT, location.getLongitude());
+        initialValues.put(K_NOTE_ALT, location.getAltitude());
+        initialValues.put(K_NOTE_SPEED, location.getSpeed());
+        initialValues.put(K_NOTE_ACC, location.getAccuracy());
+        initialValues.put(K_NOTE_TYPE, type);
+        initialValues.put(K_NOTE_DET, details);
+        initialValues.put(K_NOTE_IMG, image_url);
+
+        Log.i(getClass().getName(), initialValues.toString());
+
+        return mDb.insert(DATA_TABLE_MARKS, null, initialValues);
+    }
+
+    public Cursor fetchAllMarks() {
+        Cursor c = mDb.query(DATA_TABLE_MARKS, new String[] { K_NOTE_ROWID,
+        		K_NOTE_TRIP, K_NOTE_TIME, K_NOTE_TYPE, K_NOTE_DET, K_NOTE_IMG },
+                null, null, null, null, "-" + K_NOTE_TIME);
+        if (c != null && c.getCount()>0) {
+        	Log.i(getClass().getName(), "at least 1");
+        	c.moveToFirst();
         }
-        return mCursor;
+        return c;
     }
 
-    public boolean updateTrip(long tripid, String purp, double starttime, String fancystart, String fancyinfo, float distance) {
-        ContentValues initialValues = new ContentValues();
-        initialValues.put(K_TRIP_PURP, purp);
-        initialValues.put(K_TRIP_START, starttime);
-        initialValues.put(K_TRIP_FANCYSTART, fancystart);
-        initialValues.put(K_TRIP_FANCYINFO, fancyinfo);
-        initialValues.put(K_TRIP_DISTANCE, distance);
-
-        return mDb.update(DATA_TABLE_TRIPS, initialValues, K_TRIP_ROWID + "=" + tripid, null) > 0;
-    }
-
-    public boolean updateTripStatus(long tripid, int tripStatus) {
-        ContentValues initialValues = new ContentValues();
-        initialValues.put(K_TRIP_STATUS, tripStatus);
-
-        return mDb.update(DATA_TABLE_TRIPS, initialValues, K_TRIP_ROWID + "=" + tripid, null) > 0;
-    }
+	public boolean deleteMark(long rowId) {
+	    return mDb.delete(DATA_TABLE_TRIPS, K_NOTE_ROWID + "=" + rowId, null) > 0;
+	}
 }

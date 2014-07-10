@@ -20,10 +20,8 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptor;
@@ -50,7 +48,7 @@ public class RecordingFragment extends Fragment {
 	private GoogleMap map;
 	private FragmentActivity activity;
 
-	private LatLng reno;
+	private final LatLng mapCenter = new LatLng(39.505804, -119.789043);
 	private SupportMapFragment mapFragment;
 	private UiSettings mapUiSettings;
 	private TripData trip;
@@ -63,21 +61,13 @@ public class RecordingFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
 
-		reno = new LatLng(39.505804, -119.789043);
-
-		activity = getActivity();
 		view = inflater.inflate(R.layout.recording_fragment, container, false);
 
-		try {
-			MapsInitializer.initialize(getActivity());
-		} catch (GooglePlayServicesNotAvailableException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
+		activity = getActivity();
 		mapFragment = (SupportMapFragment) getFragmentManager().findFragmentById(R.id.map);
+
 		map = mapFragment.getMap();
-		map.moveCamera(CameraUpdateFactory.newLatLngZoom(reno, 11));
+		map.moveCamera(CameraUpdateFactory.newLatLngZoom(mapCenter, 11));
 
 		myLocationMarkerIcon = BitmapDescriptorFactory.fromResource(R.drawable.trip_start);
 
@@ -169,6 +159,7 @@ public class RecordingFragment extends Fragment {
 		return view;
 	}
 
+
 	private Location myLocation;
 	private LatLng myLocationLatLng;
 	private Marker myLocationMarker;
@@ -187,7 +178,7 @@ public class RecordingFragment extends Fragment {
 
 	protected void makeMark() {
 		if (myLocation != null) {
-			Intent markActivity = new Intent(activity, MarkActivity.class);
+			Intent markActivity = new Intent(activity, SaveMarkActivity.class);
 			Bundle myLocationBundle = new Bundle();
 			myLocationBundle.putParcelable("position", myLocation);
 			markActivity.putExtras(myLocationBundle);
@@ -230,18 +221,17 @@ public class RecordingFragment extends Fragment {
 	}
 
 	private void stopRecording() {
-		recordingServiceInterface.stopRecording();
+		//recordingServiceInterface.stopRecording();
 
-		/*
+
 		// Handle pause time gracefully
-        if (trip.pauseStartedAt> 0) {
-            trip.totalPauseTime += (System.currentTimeMillis() - trip.pauseStartedAt);
-        }
-        if (trip.totalPauseTime > 0) {
-            trip.endTime = System.currentTimeMillis() - trip.totalPauseTime;
-        }
-        trip.updateTrip("","","");
-		 */
+		//if (trip.pauseStartedAt> 0) {
+			//trip.totalPauseTime += (System.currentTimeMillis() - trip.pauseStartedAt);
+		//}
+		//if (trip.totalPauseTime > 0) {
+			//trip.endTime = System.currentTimeMillis() - trip.totalPauseTime;
+		//}
+		//trip.updateTrip("","","");
 
 		Intent finishedActivity = new Intent(activity, SaveTripActivity.class);
 		finishedActivity.putExtra("tripID", recordingServiceInterface.trip.tripid);
@@ -261,8 +251,8 @@ public class RecordingFragment extends Fragment {
 
 	@Override
 	public void onStop() {
-		super.onStop();
 		Log.i(getClass().getName(), "onStop");
+		super.onStop();
 
 		if (recordingServiceInterface.recordingState() == RecordingService.STATE_STOPPED) {
 			activity.stopService(recordingService);
@@ -272,11 +262,10 @@ public class RecordingFragment extends Fragment {
 		activity.unbindService(recordingServiceConnection);
 	}
 
-	@Override
-	public void onDestroyView() {
-		super.onDestroyView();
-		Log.i(getClass().getName(), "onDestroyView");
-		activity.getSupportFragmentManager().beginTransaction().remove(mapFragment).commit();
+	public void clearMap() {
+		if (activity != null && mapFragment != null) {
+			activity.getSupportFragmentManager().beginTransaction().remove(mapFragment).commit();
+		}
 	}
 }
 
@@ -290,20 +279,20 @@ public class RecordingFragment extends Activity {
 	Timer timer;
 	float curDistance;
 
-    TextView txtStat;
-    TextView txtDistance;
-    TextView txtDuration;
-    TextView txtCurSpeed;
-    TextView txtMaxSpeed;
-    TextView txtAvgSpeed;
+	TextView txtStat;
+	TextView txtDistance;
+	TextView txtDuration;
+	TextView txtCurSpeed;
+	TextView txtMaxSpeed;
+	TextView txtAvgSpeed;
 
-    // Need handler for callbacks to the UI thread
-    final Handler mHandler = new Handler();
-    final Runnable mUpdateTimer = new Runnable() {
-        public void run() {
-            updateTimer();
-        }
-    };
+	// Need handler for callbacks to the UI thread
+	final Handler mHandler = new Handler();
+	final Runnable mUpdateTimer = new Runnable() {
+		public void run() {
+			updateTimer();
+		}
+	};
 
 	Drawable pauseDrawable;
 	Drawable recordDrawable;
@@ -319,18 +308,18 @@ public class RecordingFragment extends Activity {
 
 		setContentView(R.layout.recording);
 
-        txtStat =     (TextView) findViewById(R.id.TextRecordStats);
-        txtDistance = (TextView) findViewById(R.id.TextDistance);
-        txtDuration = (TextView) findViewById(R.id.TextDuration);
-        txtCurSpeed = (TextView) findViewById(R.id.TextSpeed);
-        txtMaxSpeed = (TextView) findViewById(R.id.TextMaxSpeed);
-        txtAvgSpeed = (TextView) findViewById(R.id.TextAvgSpeed);
+		txtStat =	 (TextView) findViewById(R.id.TextRecordStats);
+		txtDistance = (TextView) findViewById(R.id.TextDistance);
+		txtDuration = (TextView) findViewById(R.id.TextDuration);
+		txtCurSpeed = (TextView) findViewById(R.id.TextSpeed);
+		txtMaxSpeed = (TextView) findViewById(R.id.TextMaxSpeed);
+		txtAvgSpeed = (TextView) findViewById(R.id.TextAvgSpeed);
 
-        pauseDrawable = getResources().getDrawable(R.drawable.pause);
-        recordDrawable = getResources().getDrawable(R.drawable.record);
+		pauseDrawable = getResources().getDrawable(R.drawable.pause);
+		recordDrawable = getResources().getDrawable(R.drawable.record);
 
-        pausedTitle = getResources().getString(R.string.paused_title);
-        recordingTitle = getResources().getString(R.string.recording_title);
+		pausedTitle = getResources().getString(R.string.paused_title);
+		recordingTitle = getResources().getString(R.string.recording_title);
 
 		pauseButton = (Button) findViewById(R.id.ButtonRecordPause);
 		finishButton = (Button) findViewById(R.id.ButtonFinished);
@@ -366,8 +355,8 @@ public class RecordingFragment extends Activity {
 					setTitle(recordingTitle);
 					// Don't include pause time in trip duration
 					if (trip.pauseStartedAt > 0) {
-	                    trip.totalPauseTime += (System.currentTimeMillis() - trip.pauseStartedAt);
-	                    trip.pauseStartedAt = 0;
+						trip.totalPauseTime += (System.currentTimeMillis() - trip.pauseStartedAt);
+						trip.pauseStartedAt = 0;
 					}
 					Toast.makeText(getBaseContext(),getResources().getString(R.string.gps_restarted), Toast.LENGTH_LONG).show();
 				} else {
@@ -383,19 +372,19 @@ public class RecordingFragment extends Activity {
 	}
 
 	public void updateStatus(int points, float distance, float spdCurrent, float spdMax) {
-	    this.curDistance = distance;
+		this.curDistance = distance;
 
-	    //TODO: check task status before doing this?
-        if (points>0) {
-            txtStat.setText(points + getResources().getString(R.string.data_points_received));
-        } else {
-            txtStat.setText(getResources().getString(R.string.waiting_gps_fix));
-        }
-        txtCurSpeed.setText(String.format("%1.1f mph", spdCurrent));
-        txtMaxSpeed.setText(String.format("%1.1f mph", spdMax));
+		//TODO: check task status before doing this?
+		if (points>0) {
+			txtStat.setText(points + getResources().getString(R.string.data_points_received));
+		} else {
+			txtStat.setText(getResources().getString(R.string.waiting_gps_fix));
+		}
+		txtCurSpeed.setText(String.format("%1.1f mph", spdCurrent));
+		txtMaxSpeed.setText(String.format("%1.1f mph", spdMax));
 
-    	float miles = 0.0006212f * distance;
-    	txtDistance.setText(String.format("%1.1f miles", miles));
+		float miles = 0.0006212f * distance;
+		txtDistance.setText(String.format("%1.1f miles", miles));
 	}
 
 	void setListener() {
@@ -418,60 +407,60 @@ public class RecordingFragment extends Activity {
 
 	// onResume is called whenever this activity comes to foreground.
 	// Use a timer to update the trip duration.
-    @Override
-    public void onResume() {
-        super.onResume();
+	@Override
+	public void onResume() {
+		super.onResume();
 
-        timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                mHandler.post(mUpdateTimer);
-            }
-        }, 0, 1000);  // every second
-    }
+		timer = new Timer();
+		timer.scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				mHandler.post(mUpdateTimer);
+			}
+		}, 0, 1000);  // every second
+	}
 
-    void updateTimer() {
-        if (trip != null && isRecording) {
-            double dd = System.currentTimeMillis()
-                        - trip.startTime
-                        - trip.totalPauseTime;
+	void updateTimer() {
+		if (trip != null && isRecording) {
+			double dd = System.currentTimeMillis()
+						- trip.startTime
+						- trip.totalPauseTime;
 
-            txtDuration.setText(sdf.format(dd));
+			txtDuration.setText(sdf.format(dd));
 
-            double avgSpeed = 3600.0 * 0.6212 * this.curDistance / dd;
-            txtAvgSpeed.setText(String.format("%1.1f mph", avgSpeed));
-        }
-    }
+			double avgSpeed = 3600.0 * 0.6212 * this.curDistance / dd;
+			txtAvgSpeed.setText(String.format("%1.1f mph", avgSpeed));
+		}
+	}
 
-    // Don't do pointless UI updates if the activity isn't being shown.
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (timer != null) timer.cancel();
-    }
+	// Don't do pointless UI updates if the activity isn't being shown.
+	@Override
+	public void onPause() {
+		super.onPause();
+		if (timer != null) timer.cancel();
+	}
 
-    private void buildAlertMessageNoGps() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(getResources().getString(R.string.gps_disabled))
-               .setCancelable(false)
-               .setPositiveButton(getResources().getString(R.string.gps_settings), new DialogInterface.OnClickListener() {
-                   public void onClick(final DialogInterface dialog, final int id) {
-                       final ComponentName toLaunch = new ComponentName("com.android.settings","com.android.settings.SecuritySettings");
-                       final Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                       intent.addCategory(Intent.CATEGORY_LAUNCHER);
-                       intent.setComponent(toLaunch);
-                       intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                       startActivityForResult(intent, 0);
-                   }
-               })
-               .setNegativeButton(getResources().getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                   public void onClick(final DialogInterface dialog, final int id) {
-                        dialog.cancel();
-                   }
-               });
-        final AlertDialog alert = builder.create();
-        alert.show();
-    }
+	private void buildAlertMessageNoGps() {
+		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(getResources().getString(R.string.gps_disabled))
+			   .setCancelable(false)
+			   .setPositiveButton(getResources().getString(R.string.gps_settings), new DialogInterface.OnClickListener() {
+				   public void onClick(final DialogInterface dialog, final int id) {
+					   final ComponentName toLaunch = new ComponentName("com.android.settings","com.android.settings.SecuritySettings");
+					   final Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+					   intent.addCategory(Intent.CATEGORY_LAUNCHER);
+					   intent.setComponent(toLaunch);
+					   intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					   startActivityForResult(intent, 0);
+				   }
+			   })
+			   .setNegativeButton(getResources().getString(R.string.cancel), new DialogInterface.OnClickListener() {
+				   public void onClick(final DialogInterface dialog, final int id) {
+						dialog.cancel();
+				   }
+			   });
+		final AlertDialog alert = builder.create();
+		alert.show();
+	}
 }
 */

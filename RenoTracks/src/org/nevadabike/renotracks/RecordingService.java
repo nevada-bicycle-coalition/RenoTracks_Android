@@ -1,4 +1,5 @@
 package org.nevadabike.renotracks;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -57,6 +58,8 @@ public class RecordingService extends Service implements
 	TripData trip;
 	final float spdConvert = 2.2369f; //Meters per second to miles per hour
 
+	private NotificationManager notificationManager;
+
 	//SERVICE LIFECYCLE FUNCTIONS
 	public class RecordingServiceBinder extends Binder {
 		RecordingService getService() {
@@ -100,6 +103,8 @@ public class RecordingService extends Service implements
 			.setOngoing(true)
 			.setContentIntent(pendingNotificationIntent)
 			.setContent(notificationView);
+
+		notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 	}
 
 	@Override
@@ -232,7 +237,8 @@ public class RecordingService extends Service implements
 		Log.i(getClass().getName(), "stopRecording");
 		recordingState = STATE_STOPPED;
 
-		stopForeground(true);
+		//stopForeground(true);
+		notificationManager.cancel(NOTIFICATION_ID);
 		unregisterReceiver(broadcastReceiver);
 	}
 
@@ -251,7 +257,9 @@ public class RecordingService extends Service implements
 		notificationView.setViewVisibility(R.id.notification_record, recordingState == STATE_RECORDING ? View.GONE : View.VISIBLE);
 		notificationView.setViewVisibility(R.id.notification_pause, recordingState == STATE_PAUSED ? View.GONE : View.VISIBLE);
 		notificationView.setTextViewText(R.id.notification_time_display, String.valueOf(this.distanceTraveled));
-		startForeground(NOTIFICATION_ID, notificationBuilder.build());
+
+		notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
+		//startForeground(NOTIFICATION_ID, notificationBuilder.build());
 	}
 
 	public TripData getCurrentTrip() {

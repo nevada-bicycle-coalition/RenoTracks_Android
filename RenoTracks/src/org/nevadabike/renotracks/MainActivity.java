@@ -81,8 +81,9 @@ public class MainActivity extends FragmentActivity {
 		}
 
 		if (newFragment != null) {
-			 fragmentManager.beginTransaction().replace(R.id.content_frame, newFragment).setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).commit();
-			 menuFragment.selectMenu(currentView);
+			recordingFragment.clearMap();
+			fragmentManager.beginTransaction().replace(R.id.content_frame, newFragment).setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).commit();
+			menuFragment.selectMenu(currentView);
 		}
 
 		drawerLayout.closeDrawers();
