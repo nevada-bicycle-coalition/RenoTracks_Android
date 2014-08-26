@@ -1,5 +1,11 @@
 package org.nevadabike.renotracks;
 
-public class ShowMark {
+import android.app.Activity;
+import android.os.Bundle;
 
+public class ShowMark extends Activity {
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+	}
 }

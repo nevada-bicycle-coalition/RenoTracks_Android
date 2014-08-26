@@ -84,9 +84,6 @@ public class RecordingFragment extends Fragment {
 
 				recordingServiceInterface = ((RecordingService.RecordingServiceBinder) binder).getService();
 
-				if (recordingServiceInterface.recordingState() == RecordingService.STATE_STOPPED) {
-					registerService();
-				}
 				updateUI();
 				updateMap();
 			}
@@ -187,8 +184,8 @@ public class RecordingFragment extends Fragment {
 	}
 
 	private void registerService() {
-		activity.registerReceiver(recordingBroadcastReceiver, new IntentFilter(RecordingService.BROADCAST_ACTION_START));
-		activity.registerReceiver(recordingBroadcastReceiver, new IntentFilter(RecordingService.BROADCAST_ACTION_PAUSE));
+		activity.registerReceiver(recordingBroadcastReceiver, new IntentFilter(RecordingService.SERVICE_BROADCAST_ACTION_START));
+		activity.registerReceiver(recordingBroadcastReceiver, new IntentFilter(RecordingService.SERVICE_BROADCAST_ACTION_PAUSE));
 		activity.registerReceiver(locationBroadcastReceiver, new IntentFilter(RecordingService.BROADCAST_ACTION_LOCATION_CHANGED));
 	}
 
@@ -209,7 +206,7 @@ public class RecordingFragment extends Fragment {
 
 	private void startRecording() {
 		recordingServiceInterface.startRecording(TripData.createTrip(activity));
-		registerService();
+		//registerService();
 	}
 
 	private void pauseRecording() {
@@ -221,8 +218,7 @@ public class RecordingFragment extends Fragment {
 	}
 
 	private void stopRecording() {
-		//recordingServiceInterface.stopRecording();
-
+		recordingServiceInterface.stopRecording();
 
 		// Handle pause time gracefully
 		//if (trip.pauseStartedAt> 0) {

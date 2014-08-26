@@ -37,9 +37,13 @@ public class RecordingService extends Service implements
 
 	private BroadcastReceiver broadcastReceiver;
 
-	public final static String BROADCAST_ACTION_START = "BROADCAST_ACTION_START";
-	public final static String BROADCAST_ACTION_STOP = "BROADCAST_ACTION_STOP";
-	public final static String BROADCAST_ACTION_PAUSE = "BROADCAST_ACTION_PAUSE";
+	public final static String NOTIFICATION_BROADCAST_ACTION_START = "NOTIFICATION_BROADCAST_ACTION_START";
+	public final static String NOTIFICATION_BROADCAST_ACTION_STOP = "NOTIFICATION_BROADCAST_ACTION_STOP";
+	public final static String NOTIFICATION_BROADCAST_ACTION_PAUSE = "NOTIFICATION_BROADCAST_ACTION_PAUSE";
+
+	public final static String SERVICE_BROADCAST_ACTION_START = "SERVICE_BROADCAST_ACTION_START";
+	public final static String SERVICE_BROADCAST_ACTION_STOP = "SERVICE_BROADCAST_ACTION_STOP";
+	public final static String SERVICE_BROADCAST_ACTION_PAUSE = "SERVICE_BROADCAST_ACTION_PAUSE";
 
 	public final static String BROADCAST_ACTION_LOCATION_CHANGED = "BROADCAST_ACTION_LOCATION_CHANGED";
 
@@ -60,6 +64,10 @@ public class RecordingService extends Service implements
 
 	private NotificationManager notificationManager;
 
+	private Intent serviceStartIntent;
+	private Intent serviceStopIntent;
+	private Intent servicePauseIntent;
+
 	//SERVICE LIFECYCLE FUNCTIONS
 	public class RecordingServiceBinder extends Binder {
 		RecordingService getService() {
@@ -77,22 +85,28 @@ public class RecordingService extends Service implements
 			public void onReceive(Context context, Intent intent) {
 				String action = intent.getAction();
 				Log.i(getClass().getName(), action);
-				if (action == BROADCAST_ACTION_START) {
+				if (action == NOTIFICATION_BROADCAST_ACTION_START) {
 					resumeRecording();
-				} else if (action == BROADCAST_ACTION_PAUSE) {
+				} else if (action == NOTIFICATION_BROADCAST_ACTION_PAUSE) {
 					pauseRecording();
+				} else if (action == NOTIFICATION_BROADCAST_ACTION_STOP) {
+					stopRecording();
 				}
 			}
 		};
 
-		Intent startIntent = new Intent(BROADCAST_ACTION_START);
-		notificationView.setOnClickPendingIntent(R.id.notification_record, PendingIntent.getBroadcast(this, 0, startIntent, 0));
+		serviceStartIntent = new Intent(SERVICE_BROADCAST_ACTION_START);
+		serviceStopIntent = new Intent(SERVICE_BROADCAST_ACTION_STOP);
+		servicePauseIntent = new Intent(SERVICE_BROADCAST_ACTION_PAUSE);
 
-		Intent stopIntent = new Intent(this, SaveTripActivity.class);
-		notificationView.setOnClickPendingIntent(R.id.notification_stop, PendingIntent.getActivity(this, 0, stopIntent, 0));
+		Intent notificationStartIntent = new Intent(NOTIFICATION_BROADCAST_ACTION_START);
+		notificationView.setOnClickPendingIntent(R.id.notification_record, PendingIntent.getBroadcast(this, 0, notificationStartIntent, 0));
 
-		Intent pauseIntent = new Intent(BROADCAST_ACTION_PAUSE);
-		notificationView.setOnClickPendingIntent(R.id.notification_pause, PendingIntent.getBroadcast(this, 0, pauseIntent, 0));
+		Intent notificationStopIntent = new Intent(this, SaveTripActivity.class);
+		notificationView.setOnClickPendingIntent(R.id.notification_stop, PendingIntent.getActivity(this, 0, notificationStopIntent, 0));
+
+		Intent notificationPauseIntent = new Intent(NOTIFICATION_BROADCAST_ACTION_PAUSE);
+		notificationView.setOnClickPendingIntent(R.id.notification_pause, PendingIntent.getBroadcast(this, 0, notificationPauseIntent, 0));
 
 		notificationIntent = new Intent(this, MainActivity.class);
 		pendingNotificationIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
@@ -207,6 +221,8 @@ public class RecordingService extends Service implements
 		Log.i(getClass().getName(), "startRecording");
 		recordingState = STATE_RECORDING;
 
+		sendBroadcast(serviceStartIntent);
+
 		updateNotification();
 		registerReceivers();
 
@@ -216,30 +232,34 @@ public class RecordingService extends Service implements
 	}
 
 	private void registerReceivers() {
-		registerReceiver(broadcastReceiver, new IntentFilter(BROADCAST_ACTION_START));
-		registerReceiver(broadcastReceiver, new IntentFilter(BROADCAST_ACTION_PAUSE));
+		registerReceiver(broadcastReceiver, new IntentFilter(NOTIFICATION_BROADCAST_ACTION_START));
+		registerReceiver(broadcastReceiver, new IntentFilter(NOTIFICATION_BROADCAST_ACTION_PAUSE));
+	}
+
+	private void unregisterReceivers() {
+		unregisterReceiver(broadcastReceiver);
 	}
 
 	public void pauseRecording() {
 		Log.i(getClass().getName(), "pauseRecording");
 		recordingState = STATE_PAUSED;
-
+		sendBroadcast(servicePauseIntent);
 		updateNotification();
 	}
 
 	public void resumeRecording() {
 		Log.i(getClass().getName(), "resumeRecording");
 		recordingState = STATE_RECORDING;
+		sendBroadcast(serviceStartIntent);
 		updateNotification();
 	}
 
 	public void stopRecording() {
 		Log.i(getClass().getName(), "stopRecording");
 		recordingState = STATE_STOPPED;
-
-		//stopForeground(true);
+		sendBroadcast(serviceStopIntent);
 		notificationManager.cancel(NOTIFICATION_ID);
-		unregisterReceiver(broadcastReceiver);
+		unregisterReceivers();
 	}
 
 	public void cancelRecording() {
@@ -259,7 +279,6 @@ public class RecordingService extends Service implements
 		notificationView.setTextViewText(R.id.notification_time_display, String.valueOf(this.distanceTraveled));
 
 		notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
-		//startForeground(NOTIFICATION_ID, notificationBuilder.build());
 	}
 
 	public TripData getCurrentTrip() {

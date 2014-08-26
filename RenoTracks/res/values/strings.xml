@@ -124,7 +124,8 @@
 	<string name="submit_fail">Reno Tracks couldn\'t upload the trip, and will retry when your next trip is completed.</string>
 	
 	<string name="discarded">Trip discarded.</string>
-	<string name="select_purpose">You must select a trip purpose before submitting! Choose from the purposes above.</string>
+	<string name="select_trip_purpose">You must select a trip purpose before submitting! Choose from the purposes above.</string>
+	<string name="select_mark_purpose">You must select a mark purpose before submitting! Choose from the purposes above.</string>
 	
 	<string name="preferences_saved">User preferences saved.</string>
 	
@@ -141,7 +142,7 @@
 	<string name="stop">Stop</string>
 	
 	<string name="trip_purpose">Trip Purpose</string>
-	<string name="select_trip_purpose">Please select a trip purpose</string>
+	<string name="select_trip_purpose_prompt">Please select a trip purpose</string>
 	
 	<string name="trip_purpose_commute">Commute</string>
 	<string name="trip_purpose_school">School</string>
@@ -224,4 +225,7 @@
 	<string name="marks_11">Note this asset</string>
 	
 	<string name="select_mark_type">Select Mark Type</string>
+	
+	<string name="mark_upload_error">There was an error uploading this mark. Please try again.</string>
+	<string name="take_mark_picture">Please take a picture of the mark.</string>
 </resources>

@@ -69,7 +69,7 @@ public class MenuFragment extends Fragment {
         helpButton = (Button) view.findViewById(R.id.menu_help);
         helpButton.setOnClickListener(clickListener);
 
-        activity.selectMenu(MainActivity.MENU_RECORD);
+        activity.selectMenu(MainActivity.MENU_MARKS);
 
         return view;
     }

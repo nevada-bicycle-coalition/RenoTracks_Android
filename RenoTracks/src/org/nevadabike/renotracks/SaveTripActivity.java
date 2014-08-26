@@ -9,17 +9,11 @@ import java.util.TimeZone;
 import org.nevadabike.renotracks.IconSpinnerAdapter.IconItem;
 
 import android.app.Activity;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.text.Html;
-import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
@@ -45,40 +39,17 @@ public class SaveTripActivity extends Activity {
 	private Button btnDiscard;
 	private LinearLayout tripButtons;
 
-	private Intent recordingService;
-	private ServiceConnection recordingServiceConnection;
-	private RecordingService recordingServiceInterface;
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.save);
 
-		this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+		sendBroadcast(new Intent(RecordingService.NOTIFICATION_BROADCAST_ACTION_STOP));
 
-		recordingService = new Intent(this, RecordingService.class);
-		recordingServiceConnection = new ServiceConnection() {
-			@Override
-			public void onServiceConnected(ComponentName name, IBinder binder) {
-				Log.i(getClass().getName(), "onServiceConnected");
+		Bundle cmds = getIntent().getExtras();
+		if (cmds == null) return;
 
-				recordingServiceInterface = ((RecordingService.RecordingServiceBinder) binder).getService();
-				if (recordingServiceInterface.recordingState() != RecordingService.STATE_STOPPED) {
-					recordingServiceInterface.stopRecording();
-				}
-
-				trip = recordingServiceInterface.getCurrentTrip();
-
-				if (trip.getPoints().size() == 0) {
-					discardTrip(true);
-				}
-			}
-
-			@Override
-			public void onServiceDisconnected(ComponentName name) {
-				Log.i(getClass().getName(), "onServiceConnected");
-			}
-		};
+		trip = TripData.fetchTrip(this, cmds.getLong("tripID"));
 
 		activity = this;
 
@@ -119,33 +90,19 @@ public class SaveTripActivity extends Activity {
 		}
 	}
 
-	@Override
-	public void onPause() {
-		super.onPause();
-		Log.i(getClass().getName(), "onPause");
-		unbindService(recordingServiceConnection);
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-		Log.i(getClass().getName(), "onResume");
-		bindService(recordingService, recordingServiceConnection, Context.BIND_AUTO_CREATE);
-	}
-
 	// Set up the purpose buttons to be one-click only
 	void preparePurposeButtons() {
-		tripPurposes.add(new IconSpinnerAdapter.IconItem(null, "", 0));
-		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.commute), getResources().getString(R.string.trip_purpose_commute), R.string.trip_purpose_commute));
-		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.school), getResources().getString(R.string.trip_purpose_school), R.string.trip_purpose_school));
-		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.work_related), getResources().getString(R.string.trip_purpose_work_rel), R.string.trip_purpose_work_rel));
-		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.exercise), getResources().getString(R.string.trip_purpose_exercise), R.string.trip_purpose_exercise));
-		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.social), getResources().getString(R.string.trip_purpose_social), R.string.trip_purpose_social));
-		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.shopping), getResources().getString(R.string.trip_purpose_shopping), R.string.trip_purpose_shopping));
-		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.errands), getResources().getString(R.string.trip_purpose_errand), R.string.trip_purpose_errand));
-		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.bike_event), getResources().getString(R.string.trip_purpose_bike_event), R.string.trip_purpose_bike_event));
-		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.scalley_cat), getResources().getString(R.string.trip_purpose_scalley_cat), R.string.trip_purpose_scalley_cat));
-		tripPurposes.add(new IconSpinnerAdapter.IconItem(getResources().getDrawable(R.drawable.other), getResources().getString(R.string.trip_purpose_other), R.string.trip_purpose_other));
+		tripPurposes.add(new IconSpinnerAdapter.IconItem(0, "", 0));
+		tripPurposes.add(new IconSpinnerAdapter.IconItem((R.drawable.commute), getResources().getString(R.string.trip_purpose_commute), R.string.trip_purpose_commute));
+		tripPurposes.add(new IconSpinnerAdapter.IconItem((R.drawable.school), getResources().getString(R.string.trip_purpose_school), R.string.trip_purpose_school));
+		tripPurposes.add(new IconSpinnerAdapter.IconItem((R.drawable.work_related), getResources().getString(R.string.trip_purpose_work_rel), R.string.trip_purpose_work_rel));
+		tripPurposes.add(new IconSpinnerAdapter.IconItem((R.drawable.exercise), getResources().getString(R.string.trip_purpose_exercise), R.string.trip_purpose_exercise));
+		tripPurposes.add(new IconSpinnerAdapter.IconItem((R.drawable.social), getResources().getString(R.string.trip_purpose_social), R.string.trip_purpose_social));
+		tripPurposes.add(new IconSpinnerAdapter.IconItem((R.drawable.shopping), getResources().getString(R.string.trip_purpose_shopping), R.string.trip_purpose_shopping));
+		tripPurposes.add(new IconSpinnerAdapter.IconItem((R.drawable.errands), getResources().getString(R.string.trip_purpose_errand), R.string.trip_purpose_errand));
+		tripPurposes.add(new IconSpinnerAdapter.IconItem((R.drawable.bike_event), getResources().getString(R.string.trip_purpose_bike_event), R.string.trip_purpose_bike_event));
+		tripPurposes.add(new IconSpinnerAdapter.IconItem((R.drawable.scalley_cat), getResources().getString(R.string.trip_purpose_scalley_cat), R.string.trip_purpose_scalley_cat));
+		tripPurposes.add(new IconSpinnerAdapter.IconItem((R.drawable.other), getResources().getString(R.string.trip_purpose_other), R.string.trip_purpose_other));
 
 		purpDescriptions.put(0, getResources().getString(R.string.select_trip_purpose));
 		purpDescriptions.put(R.string.trip_purpose_commute, getResources().getString(R.string.trip_purpose_commute_details));
@@ -176,13 +133,13 @@ public class SaveTripActivity extends Activity {
 	}
 
 	private void saveTrip() {
-		trip.populateDetails();
-
 		if (selected_purpose_id == 0) {
 			// Oh no!  No trip purpose!
-			Toast.makeText(getBaseContext(), getResources().getString(R.string.select_purpose), Toast.LENGTH_SHORT).show();
+			Toast.makeText(getBaseContext(), getResources().getString(R.string.select_trip_purpose), Toast.LENGTH_SHORT).show();
 			return;
 		}
+
+		trip.populateDetails();
 
 		String fancyStartTime = DateFormat.getInstance().format(trip.startTime);
 
@@ -191,17 +148,16 @@ public class SaveTripActivity extends Activity {
 		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 
 		String minutes = sdf.format(trip.endTime - trip.startTime);
-		String fancyEndInfo = String.format("%1.1f miles, %s minutes.", (0.0006212f * trip.distance), minutes);
+		String fancyEndInfo = String.format("%1.1f miles in %s minutes.", (0.0006212f * trip.distance), minutes);
 
 		// Save the trip details to the phone database.
 		trip.updateTrip(getResources().getString(selected_purpose_id), fancyStartTime, fancyEndInfo);
 		trip.updateTripStatus(TripData.STATUS_COMPLETE);
 
-		// TODO Upload the trip
-
 		// And, show the map!
 		Intent showTrip = new Intent(this, ShowMap.class);
 		showTrip.putExtra("showtrip", trip.tripid);
+		showTrip.putExtra("uploadTrip", true);
 		startActivity(showTrip);
 		finish();
 	}
@@ -217,8 +173,7 @@ public class SaveTripActivity extends Activity {
 
 		trip.dropTrip();
 
-		Intent discardTrip = new Intent(this, MainActivity.class);
-		startActivity(discardTrip);
+		startActivity(new Intent(this, MainActivity.class));
 		finish();
 	}
 }

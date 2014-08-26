@@ -7,6 +7,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Location;
+import android.text.TextUtils;
 import android.util.Log;
 
 /**
@@ -23,7 +24,12 @@ import android.util.Log;
  * SDK**
  */
 public class DbAdapter {
-    private static final int DATABASE_VERSION = 25;
+    private static final int DATABASE_VERSION = 27;
+
+    private static final String DATABASE_NAME = "data";
+    private static final String DATA_TABLE_TRIPS = "trips";
+    private static final String DATA_TABLE_COORDS = "coords";
+    private static final String DATA_TABLE_MARKS = "marks";
 
     public static final String K_TRIP_ROWID = "_id";
     public static final String K_TRIP_PURP = "purp";
@@ -52,7 +58,7 @@ public class DbAdapter {
     public static final String K_NOTE_ALT   = "altitude";
     public static final String K_NOTE_SPEED = "speed";
     public static final String K_NOTE_ACC   = "accuracy";
-    public static final String K_NOTE_TYPE  = "type";
+    public static final String K_NOTE_PURP  = "purp";
     public static final String K_NOTE_DET   = "details";
     public static final String K_NOTE_IMG   = "image_url";
 
@@ -62,25 +68,54 @@ public class DbAdapter {
     /**
      * Database creation sql statement
      */
-    private static final String TABLE_CREATE_TRIPS = "create table trips "
-    	+ "(_id integer primary key autoincrement, purp text, start double, endtime double, "
-    	+ "fancystart text, fancyinfo text, distance float, note text, status integer);";
+    private static final String TABLE_CREATE_TRIPS =  TextUtils.join(" ", new String[]{
+    	"CREATE TABLE", DATA_TABLE_TRIPS, "(",
+    		TextUtils.join(", ", new String[]{
+    			K_TRIP_ROWID + " integer primary key autoincrement",
+    			K_TRIP_PURP + " text",
+    			K_TRIP_START + " double",
+    			K_TRIP_END + " double",
+    			K_TRIP_FANCYSTART + " text",
+    			K_TRIP_FANCYINFO + " text",
+    			K_TRIP_NOTE + " text",
+    			K_TRIP_DISTANCE + " float",
+    			K_TRIP_STATUS + " integer"
+    		}),
+    	")"
+   	});
 
-    private static final String TABLE_CREATE_COORDS = "create table coords "
-    	+ "(_id integer primary key autoincrement, "
-        + "trip integer, latitude double, longitude double, "
-        + "time double, accuracy float, altitude double, speed float);";
+    private static final String TABLE_CREATE_COORDS = TextUtils.join(" ", new String[]{
+    	"CREATE TABLE", DATA_TABLE_COORDS, "(",
+    		TextUtils.join(", ", new String[]{
+    			K_POINT_ROWID + " integer primary key autoincrement",
+    			K_POINT_TRIP + " integer",
+    			K_POINT_TIME + " double",
+    			K_POINT_LAT + " double",
+    			K_POINT_LGT + " double",
+    			K_POINT_ALT + " double",
+    			K_POINT_SPEED + " float",
+    			K_POINT_ACC + " float"
+    		}),
+    	")"
+   	});
 
-    private static final String TABLE_CREATE_MARKS = "create table marks "
-        + "(_id integer primary key autoincrement, trip_id integer,"
-        + "recorded double, latitude double, longitude double, "
-        + "altitude double, speed float, accuracy float"
-        + "type integer, details text, image_url text);";
-
-    private static final String DATABASE_NAME = "data";
-    private static final String DATA_TABLE_TRIPS = "trips";
-    private static final String DATA_TABLE_COORDS = "coords";
-    private static final String DATA_TABLE_MARKS = "marks";
+    private static final String TABLE_CREATE_MARKS = TextUtils.join(" ", new String[]{
+		"CREATE TABLE", DATA_TABLE_MARKS, "(",
+			TextUtils.join(", ", new String[]{
+				K_NOTE_ROWID + " integer primary key autoincrement",
+				K_NOTE_TRIP + " integer",
+				K_NOTE_TIME + " double",
+				K_NOTE_LAT + " double",
+				K_NOTE_LGT + " double",
+				K_NOTE_ALT + " double",
+				K_NOTE_SPEED + " float",
+				K_NOTE_ACC + " float",
+				K_NOTE_PURP + " integer",
+				K_NOTE_DET + " text",
+				K_NOTE_IMG + " text"
+			}),
+		")"
+	});
 
     private final Context mCtx;
 
@@ -319,7 +354,7 @@ public class DbAdapter {
         return badTrips;
     }
 
-    public long insertMark(int tripID, Location location, int type, String details, String image_url) {
+    public long insertMark(int tripID, Location location, int purpose, String details, String image_url) {
 
         ContentValues initialValues = new ContentValues();
         initialValues.put(K_NOTE_TRIP, tripID);
@@ -329,7 +364,7 @@ public class DbAdapter {
         initialValues.put(K_NOTE_ALT, location.getAltitude());
         initialValues.put(K_NOTE_SPEED, location.getSpeed());
         initialValues.put(K_NOTE_ACC, location.getAccuracy());
-        initialValues.put(K_NOTE_TYPE, type);
+        initialValues.put(K_NOTE_PURP, purpose);
         initialValues.put(K_NOTE_DET, details);
         initialValues.put(K_NOTE_IMG, image_url);
 
@@ -340,7 +375,7 @@ public class DbAdapter {
 
     public Cursor fetchAllMarks() {
         Cursor c = mDb.query(DATA_TABLE_MARKS, new String[] { K_NOTE_ROWID,
-        		K_NOTE_TRIP, K_NOTE_TIME, K_NOTE_TYPE, K_NOTE_DET, K_NOTE_IMG },
+        		K_NOTE_TRIP, K_NOTE_TIME, K_NOTE_PURP, K_NOTE_DET, K_NOTE_IMG },
                 null, null, null, null, "-" + K_NOTE_TIME);
         if (c != null && c.getCount()>0) {
         	Log.i(getClass().getName(), "at least 1");

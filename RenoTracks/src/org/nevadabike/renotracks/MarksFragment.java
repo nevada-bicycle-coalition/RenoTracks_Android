@@ -1,12 +1,17 @@
 package org.nevadabike.renotracks;
 
+import java.util.ArrayList;
+
+import org.nevadabike.renotracks.Marks;
+import org.nevadabike.renotracks.Marks.Mark;
+import org.nevadabike.renotracks.Marks.MarksAdapter;
+
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -26,6 +31,7 @@ public class MarksFragment extends Fragment {
 	private FragmentActivity activity;
 
     private final static int CONTEXT_DELETE = 1;
+    private ArrayList<Mark> marks;
 
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -44,23 +50,29 @@ public class MarksFragment extends Fragment {
 	void populateList() {
 		// Get list from the real phone database. W00t!
 		DbAdapter mDb = new DbAdapter(activity);
-		mDb.open();
+
+		marks = new ArrayList<Mark>();
 
 		try {
+			mDb.open();
 			Cursor allTrips = mDb.fetchAllMarks();
 
-			SimpleCursorAdapter sca = new SimpleCursorAdapter(activity,
-				R.layout.twolinelist, allTrips,
-				new String[] { DbAdapter.K_NOTE_TYPE, DbAdapter.K_NOTE_TIME, DbAdapter.K_NOTE_DET},
-				new int[] {R.id.text1, R.id.text2, R.id.text3},
-				0
-			);
-			listView.setAdapter(sca);
+			allTrips.moveToFirst();
+			do {
+				int purpose = allTrips.getInt(allTrips.getColumnIndex(DbAdapter.K_NOTE_PURP));
+				double time = allTrips.getDouble(allTrips.getColumnIndex(DbAdapter.K_NOTE_TIME));
+				marks.add(new Mark(purpose, time));
+			} while(allTrips.moveToNext());
+
+			mDb.close();
 		} catch (SQLException sqle) {
 			// Do nothing, for now!
 		}
 
-		mDb.close();
+		MarksAdapter adapter = new MarksAdapter(getActivity(), marks);
+		listView.setAdapter(adapter);
+
+
 
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 		    public void onItemClick(AdapterView<?> parent, View v, int pos, long id) {

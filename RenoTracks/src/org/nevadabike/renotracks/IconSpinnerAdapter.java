@@ -3,7 +3,6 @@ package org.nevadabike.renotracks;
 import java.util.ArrayList;
 
 import android.app.Activity;
-import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -37,22 +36,23 @@ public class IconSpinnerAdapter extends ArrayAdapter<IconSpinnerAdapter.IconItem
 
 		TextView label = (TextView) row.findViewById(android.R.id.text1);
 		label.setText(item.label);
-
-		ImageView icon = (ImageView) row.findViewById(android.R.id.icon1);
-		icon.setImageDrawable(item.icon);
+		if (item.icon != 0) {
+			ImageView icon = (ImageView) row.findViewById(android.R.id.icon1);
+			icon.setImageDrawable(activity.getResources().getDrawable(item.icon));
+		}
 
 		return row;
     }
 
     static class IconItem {
-		public Drawable icon;
+		public int icon;
 		public String label;
 		public int id;
 
-		public IconItem(Drawable icon, String label) {
+		public IconItem(int icon, String label) {
 			this(icon, label, 0);
 		}
-		public IconItem(Drawable icon, String label, int id) {
+		public IconItem(int icon, String label, int id) {
 			this.icon = icon;
 			this.label = label;
 			this.id = id;

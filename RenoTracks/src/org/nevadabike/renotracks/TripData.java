@@ -28,7 +28,7 @@ public class TripData {
     public static int STATUS_SENT = 2;
 
 	public static TripData createTrip(Context c) {
-		TripData t = new TripData(c.getApplicationContext(), 0);
+		TripData t = new TripData(c, 0);
 		t.createTripInDatabase(c);
         t.initializeData();
 		return t;

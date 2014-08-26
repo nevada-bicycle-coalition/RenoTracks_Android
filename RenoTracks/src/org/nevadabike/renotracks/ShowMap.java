@@ -28,20 +28,21 @@ public class ShowMap extends Activity {
 
         Bundle cmds = getIntent().getExtras();
 
-        if (cmds == null) return;
+        if (cmds == null) {
+        	//We have no trip to show, do nothing
+        	return;
+        }
 
         TripData trip = TripData.fetchTrip(this, cmds.getLong("showtrip"));
 
         gpspoints = trip.getPoints();
 
-        /*
         //Upload the trip if it hasn't yet been sent
-        if (trip.status < TripData.STATUS_SENT && cmds.getBoolean("uploadTrip", false)) {
+        if (trip.status < TripData.STATUS_SENT || cmds.getBoolean("uploadTrip", false)) {
     	    // And upload to the cloud database, too!  W00t W00t!
            TripUploader uploader = new TripUploader(ShowMap.this);
            uploader.execute(trip.tripid);
     	}
-    	*/
 
         // Show trip details
         this.setTitle(trip.purp);
@@ -77,12 +78,14 @@ public class ShowMap extends Activity {
         int minSize = Math.min(size.x, size.y);
         Log.i(getClass().getName(), String.valueOf(minSize));
 
+        //Zoome the camera so it shows the entire trip on the map
         map.moveCamera(CameraUpdateFactory.newLatLngBounds(tripBounds, minSize, minSize, 0));
+
+        //Draw the trip on the map
         map.addPolyline(tripLine);
 
         //Show the first and last markers
         map.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.trip_start)).anchor(0.5f, 0.5f).position(startPoint.latLng));
         map.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.trip_end)).anchor(0.5f, 0.5f).position(endPoint.latLng));
-        //*/
 	}
 }
