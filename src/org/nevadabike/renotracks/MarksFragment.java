@@ -2,7 +2,6 @@ package org.nevadabike.renotracks;
 
 import java.util.ArrayList;
 
-import org.nevadabike.renotracks.Marks;
 import org.nevadabike.renotracks.Marks.Mark;
 import org.nevadabike.renotracks.Marks.MarksAdapter;
 
@@ -40,10 +39,7 @@ public class MarksFragment extends Fragment {
 
 		listView = (ListView) view.findViewById(R.id.listView1);
 		populateList();
-		/*
-		MarksAdapter adapter = new MarksAdapter(getActivity(), marks);
-		listView.setAdapter(adapter);
-		*/
+
         return view;
     }
 

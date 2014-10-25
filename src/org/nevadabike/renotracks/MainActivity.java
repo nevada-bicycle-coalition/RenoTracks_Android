@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.MenuItem;
 
 public class MainActivity extends FragmentActivity {
+	private final static String TAG = "MainActivity";
 
 	private ActionBarDrawerToggle drawerToggle;
 	private DrawerLayout drawerLayout;
@@ -31,16 +32,14 @@ public class MainActivity extends FragmentActivity {
 	private RecordingFragment recordingFragment;
 	private TripsFragment tripsFragment;
 	private MarksFragment marksFragment;
-	private MainActivity activity;
+	private final MainActivity mActivity = this;
 
-	public final String PREFS_KEY = "PREFS";
+	public final static String PREFS_KEY = "PREFS";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_activity);
-
-		activity = this;
 
 		menuFragment = new MenuFragment();
 		recordingFragment = new RecordingFragment();
@@ -113,13 +112,13 @@ public class MainActivity extends FragmentActivity {
 	@Override
 	public void onStart() {
 		super.onStart();
-		Log.i(getClass().getName(), "onStart");
+		Log.i(TAG, "onStart");
 	}
 
 	@Override
 	public void onStop() {
 		super.onStop();
-		Log.i(getClass().getName(), "onStop");
+		Log.i(TAG, "onStop");
 	}
 
     private void showWelcomeDialog() {
@@ -128,7 +127,7 @@ public class MainActivity extends FragmentActivity {
                .setCancelable(false).setTitle(getResources().getString(R.string.welcome_title))
                .setPositiveButton(getResources().getString(R.string.okay), new DialogInterface.OnClickListener() {
                    public void onClick(final DialogInterface dialog, final int id) {
-                       startActivity(new Intent(activity, UserInfoActivity.class));
+                       startActivity(new Intent(mActivity, UserInfoActivity.class));
                    }
                });
 
@@ -137,7 +136,7 @@ public class MainActivity extends FragmentActivity {
     }
 
     public void openHelp() {
-    	Log.i(getClass().getName(), "opening help site");
+    	Log.i(TAG, "opening help site");
     	startActivity(new Intent(
    			Intent.ACTION_VIEW,
    			Uri.parse(getResources().getString(R.string.help_url))
