@@ -16,7 +16,6 @@ public class TripData {
 	int status;
 	float distance;
 	String purp, fancystart, info;
-	//private ItemizedOverlayTrack gpspoints;
 	CyclePoint startpoint, endpoint;
 	double totalPauseTime = 0;
 	double pauseStartedAt = 0;
@@ -28,10 +27,10 @@ public class TripData {
     public static int STATUS_COMPLETE = 1;
     public static int STATUS_SENT = 2;
 
-	public static TripData createTrip(Context c) {
+	public static TripData createTrip(Context c, long atTime) {
 		TripData t = new TripData(c, 0);
 		t.createTripInDatabase(c);
-        t.initializeData();
+        t.initializeData(atTime);
 		return t;
 	}
 
@@ -47,9 +46,9 @@ public class TripData {
 		mDb = new DbAdapter(context);
 	}
 
-	void initializeData() {
-		startTime = System.currentTimeMillis();
-		endTime = System.currentTimeMillis();
+	void initializeData(long atTime) {
+		startTime = atTime;
+		endTime = atTime;
         numpoints = 0;
         latestLatitude = 200;
         latestLongitude = 200;
@@ -57,6 +56,7 @@ public class TripData {
 
 		purp = fancystart = info = "";
 
+		//Create a blank trip
 		updateTrip();
 	}
 
@@ -101,8 +101,8 @@ public class TripData {
 		mDb.close();
 	}
 
-	ArrayList<CyclePoint> getPoints() {
-
+	ArrayList<CyclePoint> getPoints()
+	{
 		ArrayList<CyclePoint> cyclepoints = new ArrayList<CyclePoint>();
 
 		try {
@@ -136,7 +136,8 @@ public class TripData {
 		return cyclepoints;
 	}
 
-	boolean addPointNow(Location loc, double currentTime, float dst) {
+	boolean addPoint(Location loc, double time)
+	{
 		double latitude = loc.getLatitude();
 		double longitude = loc.getLongitude();
 
@@ -148,44 +149,39 @@ public class TripData {
 		double altitude = loc.getAltitude();
 		float speed = loc.getSpeed();
 
-		Log.i(getClass().getName(), currentTime + ": " + latitude + ", " + longitude + " (" + accuracy + ")");
+		Log.i(getClass().getName(), time + ": " + latitude + ", " + longitude + " (" + accuracy + ")");
 
-		CyclePoint pt = new CyclePoint(latitude, longitude, currentTime, accuracy, altitude, speed);
+		CyclePoint pt = new CyclePoint(latitude, longitude, time, accuracy, altitude, speed);
 
         numpoints++;
-        endTime = currentTime - this.totalPauseTime;
-        distance = dst;
+        endTime = time - this.totalPauseTime;
 
         latestLatitude = latitude;
 		latestLongitude = longitude;
 
         mDb.open();
         boolean rtn = mDb.addCoordToTrip(tripid, pt);
-        rtn = rtn && mDb.updateTrip(tripid, "", startTime, "", "", distance, "");
         mDb.close();
 
         return rtn;
 	}
 
-	public boolean updateTripStatus(int tripStatus) {
-		boolean rtn;
+
+	public boolean updateTripStatus(int tripStatus)
+	{
 		mDb.open();
-		rtn = mDb.updateTripStatus(tripid, tripStatus);
+		boolean rtn = mDb.updateTripStatus(tripid, tripStatus);
 		mDb.close();
 		return rtn;
 	}
 
-	public boolean getStatus(int tripStatus) {
-		boolean rtn;
-		mDb.open();
-		rtn = mDb.updateTripStatus(tripid, tripStatus);
-		mDb.close();
-		return rtn;
+	public void updateTrip()
+	{
+		updateTrip("","","","");
 	}
 
-	public void updateTrip() { updateTrip("","","",""); }
-	public void updateTrip(String purpose, String fancyStart, String fancyInfo, String note) {
-		// Save the trip details to the phone database. W00t!
+	public void updateTrip(String purpose, String fancyStart, String fancyInfo, String note)
+	{
 		mDb.open();
 		mDb.updateTrip(tripid, purpose,	startTime, fancyStart, fancyInfo, distance, note);
 		mDb.close();

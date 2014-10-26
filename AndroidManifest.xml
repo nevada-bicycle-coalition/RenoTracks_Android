@@ -36,7 +36,8 @@
 		    android:value="@integer/google_play_services_version" />
 		
 		<activity
-			android:name="org.nevadabike.renotracks.MainActivity">
+			android:name="org.nevadabike.renotracks.MainActivity"
+			android:screenOrientation="portrait">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />
@@ -47,27 +48,32 @@
 			android:name="org.nevadabike.renotracks.UserInfoActivity"
 			android:parentActivityName="org.nevadabike.renotracks.MainActivity"
 			android:label="@string/edit_user_info"
-			android:windowSoftInputMode="adjustPan|adjustResize">
+			android:windowSoftInputMode="adjustPan|adjustResize"
+			android:screenOrientation="portrait">
 		</activity>
 		
 		<activity
 			android:name="org.nevadabike.renotracks.SaveTripActivity"
 			android:parentActivityName="org.nevadabike.renotracks.MainActivity"
 			android:label="@string/save_trip"
-			android:windowSoftInputMode="stateHidden|adjustPan|adjustResize">
+			android:windowSoftInputMode="stateHidden|adjustPan|adjustResize"
+			android:screenOrientation="portrait">
 		</activity>
 		
 		<activity
 			android:name="org.nevadabike.renotracks.ShowMap"
-			android:parentActivityName="org.nevadabike.renotracks.MainActivity"/>
+			android:parentActivityName="org.nevadabike.renotracks.MainActivity"
+			android:screenOrientation="portrait"/>
 		
 		<activity
 			android:name="org.nevadabike.renotracks.SaveMarkActivity"
-			android:parentActivityName="org.nevadabike.renotracks.MainActivity"/>
+			android:parentActivityName="org.nevadabike.renotracks.MainActivity"
+			android:screenOrientation="portrait"/>
 		
 		<activity
 			android:name="org.nevadabike.renotracks.ShowMark"
-			android:parentActivityName="org.nevadabike.renotracks.MainActivity"/>
+			android:parentActivityName="org.nevadabike.renotracks.MainActivity"
+			android:screenOrientation="portrait"/>
 		
 		<service
 			android:name="org.nevadabike.renotracks.RecordingService"

@@ -7,6 +7,6 @@
     <dimen name="menu_font_size">22sp</dimen>
     <dimen name="menu_font_size_small">16sp</dimen>
     <dimen name="menu_item_height">60dp</dimen>
-    <dimen name="recording_buttons">120dp</dimen>
+    <dimen name="recording_buttons">80dp</dimen>
     <dimen name="user_pref_label">150dp</dimen>
 </resources>

@@ -66,8 +66,8 @@
 					    android:layout_below="@+id/additional_details"
 					    android:layout_width="match_parent"
 					    android:layout_height="fill_parent"
-					    android:inputType="textMultiLine"
-					    android:gravity="top|left"/>
+					    android:gravity="top|left"
+					    android:imeOptions="actionDone"/>
 				    
 				</RelativeLayout>
 		   	</LinearLayout>

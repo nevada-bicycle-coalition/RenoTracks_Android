@@ -8,32 +8,38 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:adjustViewBounds="true"
-        android:layout_marginRight="@dimen/standard_padding" />
+        android:layout_marginLeft="@dimen/standard_padding"
+        android:layout_marginRight="@dimen/standard_padding"
+        android:src="@drawable/ic_launcher" />
+    
 	<LinearLayout
 	    android:layout_toRightOf="@+id/notification_icon"
+	    android:layout_toLeftOf="@+id/notification_buttons"
 		android:layout_width="fill_parent"
 		android:layout_height="match_parent"
 		android:orientation="vertical"
 		android:gravity="center_vertical">
 		<TextView
-		    android:id="@+id/notification_time_display"
+		    android:id="@+id/notification_distance_display"
 		    android:textAppearance="?android:attr/textAppearanceMedium"
 		    android:layout_width="match_parent"
 		    android:layout_height="wrap_content"
-		    android:text="@string/zero_time" />
+		    android:text="@string/zero_distance" />
 		<TextView
-			android:id="@+id/notification_distance_display"
+			android:id="@+id/notification_time_display"
 			android:textAppearance="?android:attr/textAppearanceSmall"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="@string/zero_distance" />
+			android:text="@string/zero_time" />
+
 	</LinearLayout>
 	<LinearLayout
+	    android:id="@+id/notification_buttons"
 	    android:layout_alignParentRight="true"
 	    android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:gravity="center_vertical">
-		<ImageButton
+		<!-- <ImageButton
 		    android:id="@+id/notification_record"
 		    style="?android:attr/buttonBarButtonStyle"
 		    android:src="@drawable/ic_action_record"
@@ -44,7 +50,7 @@
 		    style="?android:attr/buttonBarButtonStyle"
 		    android:src="@drawable/ic_action_pause"
 		    android:layout_width="wrap_content"
-	        android:layout_height="match_parent"/>
+	        android:layout_height="match_parent"/> -->
 		<ImageButton
 		    android:id="@+id/notification_stop"
 		    style="?android:attr/buttonBarButtonStyle"

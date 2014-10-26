@@ -9,11 +9,18 @@ import java.util.TimeZone;
 import org.nevadabike.renotracks.IconSpinnerAdapter.IconItem;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.text.Html;
+import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
@@ -24,7 +31,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class SaveTripActivity extends Activity {
-	Activity activity;
 	TripData trip;
 
 	private int selected_purpose_id = 0;
@@ -41,6 +47,12 @@ public class SaveTripActivity extends Activity {
 	private LinearLayout tripButtons;
 	private EditText notesField;
 
+	private Intent recordingService;
+	private ServiceConnection recordingServiceConnection;
+	private RecordingService recordingServiceInterface;
+	private BroadcastReceiver recordingBroadcastReceiver;
+	private BroadcastReceiver locationBroadcastReceiver;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -48,12 +60,27 @@ public class SaveTripActivity extends Activity {
 
 		sendBroadcast(new Intent(RecordingService.NOTIFICATION_BROADCAST_ACTION_STOP));
 
-		Bundle cmds = getIntent().getExtras();
-		if (cmds == null) return;
+		recordingService = new Intent(this, RecordingService.class);
+		recordingServiceConnection = new ServiceConnection() {
+			@Override
+			public void onServiceConnected(ComponentName name, IBinder binder) {
+				Log.i(getClass().getName(), "onServiceConnected");
 
-		trip = TripData.fetchTrip(this, cmds.getLong("tripID"));
+				recordingServiceInterface = ((RecordingService.RecordingServiceBinder) binder).getService();
 
-		activity = this;
+				if (recordingServiceInterface.recordingState() != RecordingService.STATE_STOPPED)
+				{
+					recordingServiceInterface.stopRecording();
+				}
+
+				trip = recordingServiceInterface.trip;
+			}
+
+			@Override
+			public void onServiceDisconnected(ComponentName name) {
+				Log.i(getClass().getName(), "onServiceConnected");
+			}
+		};
 
 		// Set up trip purpose buttons
 		preparePurposeButtons();
@@ -66,35 +93,41 @@ public class SaveTripActivity extends Activity {
 		btnDiscard = (Button) findViewById(R.id.ButtonDiscard);
 		notesField = (EditText) findViewById(R.id.NotesField);
 
+
 		//if the users has not yet entered their profile information, require them to do so now
-		SharedPreferences settings = getSharedPreferences("PREFS", 0);
-		if (settings.getAll().size() >= 1) {
-			prefsButtonContainer.setVisibility(View.GONE);
-
-			btnDiscard.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View v) {
-					discardTrip();
-				}
-			});
-
-			btnSubmit.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View v) {
-					saveTrip();
-				}
-			});
-		} else {
-			tripButtons.setVisibility(View.GONE);
-
-			prefsButton.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View v) {
-					startActivity(new Intent(activity, UserInfoActivity.class));
-				}
-			});
-		}
+		SharedPreferences settings = getSharedPreferences(Common.PREFS_NAME, 0);
+		prefsButtonContainer.setVisibility(settings.getAll().size() >= 1 ? View.GONE : View.VISIBLE);
+		tripButtons.setVisibility(settings.getAll().size() >= 1 ? View.VISIBLE : View.GONE);
+		btnDiscard.setOnClickListener(buttonClickListener);
+		btnSubmit.setOnClickListener(buttonClickListener);
+		prefsButton.setOnClickListener(buttonClickListener);
 	}
 
-	// Set up the purpose buttons to be one-click only
-	void preparePurposeButtons() {
+	private final OnClickListener buttonClickListener = new OnClickListener()
+	{
+		public void onClick(View v) {
+			switch(v.getId())
+			{
+				case R.id.ButtonSubmit:
+					saveTrip();
+					break;
+				case R.id.ButtonDiscard:
+					discardTrip();
+					break;
+				case R.id.ButtonPrefs:
+					openPrefs();
+					break;
+			}
+		}
+	};
+
+	private void openPrefs()
+	{
+		startActivity(new Intent(this, UserInfoActivity.class));
+	}
+
+	private void preparePurposeButtons()
+	{
 		tripPurposes.add(new IconSpinnerAdapter.IconItem(0, "", 0));
 		tripPurposes.add(new IconSpinnerAdapter.IconItem((R.drawable.commute), getResources().getString(R.string.trip_purpose_commute), R.string.trip_purpose_commute));
 		tripPurposes.add(new IconSpinnerAdapter.IconItem((R.drawable.school), getResources().getString(R.string.trip_purpose_school), R.string.trip_purpose_school));
@@ -135,7 +168,8 @@ public class SaveTripActivity extends Activity {
 		});
 	}
 
-	private void saveTrip() {
+	private void saveTrip()
+	{
 		if (selected_purpose_id == 0) {
 			// Oh no!  No trip purpose!
 			Toast.makeText(getBaseContext(), getResources().getString(R.string.select_trip_purpose), Toast.LENGTH_SHORT).show();
@@ -165,7 +199,8 @@ public class SaveTripActivity extends Activity {
 		finish();
 	}
 
-	private void discardTrip() {
+	private void discardTrip()
+	{
 		discardTrip(false);
 	}
 
@@ -175,8 +210,20 @@ public class SaveTripActivity extends Activity {
 		), Toast.LENGTH_SHORT).show();
 
 		trip.dropTrip();
-
-		startActivity(new Intent(this, MainActivity.class));
 		finish();
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
+		Log.i(getClass().getName(), "onStart");
+		bindService(recordingService, recordingServiceConnection, Context.BIND_AUTO_CREATE);
+	}
+
+	@Override
+	public void onStop() {
+		Log.i(getClass().getName(), "onStop");
+		super.onStop();
+		unbindService(recordingServiceConnection);
 	}
 }

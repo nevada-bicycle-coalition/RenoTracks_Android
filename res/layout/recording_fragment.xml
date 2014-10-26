@@ -18,6 +18,7 @@
 			android:orientation="vertical"
 			android:gravity="center_horizontal">
 			<TextView
+			    android:id="@+id/elapsed_display"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:text="@string/zero_time"
@@ -36,6 +37,7 @@
 			android:orientation="vertical"
 			android:gravity="center_horizontal">
 			<TextView
+			    android:id="@+id/miles_display"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:text="@string/zero_decimal"
@@ -54,6 +56,7 @@
 			android:orientation="vertical"
 			android:gravity="center_horizontal">
 			<TextView
+			    android:id="@+id/mph_display"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:text="@string/zero_decimal"
@@ -101,6 +104,7 @@
 				android:orientation="vertical"
 				android:gravity="center_horizontal">
 				<TextView
+				    android:id="@+id/calories_display"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:text="@string/zero_decimal"
@@ -119,6 +123,7 @@
 				android:orientation="vertical"
 				android:gravity="center_horizontal">
 				<TextView
+				    android:id="@+id/co2_display"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:text="@string/zero_decimal"
@@ -149,7 +154,7 @@
 				android:layout_height="wrap_content"
 				android:contentDescription="@string/start"
 				android:src="@drawable/ic_action_record"/>
-			<ImageButton
+			<!-- <ImageButton
 				android:id="@+id/resume_recording"
 				style="?android:attr/buttonBarButtonStyle"
 				android:layout_width="0dp"
@@ -166,7 +171,7 @@
 				android:layout_height="wrap_content"
 				android:contentDescription="@string/pause"
 				android:src="@drawable/ic_action_pause"
-				android:visibility="gone"/>
+				android:visibility="gone"/> -->
 			<ImageButton
 				android:id="@+id/stop_recording"
 				style="?android:attr/buttonBarButtonStyle"

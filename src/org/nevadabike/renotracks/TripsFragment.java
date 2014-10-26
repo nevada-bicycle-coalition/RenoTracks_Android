@@ -16,7 +16,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
-import android.widget.Toast;
 
 public class TripsFragment extends Fragment
 {
@@ -47,11 +46,13 @@ public class TripsFragment extends Fragment
 		DbAdapter mDb = new DbAdapter(activity);
 		mDb.open();
 
+		/*
 		// Clean up any bad trips & coords from crashes
 		int cleanedTrips = mDb.cleanTables();
 		if (cleanedTrips > 0) {
 		    Toast.makeText(activity, cleanedTrips + getResources().getString(R.string.trips_removed), Toast.LENGTH_SHORT).show();
 		}
+		*/
 
 		try {
 			Cursor allTrips = mDb.fetchAllTrips();

@@ -1,6 +1,8 @@
 package org.nevadabike.renotracks;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -10,6 +12,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -19,6 +22,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -39,8 +43,8 @@ public class RecordingFragment extends Fragment {
 	private BroadcastReceiver locationBroadcastReceiver;
 
 	private ImageButton startButton;
-	private ImageButton resumeButton;
-	private ImageButton pauseButton;
+	//private ImageButton resumeButton;
+	//private ImageButton pauseButton;
 	private ImageButton stopButton;
 	private OnClickListener clickListener;
 
@@ -56,6 +60,21 @@ public class RecordingFragment extends Fragment {
 	final SimpleDateFormat sdf = new SimpleDateFormat("H:mm:ss");
 	private ImageButton markButton;
 	private BitmapDescriptor myLocationMarkerIcon;
+
+	Timer uiUpdateTimer;
+    final Handler uiUpdateHandler = new Handler();
+    final Runnable uiUpdateRunnable = new Runnable()
+    {
+        public void run()
+        {
+        	updateUI();
+        }
+    };
+	private TextView elapsed_display;
+	private TextView miles_display;
+	private TextView mph_display;
+	private TextView co2_display;
+	private TextView calories_display;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -119,12 +138,12 @@ public class RecordingFragment extends Fragment {
 					case R.id.start_recording:
 						startRecording();
 						break;
-					case R.id.resume_recording:
-						resumeRecording();
-						break;
-					case R.id.pause_recording:
-						pauseRecording();
-						break;
+					//case R.id.resume_recording:
+					//	resumeRecording();
+					//	break;
+					//case R.id.pause_recording:
+					//	pauseRecording();
+					//	break;
 					case R.id.stop_recording:
 						stopRecording();
 						break;
@@ -139,17 +158,23 @@ public class RecordingFragment extends Fragment {
 		startButton = (ImageButton) view.findViewById(R.id.start_recording);
 		startButton.setOnClickListener(clickListener);
 
-		resumeButton = (ImageButton) view.findViewById(R.id.resume_recording);
-		resumeButton.setOnClickListener(clickListener);
+		//resumeButton = (ImageButton) view.findViewById(R.id.resume_recording);
+		//resumeButton.setOnClickListener(clickListener);
 
-		pauseButton = (ImageButton) view.findViewById(R.id.pause_recording);
-		pauseButton.setOnClickListener(clickListener);
+		//pauseButton = (ImageButton) view.findViewById(R.id.pause_recording);
+		//pauseButton.setOnClickListener(clickListener);
 
 		stopButton = (ImageButton) view.findViewById(R.id.stop_recording);
 		stopButton.setOnClickListener(clickListener);
 
 		markButton = (ImageButton) view.findViewById(R.id.mark_button);
 		markButton.setOnClickListener(clickListener);
+
+		elapsed_display = (TextView) view.findViewById(R.id.elapsed_display);
+		miles_display = (TextView) view.findViewById(R.id.miles_display);
+		mph_display = (TextView) view.findViewById(R.id.mph_display);
+		co2_display = (TextView) view.findViewById(R.id.co2_display);
+		calories_display = (TextView) view.findViewById(R.id.calories_display);
 
 		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 
@@ -198,17 +223,54 @@ public class RecordingFragment extends Fragment {
 		Log.i(getClass().getName(), "updateUI");
 		Log.i(getClass().getName(), String.valueOf(recordingServiceInterface.recordingState()));
 
-		startButton.setVisibility(recordingServiceInterface.recordingState() == RecordingService.STATE_STOPPED ? View.VISIBLE : View.GONE);
-		resumeButton.setVisibility(recordingServiceInterface.recordingState() == RecordingService.STATE_PAUSED ? View.VISIBLE : View.GONE);
-		pauseButton.setVisibility(recordingServiceInterface.recordingState() == RecordingService.STATE_RECORDING ? View.VISIBLE : View.GONE);
-		stopButton.setVisibility(recordingServiceInterface.recordingState() != RecordingService.STATE_STOPPED ? View.VISIBLE : View.GONE);
+		if (recordingServiceInterface != null)
+		{
+			startButton.setVisibility(recordingServiceInterface.recordingState() == RecordingService.STATE_STOPPED ? View.VISIBLE : View.GONE);
+			//resumeButton.setVisibility(recordingServiceInterface.recordingState() == RecordingService.STATE_PAUSED ? View.VISIBLE : View.GONE);
+			//pauseButton.setVisibility(recordingServiceInterface.recordingState() == RecordingService.STATE_RECORDING ? View.VISIBLE : View.GONE);
+			stopButton.setVisibility(recordingServiceInterface.recordingState() != RecordingService.STATE_STOPPED ? View.VISIBLE : View.GONE);
+
+			int total_seconds = 0;
+			float distance = 0;
+			if (recordingServiceInterface.recordingState() != RecordingService.STATE_STOPPED)
+			{
+				total_seconds = Math.round((System.currentTimeMillis() - recordingServiceInterface.startTime)/1000);
+				distance = recordingServiceInterface.distanceTraveled;
+			}
+
+	        int seconds = total_seconds;
+			int minutes = (int) Math.floor(seconds/60);
+			seconds -= (minutes * 60);
+			int hours = (int) Math.floor(minutes/60);
+			minutes -= (hours * 60);
+
+			double total_miles =  Common.METER_TO_MILE * distance;
+
+			double speed = 0;
+			if (total_seconds > 0)
+			{
+				speed = total_miles / total_seconds * (60 * 60);
+			}
+
+			double calories = Common.distanceToCals(distance);
+			calories = Math.max(calories, 0);
+
+			double co2 = Common.distanceToCO2(distance);
+
+			elapsed_display.setText(String.format("%1$02d:%2$02d:%3$02d", hours, minutes, seconds));
+			miles_display.setText(String.format(" %1.1f", total_miles));
+			mph_display.setText(String.format("%1.1f", speed));
+			co2_display.setText(String.format("%.1f", co2));
+			calories_display.setText(String.format("%.1f", calories));
+		}
 	}
 
 	private void startRecording() {
-		recordingServiceInterface.startRecording(TripData.createTrip(activity));
+		recordingServiceInterface.startRecording();
 		//registerService();
 	}
 
+	/*
 	private void pauseRecording() {
 		recordingServiceInterface.pauseRecording();
 	}
@@ -216,22 +278,14 @@ public class RecordingFragment extends Fragment {
 	private void resumeRecording() {
 		recordingServiceInterface.resumeRecording();
 	}
+	*/
 
-	private void stopRecording() {
-		recordingServiceInterface.stopRecording();
-
-		// Handle pause time gracefully
-		//if (trip.pauseStartedAt> 0) {
-			//trip.totalPauseTime += (System.currentTimeMillis() - trip.pauseStartedAt);
-		//}
-		//if (trip.totalPauseTime > 0) {
-			//trip.endTime = System.currentTimeMillis() - trip.totalPauseTime;
-		//}
-		//trip.updateTrip("","","");
+	private void stopRecording()
+	{
+		//recordingServiceInterface.stopRecording();
 
 		Intent finishedActivity = new Intent(activity, SaveTripActivity.class);
-		finishedActivity.putExtra("tripID", recordingServiceInterface.trip.tripid);
-		activity.startActivity(finishedActivity);
+		startActivity(finishedActivity);
 	}
 
 	@Override
@@ -243,6 +297,8 @@ public class RecordingFragment extends Fragment {
 
 		registerService();
 		activity.bindService(recordingService, recordingServiceConnection, Context.BIND_AUTO_CREATE);
+
+		setupTimer();
 	}
 
 	@Override
@@ -256,11 +312,36 @@ public class RecordingFragment extends Fragment {
 
 		unregisterService();
 		activity.unbindService(recordingServiceConnection);
+
+		cancelTimer();
 	}
 
 	public void clearMap() {
 		if (activity != null && mapFragment != null) {
 			activity.getSupportFragmentManager().beginTransaction().remove(mapFragment).commit();
+		}
+	}
+
+	public void setupTimer()
+	{
+		cancelTimer();
+
+    	uiUpdateTimer = new Timer();
+    	uiUpdateTimer.schedule (new TimerTask()
+        {
+            @Override public void run()
+            {
+            	uiUpdateHandler.post(uiUpdateRunnable);
+            }
+        }, RecordingService.NOTIFICATION_UPDATE_INTERVAL, RecordingService.NOTIFICATION_UPDATE_INTERVAL);
+	}
+
+	private void cancelTimer()
+	{
+		if (uiUpdateTimer != null)
+		{
+			uiUpdateTimer.cancel();
+			uiUpdateTimer.purge();
 		}
 	}
 }

@@ -8,6 +8,8 @@ public class Common
 	public static final String API_URL = "http://rtstage.nevadabike.org/post/";
 	public static final String TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
+	public static final String PREFS_NAME = "PREFS";
+
 	public static final float METER_TO_MILE = 0.0006212f;
 
     public static String getDeviceId(ContentResolver contentResolver)

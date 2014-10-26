@@ -85,7 +85,7 @@ public class MainActivity extends FragmentActivity {
 		helpButton = findViewById(R.id.menu_help);
 		helpButton.setOnClickListener(menuClickListener);
 
-		selectMenu(MENU_MARKS);
+		selectMenu(MENU_RECORD);
 
 		SharedPreferences settings = getSharedPreferences(PREFS_KEY, 0);
 		if (settings.getAll().isEmpty())
