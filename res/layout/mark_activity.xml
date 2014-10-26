@@ -7,13 +7,30 @@
 	        android:layout_width="match_parent"
 	        android:layout_height="fill_parent"
 	        android:layout_above="@+id/save_buttons"
-	        android:orientation="vertical">
-		    <fragment
-				android:id="@+id/map"
-				android:name="com.google.android.gms.maps.SupportMapFragment"
+	        android:orientation="vertical"
+	        android:padding="@dimen/standard_padding">
+				 
+	        <LinearLayout
+	            style="@style/user_pref_group">
+	            
+	            <TextView
+	                style="@style/user_prefs_label"
+	                android:text="@string/select_mark_type"/>
+	            <Spinner
+	                android:id="@+id/mark_type"
+	                style="@style/user_prefs_spinner"
+	                android:entries="@array/ageArray"/>
+	        </LinearLayout>
+	        
+			<TextView
 				android:layout_width="match_parent"
-				android:layout_height="0dp"
-				android:layout_weight="1"/>
+				android:layout_height="wrap_content"
+				android:id="@+id/mark_purpose_description"
+				android:text="@string/marks_0_desc"
+				android:bufferType="spannable"
+				android:textSize="14sp"
+				android:lines="4"/>
+				 
 		   	<LinearLayout
 		   	    android:layout_width="match_parent"
 		   	    android:layout_height="0dp"
@@ -21,8 +38,7 @@
 		   	    <LinearLayout
 			   	    android:layout_width="0dp"
 			   	    android:layout_height="match_parent"
-			   	    android:layout_weight="1"
-			   	    android:padding="@dimen/standard_padding">
+			   	    android:layout_weight="1">
 					<ImageButton
 					    android:id="@+id/take_photo"
 					    style="?android:attr/buttonBarButtonStyle"
@@ -31,21 +47,29 @@
 			   	    	android:src="@drawable/ic_action_camera"
 			   	    	android:background="@drawable/bordered"/>
 				</LinearLayout>
-				<LinearLayout
+				<View android:layout_width="@dimen/standard_padding"
+				    android:layout_height="match_parent"/>
+				<RelativeLayout
 			   	    android:layout_width="0dp"
 			   	    android:layout_height="match_parent"
 			   	    android:layout_weight="1"
-			   	    android:orientation="vertical"
-			   	    android:gravity="center_vertical">
+			   	    android:orientation="vertical">
+					
 				    <TextView
-				        style="@style/user_prefs_label"
-				        android:layout_width="match_parent"
-				        android:text="@string/select_mark_type"/>
+				        android:id="@+id/additional_details"
+	                	style="@style/user_prefs_label"
+	                	android:layout_width="match_parent"
+	                	android:text="@string/additional_details"/>
 
-				    <Spinner
-				        android:id="@+id/mark_type"
-				        style="@style/user_prefs_spinner" />
-				</LinearLayout>
+					<EditText
+					    android:id="@+id/mark_note_input"
+					    android:layout_below="@+id/additional_details"
+					    android:layout_width="match_parent"
+					    android:layout_height="fill_parent"
+					    android:inputType="textMultiLine"
+					    android:gravity="top|left"/>
+				    
+				</RelativeLayout>
 		   	</LinearLayout>
 	   	</LinearLayout>
 	   	

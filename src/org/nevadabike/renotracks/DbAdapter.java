@@ -24,6 +24,7 @@ import android.util.Log;
  * SDK**
  */
 public class DbAdapter {
+	private static final String TAG = "DbAdapter";
     private static final int DATABASE_VERSION = 27;
 
     private static final String DATABASE_NAME = "data";
@@ -134,7 +135,7 @@ public class DbAdapter {
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            Log.w(getClass().getName(), "Upgrading database from version " + oldVersion + " to " + newVersion + ", which will destroy all old data");
+            Log.w(TAG, "Upgrading database from version " + oldVersion + " to " + newVersion + ", which will destroy all old data");
             db.execSQL("DROP TABLE IF EXISTS " + DATA_TABLE_TRIPS);
             db.execSQL("DROP TABLE IF EXISTS " + DATA_TABLE_COORDS);
             db.execSQL("DROP TABLE IF EXISTS " + DATA_TABLE_MARKS);
@@ -194,8 +195,8 @@ public class DbAdapter {
         rowValues.put(K_POINT_ALT, pt.altitude);
         rowValues.put(K_POINT_SPEED, pt.speed);
 
-        Log.i(getClass().getName(), pt.toString());
-        Log.i(getClass().getName(), rowValues.toString());
+        Log.i(TAG, pt.toString());
+        Log.i(TAG, rowValues.toString());
 
         success = success && (mDb.insert(DATA_TABLE_COORDS, null, rowValues) > 0);
 
@@ -273,13 +274,14 @@ public class DbAdapter {
         return mCursor;
     }
 
-    public boolean updateTrip(long tripid, String purp, double starttime, String fancystart, String fancyinfo, float distance) {
+    public boolean updateTrip(long tripid, String purp, double starttime, String fancystart, String fancyinfo, float distance, String note) {
         ContentValues initialValues = new ContentValues();
         initialValues.put(K_TRIP_PURP, purp);
         initialValues.put(K_TRIP_START, starttime);
         initialValues.put(K_TRIP_FANCYSTART, fancystart);
         initialValues.put(K_TRIP_FANCYINFO, fancyinfo);
         initialValues.put(K_TRIP_DISTANCE, distance);
+        initialValues.put(K_TRIP_NOTE, note);
 
         return mDb.update(DATA_TABLE_TRIPS, initialValues, K_TRIP_ROWID + "=" + tripid, null) > 0;
     }
@@ -313,7 +315,7 @@ public class DbAdapter {
                 K_TRIP_PURP, K_TRIP_START, K_TRIP_FANCYSTART, K_TRIP_NOTE, K_TRIP_FANCYINFO },
                 null, null, null, null, "-" + K_TRIP_START);
         if (c != null && c.getCount()>0) {
-        	Log.i(getClass().getName(), "at least 1");
+        	Log.i(TAG, "at least 1");
         	c.moveToFirst();
         }
         return c;
@@ -368,20 +370,37 @@ public class DbAdapter {
         initialValues.put(K_NOTE_DET, details);
         initialValues.put(K_NOTE_IMG, image_url);
 
-        Log.i(getClass().getName(), initialValues.toString());
+        Log.i(TAG, initialValues.toString());
 
         return mDb.insert(DATA_TABLE_MARKS, null, initialValues);
     }
 
     public Cursor fetchAllMarks() {
-        Cursor c = mDb.query(DATA_TABLE_MARKS, new String[] { K_NOTE_ROWID,
-        		K_NOTE_TRIP, K_NOTE_TIME, K_NOTE_PURP, K_NOTE_DET, K_NOTE_IMG },
-                null, null, null, null, "-" + K_NOTE_TIME);
-        if (c != null && c.getCount()>0) {
-        	Log.i(getClass().getName(), "at least 1");
-        	c.moveToFirst();
+        Cursor cursor = mDb.query(DATA_TABLE_MARKS, new String[] {
+        		K_NOTE_ROWID, K_NOTE_TRIP, K_NOTE_TIME, K_NOTE_LAT,
+           		K_NOTE_LGT, K_NOTE_ALT, K_NOTE_SPEED, K_NOTE_ACC,
+           		K_NOTE_PURP, K_NOTE_DET, K_NOTE_IMG
+        }, null, null, null, null, "-" + K_NOTE_TIME);
+
+        if (cursor != null) {
+        	cursor.moveToFirst();
         }
-        return c;
+
+        return cursor;
+    }
+
+    public Cursor fetchMark(long rowId) throws SQLException {
+        Cursor cursor = mDb.query(true, DATA_TABLE_MARKS, new String[] {
+       		K_NOTE_ROWID, K_NOTE_TRIP, K_NOTE_TIME, K_NOTE_LAT,
+       		K_NOTE_LGT, K_NOTE_ALT, K_NOTE_SPEED, K_NOTE_ACC,
+       		K_NOTE_PURP, K_NOTE_DET, K_NOTE_IMG
+        }, K_NOTE_ROWID + "=" + rowId, null, null, null, null, null);
+
+        if (cursor != null) {
+        	cursor.moveToFirst();
+        }
+
+        return cursor;
     }
 
 	public boolean deleteMark(long rowId) {

@@ -13,14 +13,22 @@
 	
 	<string-array name="ageArray">
 		<item></item>
-		<item>Less than 18</item>
-		<item>18–24</item>
-		<item>25–34</item>
-		<item>35–44</item>
-		<item>45–54</item>
-		<item>55–64</item>
-		<item>65+</item>
+		<item>@string/age_1</item>
+		<item>@string/age_2</item>
+		<item>@string/age_3</item>
+		<item>@string/age_4</item>
+		<item>@string/age_5</item>
+		<item>@string/age_6</item>
+		<item>@string/age_7</item>
 	</string-array>
+	
+	<string name="age_1">Less than 18</string>
+	<string name="age_2">18–24</string>
+	<string name="age_3">25–34</string>
+	<string name="age_4">35–44</string>
+	<string name="age_5">45–54</string>
+	<string name="age_6">55–64</string>
+	<string name="age_7">65+</string>
 	
 	<string-array name="ethnicityArray">
 		<item></item>
@@ -36,29 +44,46 @@
 	
 	<string-array name="incomeArray">
 		<item></item>
-		<item>Less than $20,000</item>
-		<item>$20,000 to $39,999</item>
-		<item>$40,000 to $59,999</item>
-		<item>$60,000 to $74,999</item>
-		<item>$75,000 to $99,999</item>
-		<item>$100,000 or greater</item>
+		<item>@string/income_1</item>
+		<item>@string/income_2</item>
+		<item>@string/income_3</item>
+		<item>@string/income_4</item>
+		<item>@string/income_5</item>
+		<item>@string/income_6</item>
 	</string-array>
+	
+	<string name="income_1">Less than $20,000</string>
+	<string name="income_2">$20,000 to $39,999</string>
+	<string name="income_3">$40,000 to $59,999</string>
+	<string name="income_4">$60,000 to $74,999</string>
+	<string name="income_5">$75,000 to $99,999</string>
+	<string name="income_6">$100,000 or greater</string>
 	
 	<string-array name="ridertypeArray">
 		<item></item>
-		<item><![CDATA[Strong & fearless]]></item>
-		<item><![CDATA[Enthused & confident]]></item>
-		<item>Comfortable, but cautious</item>
-		<item>Interested, but concerned</item>
+		<item>@string/ridertype_1</item>
+		<item>@string/ridertype_2</item>
+		<item>@string/ridertype_3</item>
+		<item>@string/ridertype_4</item>
 	</string-array>
+	
+	<string name="ridertype_1">Strong &amp; fearless</string>
+	<string name="ridertype_2">Enthused &amp; confident</string>
+	<string name="ridertype_3">Comfortable, but cautious</string>
+	<string name="ridertype_4">Interested, but concerned</string>
 	
 	<string-array name="riderhistoryArray">
 		<item></item>
-		<item>Since childhood</item>
-		<item>Several years</item>
-		<item>One year or less</item>
-		<item>Just trying it out / just started</item>
+		<item>@string/riderhistory_1</item>
+		<item>@string/riderhistory_2</item>
+		<item>@string/riderhistory_3</item>
+		<item>@string/riderhistory_4</item>
 	</string-array>
+	
+	<string name="riderhistory_1">Since childhood</string>
+	<string name="riderhistory_2">Several years</string>
+	<string name="riderhistory_3">One year or less</string>
+	<string name="riderhistory_4">Just trying it out / just started</string>
 	
 	<string name="prefs_welcome">Thanks for using Reno Tracks! Please enter your user details here. It\'s optional, anonymous, and will really help us understand different people\'s biking preferences.</string>
 	<string name="age">Age</string>
@@ -116,8 +141,6 @@
 	<string name="notification_subtitle">Tap to see your ongoing trip</string>
 	<string name="recording">Recording&#8230;</string>
 	<string name="still_recording">Still recording (%d min)</string>
-	
-	<string name="post_url">http://rtstage.nevadabike.org/post/</string>
 	
 	<string name="submitting">Submitting trip. Thanks for using Reno Tracks!</string>
 	<string name="submit_success">Trip uploaded successfully.</string>
@@ -211,21 +234,57 @@
     <string name="calories">calories</string>
     <string name="co2">CO2 saved</string>
     
-	<string name="marks_0">Pavement issue</string>
-	<string name="marks_1">Traffic signal</string>
-	<string name="marks_2">Enforcement</string>
-	<string name="marks_3">Rack Em Up - park now</string>
-	<string name="marks_4">Bike lane issue</string>
-	<string name="marks_5">Note this issue</string>
-	<string name="marks_6">Rack Em Up - park future</string>
-	<string name="marks_7">Bike shops</string>
-	<string name="marks_8">Public restrooms</string>
-	<string name="marks_9">Secret passage</string>
-	<string name="marks_10">Water fountain</string>
-	<string name="marks_11">Note this asset</string>
+    <string name="marks_no">Select Mark Type</string>
+    <string name="marks_no_desc">Anything about this spot?</string>
+    
+    <string name="marks_0">Note this asset</string>
+    <string name="marks_0_desc">Anything else we should map to help your fellow cyclists? Share the details.</string>
+    
+    <string name="marks_1">Water fountains</string>
+    <string name="marks_1_desc">Here’s a spot to fill your bottle on those hot summer days… stay hydrated, people. We need you.</string>
+    
+    <string name="marks_2">Secret passage</string>
+    <string name="marks_2_desc">Here\'s an access point under the tracks, through the park, onto a trail, or over a ravine.</string>
+    
+    <string name="marks_3">Public restrooms</string>
+    <string name="marks_3_desc">Help us make cycling mainstream… here’s a place to refresh yourself before you re-enter the fashionable world of Reno.</string>
+    
+    <string name="marks_4">Bike shops</string>
+    <string name="marks_4_desc">Have a flat, a broken chain, or spongy brakes? Or do you need a bike to jump into this world of cycling in the first place? Here\'s a shop ready to help.</string>
+    
+    <string name="marks_5">Rack Em Up</string>
+    <string name="marks_5_desc">Rack \'em Up! Park you bike here and remember to secure it well! Please only include racks or other objects intended for bikes.</string>
+    
+	<string name="marks_6">Pavement issue</string>
+	<string name="marks_6_desc">Here’s a spot where the road needs to be repaired (pothole, rough concrete, gravel in the road, manhole cover, sewer grate).</string>
 	
-	<string name="select_mark_type">Select Mark Type</string>
+	<string name="marks_7">Traffic signal</string>
+	<string name="marks_7_desc">Here’s a signal that you can’t activate with your bike.</string>
+	
+	<string name="marks_8">Enforcement</string>
+	<string name="marks_8_desc">The bike lane is always blocked here, cars disobey "no right on red"… anything where the cops can help make cycling safer.</string>
+	
+	<string name="marks_9">Rack Em Up</string>
+	<string name="marks_9_desc">Rack Em Up - future parking. You wish you had a bike rack at this spot to secure your bike.</string>
+	
+	<string name="marks_10">Bike lane issue</string>
+	<string name="marks_10_desc">Where the bike lane ends (abruptly) or is too narrow (pesky parked cars).</string>
+	
+	<string name="marks_11">Note this issue</string>
+	<string name="marks_11_desc">Anything else ripe for improvement: want a sharrow, a sign, a bike lane? Share the details.</string>
 	
 	<string name="mark_upload_error">There was an error uploading this mark. Please try again.</string>
 	<string name="take_mark_picture">Please take a picture of the mark.</string>
+	
+	<string name="select_mark_type">Select Mark Type</string>
+	
+	<string name="additional_details">Addtional Details</string>
+	
+	<string name="start_time">Start Time:</string>
+	<string name="avg_speed">Avg. Speed:</string>
+	<string name="est_cal">Estimated Calories Burned:</string>
+	<string name="c02_reduced">C02 Emission Reduced:</string>
+	<string name="notes">Notes:</string>
+	<string name="date">Date:</string>
+
 </resources>

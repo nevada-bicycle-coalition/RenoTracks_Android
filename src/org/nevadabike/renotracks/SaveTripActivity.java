@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -38,6 +39,7 @@ public class SaveTripActivity extends Activity {
 	private Button btnSubmit;
 	private Button btnDiscard;
 	private LinearLayout tripButtons;
+	private EditText notesField;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -62,6 +64,7 @@ public class SaveTripActivity extends Activity {
 		tripButtons = (LinearLayout) findViewById(R.id.trip_buttons);
 		btnSubmit = (Button) findViewById(R.id.ButtonSubmit);
 		btnDiscard = (Button) findViewById(R.id.ButtonDiscard);
+		notesField = (EditText) findViewById(R.id.NotesField);
 
 		//if the users has not yet entered their profile information, require them to do so now
 		SharedPreferences settings = getSharedPreferences("PREFS", 0);
@@ -148,10 +151,10 @@ public class SaveTripActivity extends Activity {
 		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 
 		String minutes = sdf.format(trip.endTime - trip.startTime);
-		String fancyEndInfo = String.format("%1.1f miles in %s minutes.", (0.0006212f * trip.distance), minutes);
+		String fancyEndInfo = String.format("%1.1f miles in %s minutes", (Common.METER_TO_MILE * trip.distance), minutes);
 
 		// Save the trip details to the phone database.
-		trip.updateTrip(getResources().getString(selected_purpose_id), fancyStartTime, fancyEndInfo);
+		trip.updateTrip(getResources().getString(selected_purpose_id), fancyStartTime, fancyEndInfo, notesField.getText().toString());
 		trip.updateTripStatus(TripData.STATUS_COMPLETE);
 
 		// And, show the map!

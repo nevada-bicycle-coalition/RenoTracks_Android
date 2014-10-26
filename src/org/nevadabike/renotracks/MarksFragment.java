@@ -6,8 +6,6 @@ import org.nevadabike.renotracks.Marks.Mark;
 import org.nevadabike.renotracks.Marks.MarksAdapter;
 
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.SQLException;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -21,19 +19,22 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
 
-public class MarksFragment extends Fragment {
+public class MarksFragment extends Fragment
+{
+	private static final String TAG = "MarksFragment";
     private View view;
 	private ListView listView;
 
-	//private final int marksCount = 20;
-	//private ArrayList<Mark> marks;
 	private FragmentActivity activity;
 
+	private final static int CONTEXT_RETRY = 0;
     private final static int CONTEXT_DELETE = 1;
+
     private ArrayList<Mark> marks;
 
 	@Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+	{
 		activity = getActivity();
 		view = inflater.inflate(R.layout.trips_fragment, container, false);
 
@@ -43,51 +44,34 @@ public class MarksFragment extends Fragment {
         return view;
     }
 
-	void populateList() {
-		// Get list from the real phone database. W00t!
-		DbAdapter mDb = new DbAdapter(activity);
+	void populateList()
+	{
+		marks = Marks.fetchMarks(activity);
 
-		marks = new ArrayList<Mark>();
+		MarksAdapter adapter = new MarksAdapter(activity, marks);
 
-		try {
-			mDb.open();
-			Cursor allTrips = mDb.fetchAllMarks();
-
-			allTrips.moveToFirst();
-			do {
-				int purpose = allTrips.getInt(allTrips.getColumnIndex(DbAdapter.K_NOTE_PURP));
-				double time = allTrips.getDouble(allTrips.getColumnIndex(DbAdapter.K_NOTE_TIME));
-				marks.add(new Mark(purpose, time));
-			} while(allTrips.moveToNext());
-
-			mDb.close();
-		} catch (SQLException sqle) {
-			// Do nothing, for now!
-		}
-
-		MarksAdapter adapter = new MarksAdapter(getActivity(), marks);
 		listView.setAdapter(adapter);
-
-
-
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 		    public void onItemClick(AdapterView<?> parent, View v, int pos, long id) {
 		        Intent i = new Intent(activity, ShowMark.class);
-		        i.putExtra("showtrip", id);
+		        i.putExtra("showtrip", marks.get(pos).rowId);
 		        startActivity(i);
 		    }
 		});
+
 		registerForContextMenu(listView);
 	}
 
 	@Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
+	{
 		super.onCreateContextMenu(menu, v, menuInfo);
 	    menu.add(0, CONTEXT_DELETE, 0,  getResources().getString(R.string.delete));
 	}
 
 	@Override
-	public boolean onContextItemSelected(MenuItem item) {
+	public boolean onContextItemSelected(MenuItem item)
+	{
 	    AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
 	    switch (item.getItemId()) {
 	    case CONTEXT_DELETE:
@@ -98,7 +82,8 @@ public class MarksFragment extends Fragment {
 	    }
 	}
 
-	private void deleteMark(long markID) {
+	private void deleteMark(long markID)
+	{
 	    DbAdapter mDbHelper = new DbAdapter(activity);
         mDbHelper.open();
         mDbHelper.deleteMark(markID);

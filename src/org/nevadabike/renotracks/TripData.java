@@ -20,6 +20,7 @@ public class TripData {
 	CyclePoint startpoint, endpoint;
 	double totalPauseTime = 0;
 	double pauseStartedAt = 0;
+	String note;
 
 	DbAdapter mDb;
 
@@ -65,14 +66,16 @@ public class TripData {
 	    mDb.openReadOnly();
 
 	    Cursor tripdetails = mDb.fetchTrip(tripid);
-	    startTime = tripdetails.getDouble(tripdetails.getColumnIndex("start"));
-	    status =  tripdetails.getInt(tripdetails.getColumnIndex("status"));
-	    endTime = tripdetails.getDouble(tripdetails.getColumnIndex("endtime"));
-        distance = tripdetails.getFloat(tripdetails.getColumnIndex("distance"));
 
-        purp = tripdetails.getString(tripdetails.getColumnIndex("purp"));
-        fancystart = tripdetails.getString(tripdetails.getColumnIndex("fancystart"));
-        info = tripdetails.getString(tripdetails.getColumnIndex("fancyinfo"));
+	    startTime = tripdetails.getDouble(tripdetails.getColumnIndex(DbAdapter.K_TRIP_START));
+	    status =  tripdetails.getInt(tripdetails.getColumnIndex(DbAdapter.K_TRIP_STATUS));
+	    endTime = tripdetails.getDouble(tripdetails.getColumnIndex(DbAdapter.K_TRIP_END));
+        distance = tripdetails.getFloat(tripdetails.getColumnIndex(DbAdapter.K_TRIP_DISTANCE));
+
+        purp = tripdetails.getString(tripdetails.getColumnIndex(DbAdapter.K_TRIP_PURP));
+        fancystart = tripdetails.getString(tripdetails.getColumnIndex(DbAdapter.K_TRIP_FANCYSTART));
+        info = tripdetails.getString(tripdetails.getColumnIndex(DbAdapter.K_TRIP_FANCYINFO));
+        note = tripdetails.getString(tripdetails.getColumnIndex(DbAdapter.K_TRIP_NOTE));
 
 	    tripdetails.close();
 
@@ -158,7 +161,7 @@ public class TripData {
 
         mDb.open();
         boolean rtn = mDb.addCoordToTrip(tripid, pt);
-        rtn = rtn && mDb.updateTrip(tripid, "", startTime, "", "", distance);
+        rtn = rtn && mDb.updateTrip(tripid, "", startTime, "", "", distance, "");
         mDb.close();
 
         return rtn;
@@ -180,11 +183,11 @@ public class TripData {
 		return rtn;
 	}
 
-	public void updateTrip() { updateTrip("","",""); }
-	public void updateTrip(String purpose, String fancyStart, String fancyInfo) {
+	public void updateTrip() { updateTrip("","","",""); }
+	public void updateTrip(String purpose, String fancyStart, String fancyInfo, String note) {
 		// Save the trip details to the phone database. W00t!
 		mDb.open();
-		mDb.updateTrip(tripid, purpose,	startTime, fancyStart, fancyInfo, distance);
+		mDb.updateTrip(tripid, purpose,	startTime, fancyStart, fancyInfo, distance, note);
 		mDb.close();
 	}
 }

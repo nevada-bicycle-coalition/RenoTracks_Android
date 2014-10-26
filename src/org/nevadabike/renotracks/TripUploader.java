@@ -26,7 +26,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.AsyncTask;
-import android.provider.Settings.System;
 import android.widget.Toast;
 
 public class TripUploader extends AsyncTask <Long, Integer, Boolean> {
@@ -142,18 +141,14 @@ public class TripUploader extends AsyncTask <Long, Integer, Boolean> {
         mDb.openReadOnly();
         Cursor tripCursor = mDb.fetchTrip(tripId);
 
-        String note = tripCursor.getString(tripCursor
-                .getColumnIndex(DbAdapter.K_TRIP_NOTE));
-        String purpose = tripCursor.getString(tripCursor
-                .getColumnIndex(DbAdapter.K_TRIP_PURP));
-        Double startTime = tripCursor.getDouble(tripCursor
-                .getColumnIndex(DbAdapter.K_TRIP_START));
-        Double endTime = tripCursor.getDouble(tripCursor
-                .getColumnIndex(DbAdapter.K_TRIP_END));
+        String note = tripCursor.getString(tripCursor.getColumnIndex(DbAdapter.K_TRIP_NOTE));
+        String purpose = tripCursor.getString(tripCursor.getColumnIndex(DbAdapter.K_TRIP_PURP));
+        Double startTime = tripCursor.getDouble(tripCursor.getColumnIndex(DbAdapter.K_TRIP_START));
+        Double endTime = tripCursor.getDouble(tripCursor.getColumnIndex(DbAdapter.K_TRIP_END));
         tripCursor.close();
         mDb.close();
 
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat df = new SimpleDateFormat(Common.TIMESTAMP_FORMAT);
         tripData.add(note);
         tripData.add(purpose);
         tripData.add(df.format(startTime));
@@ -162,23 +157,10 @@ public class TripUploader extends AsyncTask <Long, Integer, Boolean> {
         return tripData;
     }
 
-    public String getDeviceId() {
-        String androidId = System.getString(this.mCtx.getContentResolver(),
-                System.ANDROID_ID);
-        String androidBase = "androidDeviceId-";
-
-        if (androidId == null) { // This happens when running in the Emulator
-            final String emulatorId = "android-RunningAsTestingDeleteMe";
-            return emulatorId;
-        }
-        String deviceId = androidBase.concat(androidId);
-        return deviceId;
-    }
-
     private List<NameValuePair> getPostData(long tripId) throws JSONException {
         JSONObject coords = getCoordsJSON(tripId);
         JSONObject user = getUserJSON();
-        String deviceId = getDeviceId();
+        String deviceId = Common.getDeviceId(mCtx.getContentResolver());
         Vector<String> tripData = getTripData(tripId);
         String notes = tripData.get(0);
         String purpose = tripData.get(1);
@@ -239,7 +221,7 @@ public class TripUploader extends AsyncTask <Long, Integer, Boolean> {
 
         HttpClient client = new DefaultHttpClient();
         //TODO: Server URL
-        final String postUrl = mCtx.getResources().getString(R.string.post_url);
+        final String postUrl = Common.API_URL;
         HttpPost postRequest = new HttpPost(postUrl);
 
         try {

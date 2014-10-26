@@ -18,31 +18,31 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class TripsFragment extends Fragment {
+public class TripsFragment extends Fragment
+{
+	private static final String TAG = "TripsFragment";
     private View view;
 	private ListView listView;
 
-	//private final int tripsCount = 20;
-	//private ArrayList<Trip> trips;
 	private FragmentActivity activity;
 
 	private final static int CONTEXT_RETRY = 0;
     private final static int CONTEXT_DELETE = 1;
 
 	@Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    {
 		activity = getActivity();
 		view = inflater.inflate(R.layout.trips_fragment, container, false);
 
 		listView = (ListView) view.findViewById(R.id.listView1);
 		populateList();
 
-		//listView.setAdapter(adapter);
-
         return view;
     }
 
-	void populateList() {
+	void populateList()
+	{
 		// Get list from the real phone database. W00t!
 		DbAdapter mDb = new DbAdapter(activity);
 		mDb.open();
@@ -66,18 +66,18 @@ public class TripsFragment extends Fragment {
 
 			/*
 			int numtrips = allTrips.getCount();
-			switch (numtrips) {
-			case 0:
-				counter.setText(getResources().getString(R.string.saved_trips_0));
-				break;
-			case 1:
-				counter.setText(getResources().getString(R.string.saved_trips_1));
-				break;
-			default:
-				counter.setText(numtrips + getResources().getString(R.string.saved_trips_X));
+			switch (numtrips)
+			{
+				case 0:
+					counter.setText(getResources().getString(R.string.saved_trips_0));
+					break;
+				case 1:
+					counter.setText(getResources().getString(R.string.saved_trips_1));
+					break;
+				default:
+					counter.setText(numtrips + getResources().getString(R.string.saved_trips_X));
 			}
 			*/
-			// allTrips.close();
 		} catch (SQLException sqle) {
 			// Do nothing, for now!
 		}
