@@ -58,8 +58,6 @@ public class SaveTripActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.save);
 
-		sendBroadcast(new Intent(RecordingService.NOTIFICATION_BROADCAST_ACTION_STOP));
-
 		recordingService = new Intent(this, RecordingService.class);
 		recordingServiceConnection = new ServiceConnection() {
 			@Override
