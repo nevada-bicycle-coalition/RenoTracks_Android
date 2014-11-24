@@ -25,14 +25,14 @@
 		    android:layout_width="match_parent"
 		    android:layout_height="wrap_content"
 		    android:text="@string/zero_distance"
-		    android:textColor="@android:color/primary_text_dark" />
+		    android:textColor="@android:color/primary_text_light" />
 		<TextView
 			android:id="@+id/notification_time_display"
 			android:textAppearance="?android:attr/textAppearanceSmall"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:text="@string/zero_time"
-			android:textColor="@android:color/primary_text_dark" />
+			android:textColor="@android:color/primary_text_light" />
 
 	</LinearLayout>
 	<LinearLayout
@@ -44,7 +44,7 @@
 		<ImageButton
 		    android:id="@+id/notification_stop"
 		    style="?android:attr/buttonBarButtonStyle"
-		    android:src="@drawable/ic_action_stop"
+		    android:src="@drawable/ic_dark_action_stop"
 		    android:layout_width="wrap_content"
 	        android:layout_height="match_parent"/>
     </LinearLayout>

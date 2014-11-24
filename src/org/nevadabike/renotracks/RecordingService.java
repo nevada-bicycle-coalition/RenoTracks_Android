@@ -134,7 +134,7 @@ public class RecordingService extends Service implements
 
 		notificationBuilder = new NotificationCompat.Builder(this)
 			.setContentTitle(getResources().getString(R.string.recording))
-			.setSmallIcon(R.drawable.ic_notification)
+			.setSmallIcon(R.drawable.bike)
 			.setOngoing(true)
 			.setContentIntent(pendingNotificationIntent)
 			.setContent(notificationView);
